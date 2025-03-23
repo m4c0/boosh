@@ -11,6 +11,7 @@ using vtx = dotz::vec4;
 void map_buf(voo::h2l_buffer & buf) {
   unsigned c {};
   voo::memiter<vtx> m { buf.host_memory(), &c };
+  m += vtx { 0, 0, 0, 1 };
 }
 
 struct : public vapp {
@@ -29,11 +30,18 @@ struct : public vapp {
           voo::shader("poc.vert.spv").pipeline_vert_stage(),
           voo::shader("poc.frag.spv").pipeline_frag_stage(),
         },
-        .bindings { quad.vertex_input_bind() },
-        .attributes { quad.vertex_attribute(0) },
+        .bindings {
+          quad.vertex_input_bind(),
+          vee::vertex_input_bind_per_instance(sizeof(vtx)),
+        },
+        .attributes {
+          quad.vertex_attribute(0),
+          vee::vertex_attribute_vec4(1, 0),
+        },
       });
 
       ots_loop(dq, sw, [&](auto cb) {
+        buf.setup_copy(cb);
         voo::cmd_render_pass rp {{
           .command_buffer = cb,
           .render_pass = dq.render_pass(),
@@ -42,6 +50,7 @@ struct : public vapp {
         }};
         vee::cmd_set_viewport(cb, sw.extent());
         vee::cmd_set_scissor(cb, sw.extent());
+        vee::cmd_bind_vertex_buffers(cb, 1, buf.local_buffer());
         vee::cmd_bind_gr_pipeline(cb, *gp);
         quad.run(cb, 0, 1);
       });
