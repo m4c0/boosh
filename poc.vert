@@ -1,8 +1,7 @@
 #version 450
 
-layout(location = 0) in vec2 pos;
-layout(location = 1) in vec4 wpos;
+layout(location = 0) in vec4 pos;
 
 void main() {
-  gl_Position = vec4(pos, 0, 1);
+  gl_Position = pos;
 }
