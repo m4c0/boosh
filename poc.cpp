@@ -11,13 +11,13 @@ using vtx = dotz::vec4;
 void map_buf(voo::h2l_buffer & buf) {
   unsigned c {};
   voo::memiter<vtx> m { buf.host_memory(), &c };
-  m += vtx { 0, 0, 0, 1 };
-  m += vtx { 1, 1, 0, 1 };
-  m += vtx { 1, 0, 0, 1 };
+  m += vtx { 0, 0, -1, 1 };
+  m += vtx { 1, 1, -1, 1 };
+  m += vtx { 1, 0, -1, 1 };
 
-  m += vtx { 1, 1, 0, 1 };
-  m += vtx { 0, 0, 0, 1 };
-  m += vtx { 0, 1, 0, 1 };
+  m += vtx { 1, 1, -1, 1 };
+  m += vtx { 0, 0, -1, 1 };
+  m += vtx { 0, 1, -1, 1 };
 }
 
 struct : public vapp {
