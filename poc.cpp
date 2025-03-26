@@ -11,35 +11,35 @@ using vtx = dotz::vec4;
 unsigned g_count {};
 void map_buf(voo::h2l_buffer & buf) {
   voo::memiter<vtx> m { buf.host_memory(), &g_count };
-  m += vtx { -1.f, -1.f, 0.9f, 1.f };
-  m += vtx { +1.f, +1.f, 0.9f, 1.f };
-  m += vtx { +1.f, -1.f, 0.9f, 1.f };
+  //m += vtx { -1.f, -1.f, 0.9f, 1.f };
+  //m += vtx { +1.f, +1.f, 0.9f, 1.f };
+  //m += vtx { +1.f, -1.f, 0.9f, 1.f };
 
   m += vtx { -1.f, -1.f, -9.9f, 1.f };
   m += vtx { +1.f, +1.f, -9.9f, 1.f };
   m += vtx { +1.f, -1.f, -9.9f, 1.f };
 
-  m += vtx { -1, -1, -1, 1 };
-  m += vtx { +1, -1, +1, 1 };
-  m += vtx { +1, -1, -1, 1 };
+  m += vtx { -10, -1, -10, 1 };
+  m += vtx { +10, -1, +10, 1 };
+  m += vtx { +10, -1, -10, 1 };
 
-  m += vtx { +1, -1, +1, 1 };
-  m += vtx { -1, -1, -1, 1 };
-  m += vtx { -1, -1, +1, 1 };
+  m += vtx { +10, -1, +10, 1 };
+  m += vtx { -10, -1, -10, 1 };
+  m += vtx { -10, -1, +10, 1 };
 
-  m += vtx { -1, +1, -1, 1 };
-  m += vtx { +1, +1, +1, 1 };
-  m += vtx { +1, +1, -1, 1 };
+  m += vtx { -10, +1, -10, 1 };
+  m += vtx { +10, +1, +10, 1 };
+  m += vtx { +10, +1, -10, 1 };
 
-  m += vtx { +1, +1, +1, 1 };
-  m += vtx { -1, +1, -1, 1 };
-  m += vtx { -1, +1, +1, 1 };
+  m += vtx { +10, +1, +10, 1 };
+  m += vtx { -10, +1, -10, 1 };
+  m += vtx { -10, +1, +10, 1 };
 }
 
 struct : public vapp {
   void run() {
     main_loop("poc-voo", [&](auto & dq, auto & sw) {
-      voo::h2l_buffer buf { dq.physical_device(), sizeof(vtx) * 16 };
+      voo::h2l_buffer buf { dq.physical_device(), sizeof(vtx) * 128 };
       map_buf(buf);
 
       auto pl = vee::create_pipeline_layout();
