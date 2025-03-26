@@ -11,21 +11,29 @@ using vtx = dotz::vec4;
 unsigned g_count {};
 void map_buf(voo::h2l_buffer & buf) {
   voo::memiter<vtx> m { buf.host_memory(), &g_count };
-  m += vtx {   0, -1,   0, 1 };
-  m += vtx { 100, -1, 100, 1 };
-  m += vtx { 100, -1,   0, 1 };
+  m += vtx { -1.f, -1.f, 0.9f, 1.f };
+  m += vtx { +1.f, +1.f, 0.9f, 1.f };
+  m += vtx { +1.f, -1.f, 0.9f, 1.f };
 
-  m += vtx { 100, -1, 100, 1 };
-  m += vtx {   0, -1,   0, 1 };
-  m += vtx {   0, -1, 100, 1 };
+  m += vtx { -1.f, -1.f, -9.9f, 1.f };
+  m += vtx { +1.f, +1.f, -9.9f, 1.f };
+  m += vtx { +1.f, -1.f, -9.9f, 1.f };
 
-  m += vtx {   0, +1,   0, 1 };
-  m += vtx { 100, +1, 100, 1 };
-  m += vtx { 100, +1,   0, 1 };
+  m += vtx { -1, -1, -1, 1 };
+  m += vtx { +1, -1, +1, 1 };
+  m += vtx { +1, -1, -1, 1 };
 
-  m += vtx { 100, +1, 100, 1 };
-  m += vtx {   0, +1,   0, 1 };
-  m += vtx {   0, +1, 100, 1 };
+  m += vtx { +1, -1, +1, 1 };
+  m += vtx { -1, -1, -1, 1 };
+  m += vtx { -1, -1, +1, 1 };
+
+  m += vtx { -1, +1, -1, 1 };
+  m += vtx { +1, +1, +1, 1 };
+  m += vtx { +1, +1, -1, 1 };
+
+  m += vtx { +1, +1, +1, 1 };
+  m += vtx { -1, +1, -1, 1 };
+  m += vtx { -1, +1, +1, 1 };
 }
 
 struct : public vapp {
@@ -38,6 +46,7 @@ struct : public vapp {
       auto gp = vee::create_graphics_pipeline({
         .pipeline_layout = *pl,
         .render_pass = dq.render_pass(),
+        .back_face_cull = false,
         .shaders {
           voo::shader("poc.vert.spv").pipeline_vert_stage(),
           voo::shader("poc.frag.spv").pipeline_frag_stage(),
