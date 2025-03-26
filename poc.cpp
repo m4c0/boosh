@@ -8,16 +8,24 @@ import vapp;
 
 using vtx = dotz::vec4;
 
+unsigned g_count {};
 void map_buf(voo::h2l_buffer & buf) {
-  unsigned c {};
-  voo::memiter<vtx> m { buf.host_memory(), &c };
-  m += vtx { 0, 0, -1, 1 };
-  m += vtx { 1, 1, -1, 1 };
-  m += vtx { 1, 0, -1, 1 };
+  voo::memiter<vtx> m { buf.host_memory(), &g_count };
+  m += vtx {   0, -1,   0, 1 };
+  m += vtx { 100, -1, 100, 1 };
+  m += vtx { 100, -1,   0, 1 };
 
-  m += vtx { 1, 1, -1, 1 };
-  m += vtx { 0, 0, -1, 1 };
-  m += vtx { 0, 1, -1, 1 };
+  m += vtx { 100, -1, 100, 1 };
+  m += vtx {   0, -1,   0, 1 };
+  m += vtx {   0, -1, 100, 1 };
+
+  m += vtx {   0, +1,   0, 1 };
+  m += vtx { 100, +1, 100, 1 };
+  m += vtx { 100, +1,   0, 1 };
+
+  m += vtx { 100, +1, 100, 1 };
+  m += vtx {   0, +1,   0, 1 };
+  m += vtx {   0, +1, 100, 1 };
 }
 
 struct : public vapp {
@@ -59,7 +67,7 @@ struct : public vapp {
         vee::cmd_set_scissor(cb, sw.extent());
         vee::cmd_bind_vertex_buffers(cb, 0, buf.local_buffer());
         vee::cmd_bind_gr_pipeline(cb, *gp);
-        vee::cmd_draw(cb, 6);
+        vee::cmd_draw(cb, g_count);
       });
     });
   }
