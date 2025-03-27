@@ -6,34 +6,32 @@ import dotz;
 import voo;
 import vapp;
 
-using vtx = dotz::vec3;
+struct vtx {
+  dotz::vec3 pos;
+};
 
 unsigned g_count {};
 void map_buf(voo::h2l_buffer & buf) {
   voo::memiter<vtx> m { buf.host_memory(), &g_count };
-  //m += vtx { -1.f, -1.f, 0.9f, 1.f };
-  //m += vtx { +1.f, +1.f, 0.9f, 1.f };
-  //m += vtx { +1.f, -1.f, 0.9f, 1.f };
+  m += vtx { .pos = { -1.f, -1.f, -9.9f } };
+  m += vtx { .pos = { +1.f, +1.f, -9.9f } };
+  m += vtx { .pos = { +1.f, -1.f, -9.9f } };
 
-  m += vtx { -1.f, -1.f, -9.9f };
-  m += vtx { +1.f, +1.f, -9.9f };
-  m += vtx { +1.f, -1.f, -9.9f };
+  m += vtx { .pos = { -10, -1, -10 } };
+  m += vtx { .pos = { +10, -1, +10 } };
+  m += vtx { .pos = { +10, -1, -10 } };
 
-  m += vtx { -10, -1, -10 };
-  m += vtx { +10, -1, +10 };
-  m += vtx { +10, -1, -10 };
+  m += vtx { .pos = { +10, -1, +10 } };
+  m += vtx { .pos = { -10, -1, -10 } };
+  m += vtx { .pos = { -10, -1, +10 } };
 
-  m += vtx { +10, -1, +10 };
-  m += vtx { -10, -1, -10 };
-  m += vtx { -10, -1, +10 };
+  m += vtx { .pos = { -10, +1, -10 } };
+  m += vtx { .pos = { +10, +1, +10 } };
+  m += vtx { .pos = { +10, +1, -10 } };
 
-  m += vtx { -10, +1, -10 };
-  m += vtx { +10, +1, +10 };
-  m += vtx { +10, +1, -10 };
-
-  m += vtx { +10, +1, +10 };
-  m += vtx { -10, +1, -10 };
-  m += vtx { -10, +1, +10 };
+  m += vtx { .pos = { +10, +1, +10 } };
+  m += vtx { .pos = { -10, +1, -10 } };
+  m += vtx { .pos = { -10, +1, +10 } };
 }
 
 struct : public vapp {
