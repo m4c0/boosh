@@ -3,35 +3,37 @@
 #pragma leco add_shader "poc.frag"
 
 import dotz;
+import traits;
 import voo;
 import vapp;
 
 struct vtx {
   dotz::vec3 pos;
+  dotz::vec2 uv;
 };
 
 unsigned g_count {};
 void map_buf(voo::h2l_buffer & buf) {
   voo::memiter<vtx> m { buf.host_memory(), &g_count };
-  m += vtx { .pos = { -1.f, -1.f, -9.9f } };
-  m += vtx { .pos = { +1.f, +1.f, -9.9f } };
-  m += vtx { .pos = { +1.f, -1.f, -9.9f } };
+  m += vtx { .pos = { -1.f, -1.f, -9.9f }, .uv = { 0, 0 } };
+  m += vtx { .pos = { +1.f, +1.f, -9.9f }, .uv = { 1, 1 } };
+  m += vtx { .pos = { +1.f, -1.f, -9.9f }, .uv = { 1, 0 } };
 
-  m += vtx { .pos = { -10, -1, -10 } };
-  m += vtx { .pos = { +10, -1, +10 } };
-  m += vtx { .pos = { +10, -1, -10 } };
+  m += vtx { .pos = { -10, -1, -10 }, .uv = { 0, 0 } };
+  m += vtx { .pos = { +10, -1, +10 }, .uv = { 1, 1 } };
+  m += vtx { .pos = { +10, -1, -10 }, .uv = { 1, 0 } };
 
-  m += vtx { .pos = { +10, -1, +10 } };
-  m += vtx { .pos = { -10, -1, -10 } };
-  m += vtx { .pos = { -10, -1, +10 } };
+  m += vtx { .pos = { +10, -1, +10 }, .uv = { 1, 1 } };
+  m += vtx { .pos = { -10, -1, -10 }, .uv = { 0, 0 } };
+  m += vtx { .pos = { -10, -1, +10 }, .uv = { 0, 1 } };
 
-  m += vtx { .pos = { -10, +1, -10 } };
-  m += vtx { .pos = { +10, +1, +10 } };
-  m += vtx { .pos = { +10, +1, -10 } };
+  m += vtx { .pos = { -10, +1, -10 }, .uv = { 0, 0 } };
+  m += vtx { .pos = { +10, +1, +10 }, .uv = { 1, 1 } };
+  m += vtx { .pos = { +10, +1, -10 }, .uv = { 1, 0 } };
 
-  m += vtx { .pos = { +10, +1, +10 } };
-  m += vtx { .pos = { -10, +1, -10 } };
-  m += vtx { .pos = { -10, +1, +10 } };
+  m += vtx { .pos = { +10, +1, +10 }, .uv = { 1, 1 } };
+  m += vtx { .pos = { -10, +1, -10 }, .uv = { 0, 0 } };
+  m += vtx { .pos = { -10, +1, +10 }, .uv = { 0, 1 } };
 }
 
 struct : public vapp {
@@ -53,7 +55,8 @@ struct : public vapp {
           vee::vertex_input_bind(sizeof(vtx)),
         },
         .attributes {
-          vee::vertex_attribute_vec4(0, 0),
+          vee::vertex_attribute_vec3(0, traits::offset_of(&vtx::pos)),
+          vee::vertex_attribute_vec2(0, traits::offset_of(&vtx::uv)),
         },
       });
 
