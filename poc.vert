@@ -1,6 +1,6 @@
 #version 450
 
-layout(location = 0) in vec4 pos;
+layout(location = 0) in vec3 pos;
 
 const float fov_rad = radians(90);
 const float aspect = 1;
@@ -32,5 +32,5 @@ void main() {
     vec4(0, 0, 0, 1)
   );
 
-  gl_Position = pos * view * proj;
+  gl_Position = vec4(pos, 1) * view * proj;
 }

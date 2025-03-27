@@ -6,7 +6,7 @@ import dotz;
 import voo;
 import vapp;
 
-using vtx = dotz::vec4;
+using vtx = dotz::vec3;
 
 unsigned g_count {};
 void map_buf(voo::h2l_buffer & buf) {
@@ -15,25 +15,25 @@ void map_buf(voo::h2l_buffer & buf) {
   //m += vtx { +1.f, +1.f, 0.9f, 1.f };
   //m += vtx { +1.f, -1.f, 0.9f, 1.f };
 
-  m += vtx { -1.f, -1.f, -9.9f, 1.f };
-  m += vtx { +1.f, +1.f, -9.9f, 1.f };
-  m += vtx { +1.f, -1.f, -9.9f, 1.f };
+  m += vtx { -1.f, -1.f, -9.9f };
+  m += vtx { +1.f, +1.f, -9.9f };
+  m += vtx { +1.f, -1.f, -9.9f };
 
-  m += vtx { -10, -1, -10, 1 };
-  m += vtx { +10, -1, +10, 1 };
-  m += vtx { +10, -1, -10, 1 };
+  m += vtx { -10, -1, -10 };
+  m += vtx { +10, -1, +10 };
+  m += vtx { +10, -1, -10 };
 
-  m += vtx { +10, -1, +10, 1 };
-  m += vtx { -10, -1, -10, 1 };
-  m += vtx { -10, -1, +10, 1 };
+  m += vtx { +10, -1, +10 };
+  m += vtx { -10, -1, -10 };
+  m += vtx { -10, -1, +10 };
 
-  m += vtx { -10, +1, -10, 1 };
-  m += vtx { +10, +1, +10, 1 };
-  m += vtx { +10, +1, -10, 1 };
+  m += vtx { -10, +1, -10 };
+  m += vtx { +10, +1, +10 };
+  m += vtx { +10, +1, -10 };
 
-  m += vtx { +10, +1, +10, 1 };
-  m += vtx { -10, +1, -10, 1 };
-  m += vtx { -10, +1, +10, 1 };
+  m += vtx { +10, +1, +10 };
+  m += vtx { -10, +1, -10 };
+  m += vtx { -10, +1, +10 };
 }
 
 struct : public vapp {
