@@ -7,46 +7,44 @@ import traits;
 import voo;
 import vapp;
 
+static constexpr const auto max_vertices = 10240;
+
 struct vtx {
   dotz::vec3 pos;
   dotz::vec2 uv;
 };
 
-unsigned g_count {};
-void map_buf(voo::h2l_buffer & buf) {
+static unsigned g_count {};
+static void map_buf(voo::h2l_buffer & buf) {
   voo::memiter<vtx> m { buf.host_memory(), &g_count };
-  m += vtx { .pos = { -1.f, -1.f, -9.9f }, .uv = { 0, 0 } };
-  m += vtx { .pos = { +1.f, +1.f, -9.9f }, .uv = { 1, 1 } };
-  m += vtx { .pos = { +1.f, -1.f, -9.9f }, .uv = { 1, 0 } };
 
-  m += vtx { .pos = { -10, -1, -10 }, .uv = { 0, 0 } };
-  m += vtx { .pos = { +10, -1, +10 }, .uv = { 1, 1 } };
+  m += vtx { .pos = { -10, +1, -10 }, .uv = { 0, 1 } };
+  m += vtx { .pos = { +10, +1, -10 }, .uv = { 0, 1 } };
+  m += vtx { .pos = { +10, +1, +10 }, .uv = { 0, 1 } };
+
+  m += vtx { .pos = { +10, +1, +10 }, .uv = { 0, 1 } };
+  m += vtx { .pos = { -10, +1, +10 }, .uv = { 0, 1 } };
+  m += vtx { .pos = { -10, +1, -10 }, .uv = { 0, 1 } };
+
+  m += vtx { .pos = { -10, -1, -10 }, .uv = { 1, 0 } };
+  m += vtx { .pos = { +10, -1, +10 }, .uv = { 1, 0 } };
   m += vtx { .pos = { +10, -1, -10 }, .uv = { 1, 0 } };
 
-  m += vtx { .pos = { +10, -1, +10 }, .uv = { 1, 1 } };
-  m += vtx { .pos = { -10, -1, -10 }, .uv = { 0, 0 } };
-  m += vtx { .pos = { -10, -1, +10 }, .uv = { 0, 1 } };
-
-  m += vtx { .pos = { -10, +1, -10 }, .uv = { 0, 0 } };
-  m += vtx { .pos = { +10, +1, +10 }, .uv = { 1, 1 } };
-  m += vtx { .pos = { +10, +1, -10 }, .uv = { 1, 0 } };
-
-  m += vtx { .pos = { +10, +1, +10 }, .uv = { 1, 1 } };
-  m += vtx { .pos = { -10, +1, -10 }, .uv = { 0, 0 } };
-  m += vtx { .pos = { -10, +1, +10 }, .uv = { 0, 1 } };
+  m += vtx { .pos = { +10, -1, +10 }, .uv = { 1, 0 } };
+  m += vtx { .pos = { -10, -1, -10 }, .uv = { 1, 0 } };
+  m += vtx { .pos = { -10, -1, +10 }, .uv = { 1, 0 } };
 }
 
 struct : public vapp {
   void run() {
     main_loop("poc-voo", [&](auto & dq, auto & sw) {
-      voo::h2l_buffer buf { dq.physical_device(), sizeof(vtx) * 128 };
+      voo::h2l_buffer buf { dq.physical_device(), sizeof(vtx) * max_vertices };
       map_buf(buf);
 
       auto pl = vee::create_pipeline_layout();
       auto gp = vee::create_graphics_pipeline({
         .pipeline_layout = *pl,
         .render_pass = dq.render_pass(),
-        .back_face_cull = false,
         .shaders {
           voo::shader("poc.vert.spv").pipeline_vert_stage(),
           voo::shader("poc.frag.spv").pipeline_frag_stage(),

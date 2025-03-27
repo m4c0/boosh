@@ -35,6 +35,6 @@ void main() {
     vec4(0, 0, 0, 1)
   );
 
-  gl_Position = vec4(pos, 1) * view * proj;
+  gl_Position = vec4(pos.x, -pos.y, pos.z, 1) * view * proj;
   f_uv = uv;
 }
