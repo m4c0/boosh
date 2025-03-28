@@ -3,6 +3,7 @@
 #pragma leco add_shader "poc.frag"
 
 import dotz;
+import input;
 import traits;
 import voo;
 import vapp;
@@ -85,6 +86,8 @@ static void map_buf(voo::h2l_buffer & buf) {
 
 struct : public vapp {
   void run() {
+    input::setup();
+
     main_loop("poc-voo", [&](auto & dq, auto & sw) {
       voo::h2l_buffer buf { dq.physical_device(), sizeof(vtx) * max_vertices };
       map_buf(buf);
