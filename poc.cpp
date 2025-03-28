@@ -1,6 +1,9 @@
 #pragma leco app
 #pragma leco add_shader "poc.vert"
 #pragma leco add_shader "poc.frag"
+#pragma leco add_resource "Tiles040_1K-JPG_Color.jpg"
+#pragma leco add_resource "Tiles051_1K-JPG_Color.jpg"
+#pragma leco add_resource "Tiles131_1K-JPG_Color.jpg"
 
 import dotz;
 import faces;
@@ -67,7 +70,14 @@ struct : public vapp {
       voo::h2l_buffer buf { dq.physical_device(), sizeof(faces::vtx) * max_vertices };
       map_buf(buf);
 
+      voo::single_dset ds {
+        vee::dsl_fragment_sampler(),
+        vee::combined_image_sampler(),
+      };
+
       auto pl = vee::create_pipeline_layout({
+        ds.descriptor_set_layout()
+      }, {
         vee::vertex_push_constant_range<upc>()
       });
       auto gp = vee::create_graphics_pipeline({
@@ -87,6 +97,11 @@ struct : public vapp {
         },
       });
 
+      auto smp = vee::create_sampler(vee::linear_sampler);
+
+      auto t040 = voo::load_sires_image("Tiles040_1K-JPG_Color.jpg", dq.physical_device());
+      vee::update_descriptor_set(ds.descriptor_set(), 0, t040.iv(), *smp);
+
       sitime::stopwatch time {};
       bool copied = false;
       ots_loop(dq, sw, [&](auto cb) {
@@ -95,6 +110,7 @@ struct : public vapp {
 
         if (!copied) {
           buf.setup_copy(cb);
+          t040.setup_copy(cb);
           copied = true;
         }
 
@@ -107,6 +123,7 @@ struct : public vapp {
         vee::cmd_set_viewport(cb, sw.extent());
         vee::cmd_set_scissor(cb, sw.extent());
         vee::cmd_bind_vertex_buffers(cb, 0, buf.local_buffer());
+        vee::cmd_bind_descriptor_set(cb, *pl, 0, ds.descriptor_set());
         vee::cmd_push_vertex_constants(cb, *pl, &g_upc);
         vee::cmd_bind_gr_pipeline(cb, *gp);
         vee::cmd_draw(cb, g_count);
