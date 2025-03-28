@@ -4,11 +4,13 @@
 
 import dotz;
 import input;
+import sitime;
 import traits;
 import voo;
 import vapp;
 
 static constexpr const auto max_vertices = 10240;
+static constexpr const auto turn_speed = 180.0f;
 
 struct vtx {
   dotz::vec3 pos;
@@ -83,8 +85,9 @@ static void map_buf(voo::h2l_buffer & buf) {
   }
 }
 
-static void update_camera() {
-  g_upc.angle = dotz::mod(360 + g_upc.angle + input::state(input::axis::TURN), 360);
+static void update_camera(float ms) {
+  float da = -input::state(input::axis::TURN) * turn_speed * ms / 1000.0;
+  g_upc.angle = dotz::mod(360 + g_upc.angle + da, 360);
 }
 
 struct : public vapp {
@@ -115,9 +118,11 @@ struct : public vapp {
         },
       });
 
+      sitime::stopwatch time {};
       bool copied = false;
       ots_loop(dq, sw, [&](auto cb) {
-        update_camera();
+        update_camera(time.millis());
+        time = {};
 
         if (!copied) {
           buf.setup_copy(cb);
