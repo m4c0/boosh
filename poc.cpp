@@ -47,6 +47,16 @@ static void draw_x_wall(voo::memiter<vtx> & m, float x0, float x1, float y, floa
   m += vtx { .pos = { x0, f, y }, .uv = { 0, 1 } };
 }
 
+static void draw_y_wall(voo::memiter<vtx> & m, float x, float y0, float y1, float f, float c) {
+  m += vtx { .pos = { x, f, y0 }, .uv = { 0, 1 } };
+  m += vtx { .pos = { x, f, y1 }, .uv = { 1, 1 } };
+  m += vtx { .pos = { x, c, y1 }, .uv = { 1, 0 } };
+                              
+  m += vtx { .pos = { x, c, y1 }, .uv = { 1, 0 } };
+  m += vtx { .pos = { x, c, y0 }, .uv = { 0, 0 } };
+  m += vtx { .pos = { x, f, y0 }, .uv = { 0, 1 } };
+}
+
 static unsigned g_count {};
 static void map_buf(voo::h2l_buffer & buf) {
   voo::memiter<vtx> m { buf.host_memory(), &g_count };
@@ -59,6 +69,11 @@ static void map_buf(voo::h2l_buffer & buf) {
   for (auto x = -10; x < 10; x++) {
     draw_x_wall(m, x, x + 1, -10, -1, 1);
     draw_x_wall(m, x + 1, x, 9, -1, 1);
+  }
+
+  for (auto y = -10; y < 10; y++) {
+    draw_y_wall(m, 9, y, y + 1, -1, 1);
+    draw_y_wall(m, -10, y + 1, y, -1, 1);
   }
 }
 
