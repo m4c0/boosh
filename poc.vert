@@ -26,18 +26,27 @@ const mat4 proj = mat4(
 );
 
 const vec3 up = normalize(vec3(0, 1, 0));
-void main() {
+mat4 view() {
   float a = radians(cam.w);
   vec3 f = normalize(vec3(sin(a), 0, cos(a)));
   vec3 s = normalize(cross(f, up));
   vec3 u = cross(s, f);
-  mat4 view = mat4(
-    vec4( s, -cam.x),
-    vec4( u, -cam.y),
-    vec4(-f, -cam.z),
+  mat4 trn = mat4(
+    vec4(1, 0, 0, -cam.x),
+    vec4(0, 1, 0, -cam.y),
+    vec4(0, 0, 1, -cam.z),
     vec4(0, 0, 0, 1)
   );
+  mat4 rot = mat4(
+    vec4( s, 0),
+    vec4( u, 0),
+    vec4(-f, 0),
+    vec4(0, 0, 0, 1)
+  );
+  return trn * rot;
+}
 
-  gl_Position = vec4(pos.x, -pos.y, pos.z, 1) * view * proj;
+void main() {
+  gl_Position = vec4(pos.x, -pos.y, pos.z, 1) * view() * proj;
   f_uv = uv;
 }
