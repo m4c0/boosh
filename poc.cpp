@@ -15,10 +15,10 @@ struct vtx {
 };
 
 static void draw_floor(voo::memiter<vtx> & m, int x, int y, float f, float c) {
-  float x0 = x - 0.5;
-  float x1 = x + 0.5;
-  float y0 = y - 0.5;
-  float y1 = y + 0.5;
+  float x0 = x;
+  float x1 = x + 1;
+  float y0 = y;
+  float y1 = y + 1;
 
   m += vtx { .pos = { x0, c, y0 }, .uv = { 0, 0 } };
   m += vtx { .pos = { x1, c, y0 }, .uv = { 1, 0 } };
@@ -46,6 +46,20 @@ static void map_buf(voo::h2l_buffer & buf) {
     }
   }
 
+  float x = 0;
+  float y = -10;
+  float f = -1;
+  float c = 1;
+  float x0 = x;
+  float x1 = x + 1;
+
+  m += vtx { .pos = { x0, f, y }, .uv = { 0, 0 } };
+  m += vtx { .pos = { x1, c, y }, .uv = { 1, 1 } };
+  m += vtx { .pos = { x1, f, y }, .uv = { 1, 0 } };
+
+  m += vtx { .pos = { x1, c, y }, .uv = { 1, 1 } };
+  m += vtx { .pos = { x0, f, y }, .uv = { 0, 0 } };
+  m += vtx { .pos = { x0, c, y }, .uv = { 0, 1 } };
 }
 
 struct : public vapp {
