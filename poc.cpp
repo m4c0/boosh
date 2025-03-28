@@ -23,7 +23,7 @@ struct upc {
   float angle {};
 } g_upc {};
 
-static void draw_floor(voo::memiter<vtx> & m, int x, int y, float f, float c) {
+static void draw_ceiling(voo::memiter<vtx> & m, int x, int y, float c) {
   float x0 = x;
   float x1 = x + 1;
   float y0 = y;
@@ -36,6 +36,13 @@ static void draw_floor(voo::memiter<vtx> & m, int x, int y, float f, float c) {
   m += vtx { .pos = { x1, c, y1 }, .uv = { 1, 1 } };
   m += vtx { .pos = { x0, c, y1 }, .uv = { 0, 1 } };
   m += vtx { .pos = { x0, c, y0 }, .uv = { 0, 0 } };
+}
+
+static void draw_floor(voo::memiter<vtx> & m, int x, int y, float f) {
+  float x0 = x;
+  float x1 = x + 1;
+  float y0 = y;
+  float y1 = y + 1;
 
   m += vtx { .pos = { x0, f, y0 }, .uv = { 0, 0 } };
   m += vtx { .pos = { x1, f, y1 }, .uv = { 1, 1 } };
@@ -71,7 +78,8 @@ static void map_buf(voo::h2l_buffer & buf) {
   voo::memiter<vtx> m { buf.host_memory(), &g_count };
   for (auto y = -10; y < 10; y++) {
     for (auto x = -10; x < 10; x++) {
-      draw_floor(m, x, y, -1, 1);
+      draw_ceiling(m, x, y, 1);
+      draw_floor(m, x, y, -1);
     }
   }
 
