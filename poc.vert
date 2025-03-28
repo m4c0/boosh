@@ -1,8 +1,7 @@
 #version 450
 
 layout(push_constant) uniform upc {
-  vec3 cam;
-  vec3 tgt;
+  vec4 cam;
 };
 
 layout(location = 0) in vec3 pos;
@@ -28,7 +27,8 @@ const mat4 proj = mat4(
 
 const vec3 up = normalize(vec3(0, 1, 0));
 void main() {
-  vec3 f = normalize(tgt);
+  float a = radians(cam.w);
+  vec3 f = normalize(vec3(sin(a), 0, cos(a)));
   vec3 s = normalize(cross(f, up));
   vec3 u = cross(s, f);
   mat4 view = mat4(

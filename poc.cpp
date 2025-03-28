@@ -17,8 +17,7 @@ struct vtx {
 
 struct upc {
   dotz::vec3 cam {};
-  float pad {};
-  dotz::vec3 tgt { 0, 0, 1 };
+  float angle {};
 } g_upc {};
 
 static void draw_floor(voo::memiter<vtx> & m, int x, int y, float f, float c) {
@@ -84,6 +83,10 @@ static void map_buf(voo::h2l_buffer & buf) {
   }
 }
 
+static void update_camera() {
+  g_upc.angle = dotz::mod(360 + g_upc.angle + input::state(input::axis::TURN), 360);
+}
+
 struct : public vapp {
   void run() {
     input::setup();
@@ -114,6 +117,8 @@ struct : public vapp {
 
       bool copied = false;
       ots_loop(dq, sw, [&](auto cb) {
+        update_camera();
+
         if (!copied) {
           buf.setup_copy(cb);
           copied = true;
