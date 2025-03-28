@@ -37,19 +37,7 @@ static void draw_floor(voo::memiter<vtx> & m, int x, int y, float f, float c) {
   m += vtx { .pos = { x0, f, y1 }, .uv = { 0, 1 } };
 }
 
-static unsigned g_count {};
-static void map_buf(voo::h2l_buffer & buf) {
-  voo::memiter<vtx> m { buf.host_memory(), &g_count };
-  for (auto y = -10; y < 10; y++) {
-    for (auto x = -10; x < 10; x++) {
-      draw_floor(m, x, y, -1, 1);
-    }
-  }
-
-  float x = 0;
-  float y = -10;
-  float f = -1;
-  float c = 1;
+static void draw_x_wall(voo::memiter<vtx> & m, int x, float y, float f, float c) {
   float x0 = x;
   float x1 = x + 1;
 
@@ -60,6 +48,21 @@ static void map_buf(voo::h2l_buffer & buf) {
   m += vtx { .pos = { x1, c, y }, .uv = { 1, 0 } };
   m += vtx { .pos = { x0, c, y }, .uv = { 0, 0 } };
   m += vtx { .pos = { x0, f, y }, .uv = { 0, 1 } };
+}
+
+static unsigned g_count {};
+static void map_buf(voo::h2l_buffer & buf) {
+  voo::memiter<vtx> m { buf.host_memory(), &g_count };
+  for (auto y = -10; y < 10; y++) {
+    for (auto x = -10; x < 10; x++) {
+      draw_floor(m, x, y, -1, 1);
+    }
+  }
+
+  for (auto x = -10; x < 10; x++) {
+    draw_x_wall(m, x, -10, -1, 1);
+    draw_x_wall(m, x, 9, -1, 1);
+  }
 }
 
 struct : public vapp {
