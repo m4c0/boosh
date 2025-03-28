@@ -14,6 +14,12 @@ struct vtx {
   dotz::vec2 uv;
 };
 
+struct upc {
+  dotz::vec3 cam {};
+  float pad {};
+  dotz::vec3 tgt { 0, 0, 1 };
+} g_upc {};
+
 static void draw_floor(voo::memiter<vtx> & m, int x, int y, float f, float c) {
   float x0 = x;
   float x1 = x + 1;
@@ -83,7 +89,9 @@ struct : public vapp {
       voo::h2l_buffer buf { dq.physical_device(), sizeof(vtx) * max_vertices };
       map_buf(buf);
 
-      auto pl = vee::create_pipeline_layout();
+      auto pl = vee::create_pipeline_layout({
+        vee::vertex_push_constant_range<upc>()
+      });
       auto gp = vee::create_graphics_pipeline({
         .pipeline_layout = *pl,
         .render_pass = dq.render_pass(),
@@ -117,6 +125,7 @@ struct : public vapp {
         vee::cmd_set_viewport(cb, sw.extent());
         vee::cmd_set_scissor(cb, sw.extent());
         vee::cmd_bind_vertex_buffers(cb, 0, buf.local_buffer());
+        vee::cmd_push_vertex_constants(cb, *pl, &g_upc);
         vee::cmd_bind_gr_pipeline(cb, *gp);
         vee::cmd_draw(cb, g_count);
       });

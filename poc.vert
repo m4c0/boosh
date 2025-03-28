@@ -1,5 +1,10 @@
 #version 450
 
+layout(push_constant) uniform upc {
+  vec3 cam;
+  vec3 tgt;
+};
+
 layout(location = 0) in vec3 pos;
 layout(location = 1) in vec2 uv;
 
@@ -21,8 +26,6 @@ const mat4 proj = mat4(
   0.0, 0.0, -1, 0.0
 );
 
-vec3 cam = vec3(0.0, 0.0, 5.0);
-vec3 tgt = vec3(0, 0, -1);
 const vec3 up = normalize(vec3(0, 1, 0));
 void main() {
   vec3 f = normalize(tgt);
