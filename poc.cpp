@@ -53,13 +53,13 @@ static void map_buf(voo::h2l_buffer & buf) {
   float x0 = x;
   float x1 = x + 1;
 
-  m += vtx { .pos = { x0, f, y }, .uv = { 0, 0 } };
-  m += vtx { .pos = { x1, c, y }, .uv = { 1, 1 } };
-  m += vtx { .pos = { x1, f, y }, .uv = { 1, 0 } };
+  m += vtx { .pos = { x0, f, y }, .uv = { 0, 1 } };
+  m += vtx { .pos = { x1, f, y }, .uv = { 1, 1 } };
+  m += vtx { .pos = { x1, c, y }, .uv = { 1, 0 } };
 
-  m += vtx { .pos = { x1, c, y }, .uv = { 1, 1 } };
-  m += vtx { .pos = { x0, f, y }, .uv = { 0, 0 } };
-  m += vtx { .pos = { x0, c, y }, .uv = { 0, 1 } };
+  m += vtx { .pos = { x1, c, y }, .uv = { 1, 0 } };
+  m += vtx { .pos = { x0, c, y }, .uv = { 0, 0 } };
+  m += vtx { .pos = { x0, f, y }, .uv = { 0, 1 } };
 }
 
 struct : public vapp {
@@ -72,6 +72,7 @@ struct : public vapp {
       auto gp = vee::create_graphics_pipeline({
         .pipeline_layout = *pl,
         .render_pass = dq.render_pass(),
+        //.back_face_cull = false,
         .shaders {
           voo::shader("poc.vert.spv").pipeline_vert_stage(),
           voo::shader("poc.frag.spv").pipeline_frag_stage(),
