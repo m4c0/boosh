@@ -3,6 +3,7 @@
 #pragma leco add_shader "poc.frag"
 
 import dotz;
+import faces;
 import input;
 import sitime;
 import traits;
@@ -13,69 +14,14 @@ static constexpr const auto max_vertices = 10240;
 static constexpr const auto turn_speed = 180.0f;
 static constexpr const auto walk_speed = 5.0f;
 
-struct vtx {
-  dotz::vec3 pos;
-  dotz::vec2 uv;
-};
-
 struct upc {
   dotz::vec3 cam {};
   float angle {};
 } g_upc {};
 
-static void draw_ceiling(voo::memiter<vtx> & m, int x, int y, float c) {
-  float x0 = x;
-  float x1 = x + 1;
-  float y0 = y;
-  float y1 = y + 1;
-
-  m += vtx { .pos = { x0, c, y0 }, .uv = { 0, 0 } };
-  m += vtx { .pos = { x1, c, y0 }, .uv = { 1, 0 } };
-  m += vtx { .pos = { x1, c, y1 }, .uv = { 1, 1 } };
-
-  m += vtx { .pos = { x1, c, y1 }, .uv = { 1, 1 } };
-  m += vtx { .pos = { x0, c, y1 }, .uv = { 0, 1 } };
-  m += vtx { .pos = { x0, c, y0 }, .uv = { 0, 0 } };
-}
-
-static void draw_floor(voo::memiter<vtx> & m, int x, int y, float f) {
-  float x0 = x;
-  float x1 = x + 1;
-  float y0 = y;
-  float y1 = y + 1;
-
-  m += vtx { .pos = { x0, f, y0 }, .uv = { 0, 0 } };
-  m += vtx { .pos = { x1, f, y1 }, .uv = { 1, 1 } };
-  m += vtx { .pos = { x1, f, y0 }, .uv = { 1, 0 } };
-
-  m += vtx { .pos = { x1, f, y1 }, .uv = { 1, 1 } };
-  m += vtx { .pos = { x0, f, y0 }, .uv = { 0, 0 } };
-  m += vtx { .pos = { x0, f, y1 }, .uv = { 0, 1 } };
-}
-
-static void draw_x_wall(voo::memiter<vtx> & m, float x0, float x1, float y, float f, float c) {
-  m += vtx { .pos = { x0, f, y }, .uv = { 0, 1 } };
-  m += vtx { .pos = { x1, f, y }, .uv = { 1, 1 } };
-  m += vtx { .pos = { x1, c, y }, .uv = { 1, 0 } };
-
-  m += vtx { .pos = { x1, c, y }, .uv = { 1, 0 } };
-  m += vtx { .pos = { x0, c, y }, .uv = { 0, 0 } };
-  m += vtx { .pos = { x0, f, y }, .uv = { 0, 1 } };
-}
-
-static void draw_y_wall(voo::memiter<vtx> & m, float x, float y0, float y1, float f, float c) {
-  m += vtx { .pos = { x, f, y0 }, .uv = { 0, 1 } };
-  m += vtx { .pos = { x, f, y1 }, .uv = { 1, 1 } };
-  m += vtx { .pos = { x, c, y1 }, .uv = { 1, 0 } };
-                              
-  m += vtx { .pos = { x, c, y1 }, .uv = { 1, 0 } };
-  m += vtx { .pos = { x, c, y0 }, .uv = { 0, 0 } };
-  m += vtx { .pos = { x, f, y0 }, .uv = { 0, 1 } };
-}
-
 static unsigned g_count {};
 static void map_buf(voo::h2l_buffer & buf) {
-  voo::memiter<vtx> m { buf.host_memory(), &g_count };
+  voo::memiter<faces::vtx> m { buf.host_memory(), &g_count };
   for (auto y = -10; y < 10; y++) {
     for (auto x = -10; x < 10; x++) {
       draw_ceiling(m, x, y, 1);
@@ -118,7 +64,7 @@ struct : public vapp {
     input::setup();
 
     main_loop("poc-voo", [&](auto & dq, auto & sw) {
-      voo::h2l_buffer buf { dq.physical_device(), sizeof(vtx) * max_vertices };
+      voo::h2l_buffer buf { dq.physical_device(), sizeof(faces::vtx) * max_vertices };
       map_buf(buf);
 
       auto pl = vee::create_pipeline_layout({
@@ -133,11 +79,11 @@ struct : public vapp {
           voo::shader("poc.frag.spv").pipeline_frag_stage(),
         },
         .bindings {
-          vee::vertex_input_bind(sizeof(vtx)),
+          vee::vertex_input_bind(sizeof(faces::vtx)),
         },
         .attributes {
-          vee::vertex_attribute_vec3(0, traits::offset_of(&vtx::pos)),
-          vee::vertex_attribute_vec2(0, traits::offset_of(&vtx::uv)),
+          vee::vertex_attribute_vec3(0, traits::offset_of(&faces::vtx::pos)),
+          vee::vertex_attribute_vec2(0, traits::offset_of(&faces::vtx::uv)),
         },
       });
 
