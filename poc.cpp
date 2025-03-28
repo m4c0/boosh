@@ -11,6 +11,7 @@ import vapp;
 
 static constexpr const auto max_vertices = 10240;
 static constexpr const auto turn_speed = 180.0f;
+static constexpr const auto walk_speed = 1.0f;
 
 struct vtx {
   dotz::vec3 pos;
@@ -88,6 +89,19 @@ static void map_buf(voo::h2l_buffer & buf) {
 static void update_camera(float ms) {
   float da = -input::state(input::axis::TURN) * turn_speed * ms / 1000.0;
   g_upc.angle = dotz::mod(360 + g_upc.angle + da, 360);
+
+  dotz::vec2 d {
+    input::state(input::axis::STRAFE),
+    input::state(input::axis::WALK)
+  };
+
+  float c = dotz::cos(g_upc.angle);
+  float s = dotz::sin(g_upc.angle);
+  g_upc.cam = g_upc.cam + dotz::vec3 {
+    d.x * c - d.y * s,
+    0.0f,
+    d.x * s + d.y * c,
+  } * walk_speed * ms / 1000.0;
 }
 
 struct : public vapp {
