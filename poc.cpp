@@ -32,8 +32,12 @@ static void map_buf(voo::h2l_buffer & buf) {
   voo::memiter<faces::vtx> m { buf.host_memory(), &g_count };
   for (auto y = -10; y < 10; y++) {
     for (auto x = -10; x < 10; x++) {
-      draw_ceiling(m, x, y, 1);
       draw_floor(m, x, y, -1);
+    }
+  }
+  for (auto y = -10; y < 10; y++) {
+    for (auto x = -10; x < 10; x++) {
+      draw_ceiling(m, x, y, 1);
     }
   }
 
@@ -134,10 +138,23 @@ struct : public vapp {
         vee::cmd_set_viewport(cb, sw.extent());
         vee::cmd_set_scissor(cb, sw.extent());
         vee::cmd_bind_vertex_buffers(cb, 0, buf.local_buffer());
-        vee::cmd_bind_descriptor_set(cb, *pl, 0, dsets[3]);
         vee::cmd_push_vertex_constants(cb, *pl, &g_upc);
         vee::cmd_bind_gr_pipeline(cb, *gp);
-        vee::cmd_draw(cb, g_count);
+
+        vee::cmd_bind_descriptor_set(cb, *pl, 0, dsets[2]);
+        vee::cmd_draw(cb, {
+          .vcount = 20 * 20 * 6,
+        });
+        vee::cmd_bind_descriptor_set(cb, *pl, 0, dsets[3]);
+        vee::cmd_draw(cb, {
+          .vcount = 20 * 20 * 6,
+          .first_v = 20 * 20 * 6,
+        });
+        vee::cmd_bind_descriptor_set(cb, *pl, 0, dsets[0]);
+        vee::cmd_draw(cb, {
+          .vcount = g_count - 2 * 20 * 20 * 6,
+          .first_v = 2 * 20 * 20 * 6,
+        });
       });
     });
   }
