@@ -23,6 +23,8 @@ static constexpr const auto max_vertices = 10240;
 static constexpr const auto turn_speed = 180.0f;
 static constexpr const auto walk_speed = 5.0f;
 
+static constexpr const auto dset_smps = 16;
+
 struct upc {
   dotz::vec3 cam {};
   float angle {};
@@ -81,14 +83,14 @@ struct : public vapp {
         .limits
         .maxDescriptorSetSampledImages;
       silog::log(silog::info, "Max descriptor set sampled images: %d", max_dset_imgs);
-      if (max_dset_imgs < 16)
+      if (max_dset_imgs < dset_smps)
         silog::die("Expecting at least 16 images sampled per descriptor set. Please notify the developer");
 
       voo::h2l_buffer buf { dq.physical_device(), sizeof(faces::vtx) * max_vertices };
       map_buf(buf);
 
       auto dsl = vee::create_descriptor_set_layout({
-        vee::dsl_fragment_sampler()
+        vee::dsl_fragment_sampler(dset_smps)
       });
       auto pl = vee::create_pipeline_layout(*dsl, vee::vertex_push_constant_range<upc>());
       auto gp = vee::create_graphics_pipeline({
@@ -109,6 +111,8 @@ struct : public vapp {
       });
 
       auto smp = vee::create_sampler(vee::linear_sampler);
+      auto dpool = vee::create_descriptor_pool(1, { vee::combined_image_sampler(dset_smps) });
+      auto dset = vee::allocate_descriptor_set(*dpool, *dsl);
 
       hai::view<jute::view> textures {
         "Tiles040_1K-JPG_Color.jpg"_s,
@@ -116,14 +120,16 @@ struct : public vapp {
         "Tiles131_1K-JPG_Color.jpg"_s,
         "Tiles133D_1K-JPG_Color.jpg"_s,
       };
-      auto dpool = vee::create_descriptor_pool(textures.size(), { vee::combined_image_sampler(textures.size()) });
       hai::array<voo::h2l_image> imgs { textures.size() };
-      hai::array<vee::descriptor_set> dsets { textures.size() };
+      hai::array<vee::image_view::type> ivs { dset_smps };
       for (auto i = 0; i < imgs.size(); i++) {
-        dsets[i] = vee::allocate_descriptor_set(*dpool, *dsl);
         imgs[i] = voo::load_sires_image(textures[i], dq.physical_device());
-        vee::update_descriptor_set(dsets[i], 0, imgs[i].iv(), *smp);
+        ivs[i] = imgs[i].iv();
       }
+      for (auto i = imgs.size(); i < dset_smps; i++) {
+        ivs[i] = imgs[0].iv();
+      }
+      vee::update_descriptor_set(dset, 0, ivs, *smp);
 
       sitime::stopwatch time {};
       bool copied = false;
@@ -149,16 +155,14 @@ struct : public vapp {
         vee::cmd_push_vertex_constants(cb, *pl, &g_upc);
         vee::cmd_bind_gr_pipeline(cb, *gp);
 
-        vee::cmd_bind_descriptor_set(cb, *pl, 0, dsets[2]);
+        vee::cmd_bind_descriptor_set(cb, *pl, 0, dset);
         vee::cmd_draw(cb, {
           .vcount = 20 * 20 * 6,
         });
-        vee::cmd_bind_descriptor_set(cb, *pl, 0, dsets[3]);
         vee::cmd_draw(cb, {
           .vcount = 20 * 20 * 6,
           .first_v = 20 * 20 * 6,
         });
-        vee::cmd_bind_descriptor_set(cb, *pl, 0, dsets[0]);
         vee::cmd_draw(cb, {
           .vcount = g_count - 2 * 20 * 20 * 6,
           .first_v = 2 * 20 * 20 * 6,
