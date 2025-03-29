@@ -35,23 +35,23 @@ static void map_buf(voo::h2l_buffer & buf) {
   voo::memiter<faces::vtx> m { buf.host_memory(), &g_count };
   for (auto y = -10; y < 10; y++) {
     for (auto x = -10; x < 10; x++) {
-      draw_floor(m, x, y, -1);
+      draw_floor(m, x, y, -1, 2);
     }
   }
   for (auto y = -10; y < 10; y++) {
     for (auto x = -10; x < 10; x++) {
-      draw_ceiling(m, x, y, 1);
+      draw_ceiling(m, x, y, 1, 3);
     }
   }
 
   for (auto x = -10; x < 10; x++) {
-    draw_x_wall(m, x, x + 1, -10, -1, 1);
-    draw_x_wall(m, x + 1, x, 9, -1, 1);
+    draw_x_wall(m, x, x + 1, -10, -1, 1, 0);
+    draw_x_wall(m, x + 1, x, 9, -1, 1, 0);
   }
 
   for (auto y = -10; y < 10; y++) {
-    draw_y_wall(m, 9, y, y + 1, -1, 1);
-    draw_y_wall(m, -10, y + 1, y, -1, 1);
+    draw_y_wall(m, 9, y, y + 1, -1, 1, 0);
+    draw_y_wall(m, -10, y + 1, y, -1, 1, 0);
   }
 }
 
@@ -107,6 +107,7 @@ struct : public vapp {
         .attributes {
           vee::vertex_attribute_vec3(0, traits::offset_of(&faces::vtx::pos)),
           vee::vertex_attribute_vec2(0, traits::offset_of(&faces::vtx::uv)),
+          vee::vertex_attribute_uint(0, traits::offset_of(&faces::vtx::txt)),
         },
       });
 
@@ -156,17 +157,7 @@ struct : public vapp {
         vee::cmd_bind_gr_pipeline(cb, *gp);
 
         vee::cmd_bind_descriptor_set(cb, *pl, 0, dset);
-        vee::cmd_draw(cb, {
-          .vcount = 20 * 20 * 6,
-        });
-        vee::cmd_draw(cb, {
-          .vcount = 20 * 20 * 6,
-          .first_v = 20 * 20 * 6,
-        });
-        vee::cmd_draw(cb, {
-          .vcount = g_count - 2 * 20 * 20 * 6,
-          .first_v = 2 * 20 * 20 * 6,
-        });
+        vee::cmd_draw(cb, g_count);
       });
     });
   }

@@ -6,8 +6,10 @@ layout(push_constant) uniform upc {
 
 layout(location = 0) in vec3 pos;
 layout(location = 1) in vec2 uv;
+layout(location = 2) in uint txt;
 
 layout(location = 0) out vec2 f_uv;
+layout(location = 1) out uint f_txt;
 
 const float fov_rad = radians(90);
 const float aspect = 1;
@@ -49,4 +51,5 @@ mat4 view() {
 void main() {
   gl_Position = vec4(pos.x, -pos.y, pos.z, 1) * view() * proj;
   f_uv = uv;
+  f_txt = txt;
 }
