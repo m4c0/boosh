@@ -11,6 +11,7 @@ import faces;
 import hai;
 import jute;
 import input;
+import silog;
 import sitime;
 import traits;
 import voo;
@@ -76,6 +77,13 @@ struct : public vapp {
     input::setup();
 
     main_loop("poc-voo", [&](auto & dq, auto & sw) {
+      auto max_dset_imgs = vee::get_physical_device_properties(dq.physical_device())
+        .limits
+        .maxDescriptorSetSampledImages;
+      silog::log(silog::info, "Max descriptor set sampled images: %d", max_dset_imgs);
+      if (max_dset_imgs < 16)
+        silog::die("Expecting at least 16 images sampled per descriptor set. Please notify the developer");
+
       voo::h2l_buffer buf { dq.physical_device(), sizeof(faces::vtx) * max_vertices };
       map_buf(buf);
 
