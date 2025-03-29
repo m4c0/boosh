@@ -7,11 +7,15 @@
 
 import dotz;
 import faces;
+import hai;
+import jute;
 import input;
 import sitime;
 import traits;
 import voo;
 import vapp;
+
+using namespace jute::literals;
 
 static constexpr const auto max_vertices = 10240;
 static constexpr const auto turn_speed = 180.0f;
@@ -70,16 +74,10 @@ struct : public vapp {
       voo::h2l_buffer buf { dq.physical_device(), sizeof(faces::vtx) * max_vertices };
       map_buf(buf);
 
-      voo::single_dset ds {
-        vee::dsl_fragment_sampler(),
-        vee::combined_image_sampler(),
-      };
-
-      auto pl = vee::create_pipeline_layout({
-        ds.descriptor_set_layout()
-      }, {
-        vee::vertex_push_constant_range<upc>()
+      auto dsl = vee::create_descriptor_set_layout({
+        vee::dsl_fragment_sampler()
       });
+      auto pl = vee::create_pipeline_layout(*dsl, vee::vertex_push_constant_range<upc>());
       auto gp = vee::create_graphics_pipeline({
         .pipeline_layout = *pl,
         .render_pass = dq.render_pass(),
@@ -99,8 +97,19 @@ struct : public vapp {
 
       auto smp = vee::create_sampler(vee::linear_sampler);
 
-      auto t040 = voo::load_sires_image("Tiles040_1K-JPG_Color.jpg", dq.physical_device());
-      vee::update_descriptor_set(ds.descriptor_set(), 0, t040.iv(), *smp);
+      hai::view<jute::view> textures {
+        "Tiles040_1K-JPG_Color.jpg"_s,
+        "Tiles051_1K-JPG_Color.jpg"_s,
+        "Tiles131_1K-JPG_Color.jpg"_s,
+      };
+      auto dpool = vee::create_descriptor_pool(textures.size(), { vee::combined_image_sampler(textures.size()) });
+      hai::array<voo::h2l_image> imgs { textures.size() };
+      hai::array<vee::descriptor_set> dsets { textures.size() };
+      for (auto i = 0; i < imgs.size(); i++) {
+        dsets[i] = vee::allocate_descriptor_set(*dpool, *dsl);
+        imgs[i] = voo::load_sires_image(textures[i], dq.physical_device());
+        vee::update_descriptor_set(dsets[i], 0, imgs[i].iv(), *smp);
+      }
 
       sitime::stopwatch time {};
       bool copied = false;
@@ -110,7 +119,7 @@ struct : public vapp {
 
         if (!copied) {
           buf.setup_copy(cb);
-          t040.setup_copy(cb);
+          for (auto &i : imgs) i.setup_copy(cb);
           copied = true;
         }
 
@@ -123,7 +132,7 @@ struct : public vapp {
         vee::cmd_set_viewport(cb, sw.extent());
         vee::cmd_set_scissor(cb, sw.extent());
         vee::cmd_bind_vertex_buffers(cb, 0, buf.local_buffer());
-        vee::cmd_bind_descriptor_set(cb, *pl, 0, ds.descriptor_set());
+        vee::cmd_bind_descriptor_set(cb, *pl, 0, dsets[2]);
         vee::cmd_push_vertex_constants(cb, *pl, &g_upc);
         vee::cmd_bind_gr_pipeline(cb, *gp);
         vee::cmd_draw(cb, g_count);
