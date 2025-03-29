@@ -4,6 +4,7 @@
 #pragma leco add_resource "Tiles040_1K-JPG_Color.jpg"
 #pragma leco add_resource "Tiles051_1K-JPG_Color.jpg"
 #pragma leco add_resource "Tiles131_1K-JPG_Color.jpg"
+#pragma leco add_resource "Tiles133D_1K-JPG_Color.jpg"
 
 import dotz;
 import faces;
@@ -101,6 +102,7 @@ struct : public vapp {
         "Tiles040_1K-JPG_Color.jpg"_s,
         "Tiles051_1K-JPG_Color.jpg"_s,
         "Tiles131_1K-JPG_Color.jpg"_s,
+        "Tiles133D_1K-JPG_Color.jpg"_s,
       };
       auto dpool = vee::create_descriptor_pool(textures.size(), { vee::combined_image_sampler(textures.size()) });
       hai::array<voo::h2l_image> imgs { textures.size() };
@@ -132,7 +134,7 @@ struct : public vapp {
         vee::cmd_set_viewport(cb, sw.extent());
         vee::cmd_set_scissor(cb, sw.extent());
         vee::cmd_bind_vertex_buffers(cb, 0, buf.local_buffer());
-        vee::cmd_bind_descriptor_set(cb, *pl, 0, dsets[2]);
+        vee::cmd_bind_descriptor_set(cb, *pl, 0, dsets[3]);
         vee::cmd_push_vertex_constants(cb, *pl, &g_upc);
         vee::cmd_bind_gr_pipeline(cb, *gp);
         vee::cmd_draw(cb, g_count);
