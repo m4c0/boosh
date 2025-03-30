@@ -71,7 +71,8 @@ static void update_camera(float ms) {
   auto adx = dotz::abs(dx);
   auto ady = dotz::abs(dy);
   if (adx > ady && walk(dx, 0)) return;
-  walk(0, dy);
+  if (adx < ady && walk(0, dy)) return;
+  walk(dx, 0) || walk(0, dy);
 }
 
 struct : public vapp {
