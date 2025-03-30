@@ -74,10 +74,10 @@ struct : public vapp {
     input::setup();
 
     main_loop("poc-voo", [&](auto & dq, auto & sw) {
-      auto max_dset_imgs = vee::get_physical_device_properties(dq.physical_device())
+      unsigned max_dset_imgs = vee::get_physical_device_properties(dq.physical_device())
         .limits
         .maxDescriptorSetSampledImages;
-      silog::log(silog::info, "Max descriptor set sampled images: %d", max_dset_imgs);
+      silog::log(silog::info, "Max descriptor set sampled images: %u", max_dset_imgs);
       if (max_dset_imgs < dset_smps)
         silog::die("Expecting at least 16 images sampled per descriptor set. Please notify the developer");
 
