@@ -33,6 +33,15 @@ namespace mapbuilder {
     return {};
   }
 
+  export bool walkable(unsigned x, unsigned y) {
+    if (x <= 0 || x >= width || y <= 0 || y >= height) return false;
+    switch (raw[y * width + x]) {
+      case '.':
+      case 'P': return true;
+      default:  return false;
+    }
+  }
+
   export unsigned load(voo::h2l_buffer & buf) {
     unsigned count {};
     voo::memiter<faces::vtx> m { buf.host_memory(), &count };
