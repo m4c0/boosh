@@ -16,7 +16,7 @@ const float aspect = 1;
 
 const float f = 1 / atan(fov_rad / 2);
 const float far = 100.0;
-const float near = 0.1;
+const float near = 0.01;
 
 const float p22 = (far + near) / (near - far);
 const float p32 = (2.0 * far * near) / (near - far);
