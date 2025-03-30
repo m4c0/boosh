@@ -27,7 +27,7 @@ namespace mapbuilder {
   export dotz::ivec2 initial_pos() {
     for (dotz::ivec2 p {}; p.y < height; p.y++) {
       for (p.x = 0; p.x < width; p.x++) {
-        if (raw[p.y * height + p.x] == 'P') return p;
+        if (raw[p.y * width + p.x] == 'P') return p;
       }
     }
     return {};
@@ -39,7 +39,7 @@ namespace mapbuilder {
 
     for (auto y = 0; y < height; y++) {
       for (auto x = 0; x < width; x++) {
-        switch (raw[y * height + x]) {
+        switch (raw[y * width + x]) {
           case 'X':
             draw_floor(m, x, y, -1, 0);
             break;
