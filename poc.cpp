@@ -44,10 +44,25 @@ static void update_camera(float ms) {
   float a = dotz::radians(g_upc.angle);
   float c = dotz::cos(a);
   float s = dotz::sin(a);
-  auto d = dotz::normalise(dr) * walk_speed * ms / 1000.0;
+  auto d = dotz::normalise(dr);
 
-  g_upc.cam.x -= d.x * c - d.y * s;
-  g_upc.cam.z += d.x * s + d.y * c;
+  const auto walk = [&](auto dx, auto dy) {
+    auto cam = g_upc.cam;
+    cam.x -= dx * walk_speed * ms / 1000.0;
+    cam.z += dy * walk_speed * ms / 1000.0;
+    if (!mapbuilder::walkable(cam.x, cam.z)) return false;
+    g_upc.cam = cam;
+    return true;
+  };
+
+  auto dx = d.x * c - d.y * s;
+  auto dy = d.x * s + d.y * c;
+  if (walk(dx, dy)) return;
+
+  auto adx = dotz::abs(dx);
+  auto ady = dotz::abs(dy);
+  if (adx > ady && walk(dx, 0)) return;
+  walk(0, dy);
 }
 
 struct : public vapp {
