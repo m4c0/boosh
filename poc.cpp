@@ -11,6 +11,7 @@ import faces;
 import hai;
 import jute;
 import input;
+import mapbuilder;
 import silog;
 import sitime;
 import traits;
@@ -29,31 +30,6 @@ struct upc {
   dotz::vec3 cam {};
   float angle {};
 } g_upc {};
-
-static unsigned g_count {};
-static void map_buf(voo::h2l_buffer & buf) {
-  voo::memiter<faces::vtx> m { buf.host_memory(), &g_count };
-  for (auto y = -10; y < 10; y++) {
-    for (auto x = -10; x < 10; x++) {
-      draw_floor(m, x, y, -1, 2);
-    }
-  }
-  for (auto y = -10; y < 10; y++) {
-    for (auto x = -10; x < 10; x++) {
-      draw_ceiling(m, x, y, 1, 3);
-    }
-  }
-
-  for (auto x = -10; x < 10; x++) {
-    draw_x_wall(m, x, x + 1, -10, -1, 1, 0);
-    draw_x_wall(m, x + 1, x, 9, -1, 1, 0);
-  }
-
-  for (auto y = -10; y < 10; y++) {
-    draw_y_wall(m, 9, y, y + 1, -1, 1, 0);
-    draw_y_wall(m, -10, y + 1, y, -1, 1, 0);
-  }
-}
 
 static void update_camera(float ms) {
   float da = -input::state(input::axis::TURN) * turn_speed * ms / 1000.0;
@@ -87,7 +63,10 @@ struct : public vapp {
         silog::die("Expecting at least 16 images sampled per descriptor set. Please notify the developer");
 
       voo::h2l_buffer buf { dq.physical_device(), sizeof(faces::vtx) * max_vertices };
-      map_buf(buf);
+
+      auto cam = mapbuilder::initial_pos();
+      g_upc.cam = { cam.x + 0.5f, 0.0f, cam.y + 0.5f };
+      auto vcount = mapbuilder::load(buf);
 
       auto dsl = vee::create_descriptor_set_layout({
         vee::dsl_fragment_sampler(dset_smps)
@@ -157,7 +136,7 @@ struct : public vapp {
         vee::cmd_bind_gr_pipeline(cb, *gp);
 
         vee::cmd_bind_descriptor_set(cb, *pl, 0, dset);
-        vee::cmd_draw(cb, g_count);
+        vee::cmd_draw(cb, vcount);
       });
     });
   }
