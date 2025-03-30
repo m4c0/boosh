@@ -24,6 +24,8 @@ static constexpr const auto max_vertices = 10240;
 static constexpr const auto turn_speed = 180.0f;
 static constexpr const auto walk_speed = 5.0f;
 
+static constexpr const auto player_radius = 0.2f;
+
 static constexpr const auto dset_smps = 16;
 
 struct upc {
@@ -51,6 +53,13 @@ static void update_camera(float ms) {
     cam.x -= dx * walk_speed * ms / 1000.0;
     cam.z += dy * walk_speed * ms / 1000.0;
     if (!mapbuilder::walkable(cam.x, cam.z)) return false;
+
+    auto adx = player_radius * dotz::sign(-dx);
+    auto ady = player_radius * dotz::sign(dy);
+    if (!mapbuilder::walkable(cam.x + adx, cam.z)) return false;
+    if (!mapbuilder::walkable(cam.x, cam.z + ady)) return false;
+    if (!mapbuilder::walkable(cam.x + adx, cam.z + ady)) return false;
+
     g_upc.cam = cam;
     return true;
   };
