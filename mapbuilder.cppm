@@ -41,7 +41,11 @@ namespace mapbuilder {
       for (auto x = 0; x < width; x++) {
         switch (raw[y * width + x]) {
           case 'X':
-            draw_floor(m, x, y, -1, 0);
+            // TODO: make walls based on neighbours
+            draw_x_wall(m, x, x + 1, y + 1, -1, 1, 0);
+            draw_x_wall(m, x + 1, x, y, -1, 1, 0);
+            draw_y_wall(m, x, y, y + 1, -1, 1, 0);
+            draw_y_wall(m, x + 1, y + 1, y, -1, 1, 0);
             break;
 
           case '.':
@@ -56,14 +60,3 @@ namespace mapbuilder {
     return count;
   }
 }
-/*
-  for (auto x = -10; x < 10; x++) {
-    draw_x_wall(m, x, x + 1, -10, -1, 1, 0);
-    draw_x_wall(m, x + 1, x, 9, -1, 1, 0);
-  }
-
-  for (auto y = -10; y < 10; y++) {
-    draw_y_wall(m, 9, y, y + 1, -1, 1, 0);
-    draw_y_wall(m, -10, y + 1, y, -1, 1, 0);
-  }
-  */
