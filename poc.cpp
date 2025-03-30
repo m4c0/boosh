@@ -68,6 +68,8 @@ static void update_camera(float ms) {
   auto dy = d.x * s + d.y * c;
   if (walk(dx, dy)) return;
 
+  // Wall-hugging
+  // FIXME: hold W+D, turn slightlight backwards. We wallhug backwards.
   auto adx = dotz::abs(dx);
   auto ady = dotz::abs(dy);
   if (adx > ady && walk(dx, 0)) return;
