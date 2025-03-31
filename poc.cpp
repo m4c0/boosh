@@ -69,6 +69,20 @@ static void update_camera(float ms) {
   walk(dx, dy) || walk(dx, 0) || walk(0, dy);
 }
 
+static void load_model(voo::h2l_buffer & buf) {
+  constexpr const auto p = 0.1f;
+  unsigned cnt {};
+
+  voo::memiter<dotz::vec3> m { buf.host_memory(), &cnt };
+  m += { +p, +p, 0.f };
+  m += { -p, -p, 0.f };
+  m += { +p, -p, 0.f };
+
+  m += { +p, +p, 0.f };
+  m += { -p, +p, 0.f };
+  m += { -p, -p, 0.f };
+}
+
 struct : public vapp {
   void run() {
     input::setup();
@@ -86,6 +100,9 @@ struct : public vapp {
       auto cam = mapbuilder::initial_pos();
       g_upc.cam = { cam.x + 0.5f, 0.0f, cam.y + 0.5f };
       auto vcount = mapbuilder::load(buf);
+
+      voo::h2l_buffer mod { dq.physical_device(), sizeof(dotz::vec3) * 6 };
+      load_model(mod);
 
       auto dsl = vee::create_descriptor_set_layout({
         vee::dsl_fragment_sampler(dset_smps)
