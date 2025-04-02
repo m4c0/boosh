@@ -14,7 +14,7 @@ layout(location = 0) out vec2 f_uv;
 layout(location = 1) out uint f_txt;
 
 void main() {
-  mvp(cam, pos);
+  mvp(cam, mat4(1), pos);
   f_uv = uv;
   f_txt = txt;
 }

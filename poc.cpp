@@ -160,7 +160,7 @@ struct : public vapp {
         vee::cmd_bind_descriptor_set(cb, *pl, 0, dset);
         vee::cmd_draw(cb, vcount);
 
-        blt.draw(cb);
+        blt.draw(cb, g_upc.cam, g_upc.angle);
       });
     });
   }

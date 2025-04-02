@@ -2,13 +2,15 @@
 #pragma leco add_shader "bullet.vert"
 #pragma leco add_resource "bullet.obj"
 export module bullet;
+import dotz;
 import traits;
 import voo;
 import wavefront;
 
 namespace bullet {
   struct upc {
-    float aspect;
+    dotz::vec3 cam;
+    float angle;
   };
 
   using vtx = wavefront::vtx;
@@ -46,8 +48,8 @@ namespace bullet {
       m_buf.setup_copy(cb);
     }
 
-    void draw(vee::command_buffer cb) {
-      upc pc {};
+    void draw(vee::command_buffer cb, dotz::vec3 cam, float angle) {
+      upc pc { cam, angle };
       vee::cmd_bind_vertex_buffers(cb, 0, m_buf.local_buffer());
       vee::cmd_push_vertex_constants(cb, *m_pl, &pc);
       vee::cmd_bind_gr_pipeline(cb, *m_gp);
