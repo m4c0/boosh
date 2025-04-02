@@ -6,6 +6,7 @@
 #pragma leco add_resource "Tiles131_1K-JPG_Color.jpg"
 #pragma leco add_resource "Tiles133D_1K-JPG_Color.jpg"
 
+import bullet;
 import dotz;
 import faces;
 import hai;
@@ -69,20 +70,6 @@ static void update_camera(float ms) {
   walk(dx, dy) || walk(dx, 0) || walk(0, dy);
 }
 
-static void load_model(voo::h2l_buffer & buf) {
-  constexpr const auto p = 0.1f;
-  unsigned cnt {};
-
-  voo::memiter<dotz::vec3> m { buf.host_memory(), &cnt };
-  m += { +p, +p, 0.f };
-  m += { -p, -p, 0.f };
-  m += { +p, -p, 0.f };
-
-  m += { +p, +p, 0.f };
-  m += { -p, +p, 0.f };
-  m += { -p, -p, 0.f };
-}
-
 struct : public vapp {
   void run() {
     input::setup();
@@ -101,8 +88,7 @@ struct : public vapp {
       g_upc.cam = { cam.x + 0.5f, 0.0f, cam.y + 0.5f };
       auto vcount = mapbuilder::load(buf);
 
-      voo::h2l_buffer mod { dq.physical_device(), sizeof(dotz::vec3) * 6 };
-      load_model(mod);
+      bullet::model blt { dq };
 
       auto dsl = vee::create_descriptor_set_layout({
         vee::dsl_fragment_sampler(dset_smps)
@@ -154,6 +140,7 @@ struct : public vapp {
         time = {};
 
         if (!copied) {
+          blt.setup_copy(cb);
           buf.setup_copy(cb);
           for (auto &i : imgs) i.setup_copy(cb);
           copied = true;
@@ -170,9 +157,10 @@ struct : public vapp {
         vee::cmd_bind_vertex_buffers(cb, 0, buf.local_buffer());
         vee::cmd_push_vertex_constants(cb, *pl, &g_upc);
         vee::cmd_bind_gr_pipeline(cb, *gp);
-
         vee::cmd_bind_descriptor_set(cb, *pl, 0, dset);
         vee::cmd_draw(cb, vcount);
+
+        blt.draw(cb);
       });
     });
   }
