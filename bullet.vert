@@ -14,7 +14,11 @@ layout(location = 0) out vec2 f_txt;
 layout(location = 1) out vec3 f_nrm;
 
 void main() {
-  mvp(cam, mat4(mat3(100)), pos);
+  mat4 scale = mat4(mat3(10));
+  mat4 trans = translation(-vec3(6, 1, 6));
+  mat4 model = scale * trans;
+
+  mvp(cam, model, pos);
   f_txt = txt;
   f_nrm = nrm;
 }
