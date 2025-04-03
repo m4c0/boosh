@@ -3,6 +3,8 @@
 #pragma leco add_resource "bullet.obj"
 export module bullet;
 import dotz;
+import faces;
+import mapbuilder;
 import traits;
 import voo;
 import wavefront;
@@ -13,10 +15,7 @@ namespace bullet {
     float angle;
   };
 
-  struct mdl {
-    dotz::vec3 pos;
-  };
-
+  using mdl = faces::mdl;
   using vtx = wavefront::vtx;
 
   static constexpr const auto max_models = 128;
@@ -54,10 +53,7 @@ namespace bullet {
       m_buf = traits::move(buf);
       m_vcount = count;
 
-      voo::memiter<mdl> m { m_mdl.host_memory(), &m_icount };
-      m += { .pos { 6, 1, 6 } };
-      m += { .pos { 5, 1, 6 } };
-      m += { .pos { 4, 1, 4 } };
+      mapbuilder::load_bullets(m_mdl, &m_icount);
     }
 
     void setup_copy(vee::command_buffer cb) {

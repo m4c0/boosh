@@ -9,16 +9,16 @@ static constexpr const char raw[] =
   "            "
   " XXXXX  XXX "
   " X...X X..X "
-  " X....X...X "
-  " X........X "
-  " X.P......X "
-  " X........X "
-  " XXX....XXX "
+  " X....X.B.X "
+  " X......B.X "
+  " X.P....B.X "
+  " X......B.X "
+  " XXX..B.XXX "
   "   X....X   "
   "   X..XXX   "
   "   X..X     "
-  "   X.XX     "
-  "   X.X      "
+  "   XBXX     "
+  "   XBX      "
   "   XXX      "
   "            ";
 static_assert(sizeof(raw) == width * height + 1);
@@ -37,8 +37,23 @@ namespace mapbuilder {
     if (x <= 0 || x >= width || y <= 0 || y >= height) return false;
     switch (raw[y * width + x]) {
       case '.':
+      case 'B':
       case 'P': return true;
       default:  return false;
+    }
+  }
+
+  export void load_bullets(voo::h2l_buffer & buf, unsigned * count) {
+    voo::memiter<faces::mdl> m { buf.host_memory(), count };
+
+    for (auto y = 0; y < height; y++) {
+      for (auto x = 0; x < width; x++) {
+        switch (raw[y * width + x]) {
+          case 'B':
+            m += { .pos { x + 0.5f, 0.0f, y + 0.5f} };
+            break;
+        }
+      }
     }
   }
 
@@ -58,6 +73,7 @@ namespace mapbuilder {
             break;
 
           case '.':
+          case 'B':
           case 'P':
             draw_floor(m, x, y, -1, 2);
             draw_ceiling(m, x, y, 1, 3);
