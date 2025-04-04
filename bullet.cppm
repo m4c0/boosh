@@ -1,6 +1,7 @@
 #pragma leco add_shader "bullet.frag"
 #pragma leco add_shader "bullet.vert"
 #pragma leco add_resource "bullet.obj"
+#pragma leco add_resource "bullet.uv.png"
 export module bullet;
 import dotz;
 import faces;
@@ -21,10 +22,13 @@ namespace bullet {
   static constexpr const auto max_models = 128;
 
   export class model {
-    vee::pipeline_layout m_pl = vee::create_pipeline_layout({ vee::vertex_push_constant_range<upc>() });
+    vee::sampler m_smp = vee::create_sampler(vee::linear_sampler);
+    voo::single_frag_dset m_ds { 1 };
+    vee::pipeline_layout m_pl = vee::create_pipeline_layout(m_ds.descriptor_set_layout(), vee::vertex_push_constant_range<upc>());
     vee::gr_pipeline m_gp;
     voo::h2l_buffer m_buf;
     voo::h2l_buffer m_mdl;
+    voo::h2l_image m_txt;
     unsigned m_vcount;
     unsigned m_icount;
   public:
@@ -48,17 +52,21 @@ namespace bullet {
         },
       }) }
       , m_mdl { dq.physical_device(), max_models * sizeof(mdl) }
+      , m_txt { voo::load_image_file("bullet.uv.png", dq.physical_device()) }
     {
       auto [buf, count] = wavefront::load_model(dq.physical_device(), "bullet.obj");
       m_buf = traits::move(buf);
       m_vcount = count;
 
       mapbuilder::load_bullets(m_mdl, &m_icount);
+
+      vee::update_descriptor_set(m_ds.descriptor_set(), 0, m_txt.iv(), *m_smp);
     }
 
     void setup_copy(vee::command_buffer cb) {
       m_buf.setup_copy(cb);
       m_mdl.setup_copy(cb);
+      m_txt.setup_copy(cb);
     }
 
     void draw(vee::command_buffer cb, dotz::vec3 cam, float angle) {
@@ -66,6 +74,7 @@ namespace bullet {
       vee::cmd_bind_vertex_buffers(cb, 0, m_mdl.local_buffer());
       vee::cmd_bind_vertex_buffers(cb, 1, m_buf.local_buffer());
       vee::cmd_push_vertex_constants(cb, *m_pl, &pc);
+      vee::cmd_bind_descriptor_set(cb, *m_pl, 0, m_ds.descriptor_set());
       vee::cmd_bind_gr_pipeline(cb, *m_gp);
       vee::cmd_draw(cb, m_vcount, m_icount);
     }
