@@ -70,6 +70,16 @@ static void update_camera(float ms) {
   walk(dx, dy) || walk(dx, 0) || walk(0, dy);
 }
 
+static void process_pickups() {
+  for (unsigned dy = -1; dy <= 1; dy++) {
+    for (unsigned dx = -1; dx <= 1; dx++) {
+      float x = g_upc.cam.x + dx;
+      float y = g_upc.cam.y + dy;
+      if (!mapbuilder::has_bullet(x, y)) continue;
+    }
+  }
+}
+
 struct : public vapp {
   void run() {
     input::setup();
@@ -137,6 +147,7 @@ struct : public vapp {
       bool copied = false;
       ots_loop(dq, sw, [&](auto cb) {
         update_camera(time.millis());
+        process_pickups();
         time = {};
 
         if (!copied) {
