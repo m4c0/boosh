@@ -36,6 +36,8 @@ struct upc {
   float angle {};
 } g_upc {};
 
+dotz::vec4 g_olay {};
+
 static void update_camera(float ms) {
   float da = -input::state(input::axis::TURN) * turn_speed * ms / 1000.0;
   g_upc.angle = dotz::mod(360 + g_upc.angle + da, 360);
@@ -78,8 +80,11 @@ static void process_pickups() {
       float x = g_upc.cam.x + dx;
       float y = g_upc.cam.y + dy;
       if (!mapbuilder::has_bullet(x, y)) continue;
+      g_olay = { 1.0f };
+      return;
     }
   }
+  g_olay = g_olay * 0.9;
 }
 
 struct : public vapp {
@@ -180,8 +185,7 @@ struct : public vapp {
 
         blt.draw(cb, g_upc.cam, g_upc.angle);
 
-        dotz::vec4 olay { 1 };
-        vee::cmd_push_fragment_constants(cb, *opl, &olay);
+        vee::cmd_push_fragment_constants(cb, *opl, &g_olay);
         oqr.run(cb);
       });
     });
