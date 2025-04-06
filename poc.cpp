@@ -75,9 +75,7 @@ static void update_camera(float ms) {
 }
 
 static void process_pickups() {
-  float x = g_upc.cam.x;
-  float y = g_upc.cam.y;
-  if (!bullet::has({x, 0.f, y})) return;
+  if (!bullet::has(g_upc.cam)) return;
   g_olay = { 1.0f };
 }
 
