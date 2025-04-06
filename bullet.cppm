@@ -5,23 +5,27 @@
 export module bullet;
 import dotz;
 import faces;
-import mapbuilder;
+import hai;
 import traits;
 import voo;
 import wavefront;
 
 namespace bullet {
-  struct upc {
-    dotz::vec3 cam;
-    float angle;
-  };
-
-  using mdl = faces::mdl;
-  using vtx = wavefront::vtx;
-
-  static constexpr const auto max_models = 128;
+  hai::varray<dotz::vec3> list { 128 };
+  export void add(dotz::vec3 p) { list.push_back(p); }
+  export void clear() { list.truncate(0); }
 
   export class model {
+    struct upc {
+      dotz::vec3 cam;
+      float angle;
+    };
+
+    using mdl = faces::mdl;
+    using vtx = wavefront::vtx;
+
+    static constexpr const auto max_models = 128;
+
     vee::sampler m_smp = vee::create_sampler(vee::linear_sampler);
     voo::single_frag_dset m_ds { 1 };
     vee::pipeline_layout m_pl = vee::create_pipeline_layout(m_ds.descriptor_set_layout(), vee::vertex_push_constant_range<upc>());
@@ -58,12 +62,16 @@ namespace bullet {
       m_buf = traits::move(buf);
       m_vcount = count;
 
-      mapbuilder::load_bullets(m_mdl, &m_icount);
-
       vee::update_descriptor_set(m_ds.descriptor_set(), 0, m_txt.iv(), *m_smp);
     }
 
     void setup_copy(vee::command_buffer cb) {
+      {
+        voo::memiter<mdl> m { m_mdl.host_memory(), &m_icount };
+        for (auto b : list) {
+          m += { .pos = b };
+        }
+      }
       m_buf.setup_copy(cb);
       m_mdl.setup_copy(cb);
       m_txt.setup_copy(cb);

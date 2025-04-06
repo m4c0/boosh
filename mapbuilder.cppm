@@ -1,4 +1,5 @@
 export module mapbuilder;
+import bullet;
 import dotz;
 import faces;
 import voo;
@@ -43,20 +44,6 @@ namespace mapbuilder {
     }
   }
 
-  export void load_bullets(voo::h2l_buffer & buf, unsigned * count) {
-    voo::memiter<faces::mdl> m { buf.host_memory(), count };
-
-    for (auto y = 0; y < height; y++) {
-      for (auto x = 0; x < width; x++) {
-        switch (raw[y * width + x]) {
-          case 'B':
-            m += { .pos { x + 0.5f, 0.0f, y + 0.5f} };
-            break;
-        }
-      }
-    }
-  }
-
   export bool has_bullet(unsigned x, unsigned y) {
     if (x <= 0 || x >= width || y <= 0 || y >= height) return false;
     return raw[y * width + x] == 'B';
@@ -65,6 +52,8 @@ namespace mapbuilder {
   export unsigned load(voo::h2l_buffer & buf) {
     unsigned count {};
     voo::memiter<faces::vtx> m { buf.host_memory(), &count };
+
+    bullet::clear();
 
     for (auto y = 0; y < height; y++) {
       for (auto x = 0; x < width; x++) {
@@ -77,8 +66,9 @@ namespace mapbuilder {
             draw_y_wall(m, x + 1, y + 1, y, -1, 1, 0);
             break;
 
-          case '.':
           case 'B':
+            bullet::add({ x + 0.5f, 0.0f, y + 0.5f });
+          case '.':
           case 'P':
             draw_floor(m, x, y, -1, 2);
             draw_ceiling(m, x, y, 1, 3);
