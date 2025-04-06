@@ -15,9 +15,13 @@ namespace bullet {
   export void add(dotz::vec3 p) { list.push_back(p); }
   export void clear() { list.truncate(0); }
 
-  export bool has(dotz::vec3 p) {
-    for (auto b : list) {
-      if (dotz::length(p - b) < 0.5) return true;
+  export bool take(dotz::vec3 p) {
+    for (auto i = 0; i < list.size(); i++) {
+      auto b = list[i];
+      if (dotz::length(p - b) > 0.5) continue;
+
+      list[i] = list.pop_back();
+      return true;
     }
     return false;
   }

@@ -74,8 +74,11 @@ static void update_camera(float ms) {
   walk(dx, dy) || walk(dx, 0) || walk(0, dy);
 }
 
-static void process_pickups() {
-  if (bullet::has(g_upc.cam)) g_olay = { 1.0f };
+static void process_pickups(auto cb, auto & blt) {
+  if (bullet::take(g_upc.cam)) {
+    g_olay = { 1.0f };
+    blt.setup_copy(cb);
+  }
   g_olay = g_olay * 0.9;
 }
 
@@ -151,7 +154,7 @@ struct : public vapp {
       bool copied = false;
       ots_loop(dq, sw, [&](auto cb) {
         update_camera(time.millis());
-        process_pickups();
+        process_pickups(cb, blt);
         time = {};
 
         if (!copied) {
