@@ -145,7 +145,9 @@ struct : public vapp {
       }
       vee::update_descriptor_set(dset, 0, ivs, *smp);
 
-      auto opl = vee::create_pipeline_layout();
+      auto opl = vee::create_pipeline_layout({
+        vee::fragment_push_constant_range<dotz::vec4>()
+      });
       voo::one_quad_render oqr { "overlay", &dq, *opl };
 
       sitime::stopwatch time {};
@@ -178,6 +180,8 @@ struct : public vapp {
 
         blt.draw(cb, g_upc.cam, g_upc.angle);
 
+        dotz::vec4 olay { 1 };
+        vee::cmd_push_fragment_constants(cb, *opl, &olay);
         oqr.run(cb);
       });
     });
