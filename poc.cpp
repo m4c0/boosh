@@ -75,16 +75,10 @@ static void update_camera(float ms) {
 }
 
 static void process_pickups() {
-  for (unsigned dy = -1; dy <= 1; dy++) {
-    for (unsigned dx = -1; dx <= 1; dx++) {
-      float x = g_upc.cam.x + dx;
-      float y = g_upc.cam.y + dy;
-      if (!mapbuilder::has_bullet(x, y)) continue;
-      g_olay = { 1.0f };
-      return;
-    }
-  }
-  g_olay = g_olay * 0.9;
+  float x = g_upc.cam.x;
+  float y = g_upc.cam.y;
+  if (!bullet::has({x, 0.f, y})) return;
+  g_olay = { 1.0f };
 }
 
 struct : public vapp {

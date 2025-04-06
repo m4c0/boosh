@@ -15,6 +15,13 @@ namespace bullet {
   export void add(dotz::vec3 p) { list.push_back(p); }
   export void clear() { list.truncate(0); }
 
+  export bool has(dotz::vec3 p) {
+    for (auto b : list) {
+      if (dotz::length(p - b) < 0.5) return true;
+    }
+    return false;
+  }
+
   export class model {
     struct upc {
       dotz::vec3 cam;
