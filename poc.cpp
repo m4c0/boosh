@@ -1,6 +1,8 @@
 #pragma leco app
 #pragma leco add_shader "poc.vert"
 #pragma leco add_shader "poc.frag"
+#pragma leco add_shader "overlay.vert"
+#pragma leco add_shader "overlay.frag"
 #pragma leco add_resource "Tiles040_1K-JPG_Color.jpg"
 #pragma leco add_resource "Tiles051_1K-JPG_Color.jpg"
 #pragma leco add_resource "Tiles131_1K-JPG_Color.jpg"
@@ -143,6 +145,9 @@ struct : public vapp {
       }
       vee::update_descriptor_set(dset, 0, ivs, *smp);
 
+      auto opl = vee::create_pipeline_layout();
+      voo::one_quad_render oqr { "overlay", &dq, *opl };
+
       sitime::stopwatch time {};
       bool copied = false;
       ots_loop(dq, sw, [&](auto cb) {
@@ -172,6 +177,8 @@ struct : public vapp {
         vee::cmd_draw(cb, vcount);
 
         blt.draw(cb, g_upc.cam, g_upc.angle);
+
+        oqr.run(cb);
       });
     });
   }
