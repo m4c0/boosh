@@ -75,8 +75,8 @@ static void update_camera(float ms) {
 }
 
 static void process_pickups() {
-  if (!bullet::has(g_upc.cam)) return;
-  g_olay = { 1.0f };
+  if (bullet::has(g_upc.cam)) g_olay = { 1.0f };
+  g_olay = g_olay * 0.9;
 }
 
 struct : public vapp {
