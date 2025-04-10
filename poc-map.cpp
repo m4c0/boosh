@@ -25,6 +25,10 @@ static void check_version(jute::view arg) {
 
 static void set_id(char * g, jute::view arg) {
   if (arg.size() != 1) error("invalid character id", arg);
+  if (g != &g_bullet_id && g_bullet_id == arg[0]) error("id is being used in bullet already", arg);
+  if (g != &g_hall_id   && g_hall_id   == arg[0]) error("id is being used in hall already", arg);
+  if (g != &g_player_id && g_player_id == arg[0]) error("id is being used in player already", arg);
+  if (g != &g_wall_id   && g_wall_id   == arg[0]) error("id is being used in wall already", arg);
   *g = arg[0];
 }
 
@@ -33,6 +37,15 @@ static void read_map(jute::view line) {
     g_liner = take_command;
     putln("map done?");
     return;
+  }
+
+  for (auto c : line) {
+    if (c == ' ') {}
+    else if (c == g_bullet_id) {}
+    else if (c == g_hall_id) {}
+    else if (c == g_player_id) {}
+    else if (c == g_wall_id) {}
+    else error("unknown id in map", c);
   }
 }
 
