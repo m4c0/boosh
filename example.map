@@ -11,12 +11,12 @@ X...X X..X
 X....X.B.X
 X......B.X
 X.P....B.X
-X......B.X
-XXX..B.XXX
-  X....X
-  X..XXX
-  X..X
-  XBXX
-  XBX
-  XXX
+X......B.X XXXXXX
+XXX..B.XXX X....X
+  X....X   X.BB.X
+  X..XXX   X....X
+  X..X     X.XXXX
+  XBXXXXXXXX.X
+  XB.........X
+  XXXXXXXXXXXX
 .
