@@ -13,6 +13,8 @@ static char g_hall_id;
 static char g_player_id;
 static char g_wall_id;
 
+static void take_command(jute::view line);
+
 static void error(jute::view msg, auto arg) {
   die(g_filename, ":", g_line_number, ": ", msg, ": [", arg, "]");
 }
@@ -26,6 +28,14 @@ static void set_id(char * g, jute::view arg) {
   *g = arg[0];
 }
 
+static void read_map(jute::view line) {
+  if (line == ".") {
+    g_liner = take_command;
+    putln("map done?");
+    return;
+  }
+}
+
 static void take_command(jute::view line) {
   if (line == "") return;
   
@@ -37,6 +47,11 @@ static void take_command(jute::view line) {
   if (cmd == "hall")    return set_id(&g_hall_id,   args);
   if (cmd == "player")  return set_id(&g_player_id, args);
   if (cmd == "wall")    return set_id(&g_wall_id,   args);
+
+  if (cmd == "map") {
+    g_liner = read_map;
+    return;
+  }
 
   error("unknown command", cmd);
 }
