@@ -7,6 +7,7 @@
 #pragma leco add_resource "Tiles051_1K-JPG_Color.jpg"
 #pragma leco add_resource "Tiles131_1K-JPG_Color.jpg"
 #pragma leco add_resource "Tiles133D_1K-JPG_Color.jpg"
+#pragma leco add_resource "example.map"
 
 import bullet;
 import dotz;
@@ -14,8 +15,11 @@ import faces;
 import hai;
 import jute;
 import input;
+import mapper;
 import mapbuilder;
+import mapper;
 import silog;
+import sires;
 import sitime;
 import traits;
 import voo;
@@ -82,9 +86,18 @@ static void process_pickups(auto cb, auto & blt) {
   g_olay = g_olay * 0.9;
 }
 
+struct loader : mapper::loader {
+  using mapper::loader::loader;
+  void error(jute::view msg, jute::view arg) override {
+    auto m = filename() + ": " + msg + ": [" + arg + "]";
+    silog::die("%s", m.cstr().begin());
+  }
+};
+
 struct : public vapp {
   void run() {
     input::setup();
+    loader { sires::real_path_name("example.map") };
 
     main_loop("poc-voo", [&](auto & dq, auto & sw) {
       unsigned max_dset_imgs = vee::get_physical_device_properties(dq.physical_device())
@@ -96,7 +109,7 @@ struct : public vapp {
 
       voo::h2l_buffer buf { dq.physical_device(), sizeof(faces::vtx) * max_vertices };
 
-      auto cam = mapbuilder::initial_pos();
+      auto cam = mapper::initial_pos;
       g_upc.cam = { cam.x + 0.5f, 0.0f, cam.y + 0.5f };
       auto vcount = mapbuilder::load(buf);
 

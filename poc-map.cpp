@@ -15,4 +15,15 @@ public:
 
 int main() {
   loader l { "example.map" };
+
+  for (auto y = 0; y < 32; y++) {
+    for (auto x = 0; x < 64; x++) {
+      switch (mapper::tiles[y][x]) {
+        case mapper::tile::empty: put(" "); break;
+        case mapper::tile::hall:  put("."); break;
+        case mapper::tile::wall:  put("X"); break;
+      }
+    }
+    putln();
+  }
 }
