@@ -1,0 +1,22 @@
+version 0
+
+bullet B
+hall   .
+player P
+wall   X
+
+map
+XXXXX  XXX
+X...X X..X
+X....X.B.X
+X......B.X
+X.P....B.X
+X......B.X
+XXX..B.XXX
+  X....X
+  X..XXX
+  X..X
+  XBXX
+  XBX
+  XXX
+.
