@@ -5,6 +5,8 @@ import hai;
 import jojo;
 import jute;
 
+using namespace jute::literals;
+
 namespace mapper {
   export dotz::ivec2 initial_pos { -1 };
 
@@ -34,17 +36,46 @@ namespace mapper {
     unsigned line_number;
   };
 
+  struct texture {
+    jute::heap id;
+    jute::heap name;
+  };
+  class textures {
+    static constexpr const auto max = 128;
+    hai::varray<texture> m_list { max };
+
+  public:
+    void add(jute::view arg) {
+      auto [id, name] = arg.split(' ');
+
+      id = id.trim();
+      if (id == "") throw error { "missing texture id"_hs };
+
+      name = name.trim();
+      if (name == "") throw error { "missing texture name"_hs };
+
+      for (auto &[i, n] : m_list) {
+        if (i == id) throw error { "duplicate texture id: "_hs + id };
+        if (n == name) throw error { "duplicate texture name: "_hs + name };
+      }
+      m_list.push_back(texture { id, name });
+    }
+  };
+
   export class loader {
     void (loader::*m_liner)(jute::view) = &loader::take_command;
     unsigned m_line_number = 1;
     unsigned m_map_row = 1;
    
     hai::fn<void, int, int> m_fns[256] {};
+    textures m_txts {};
 
     void check_version(jute::view arg) {
       arg = arg.trim();
       if (arg != "0") err("invalid version", arg);
     }
+
+    void add_texture(jute::view arg) { m_txts.add(arg); }
 
     void err(jute::view msg, char c) {
       char cc[2] = { c, 0 };
@@ -84,6 +115,7 @@ namespace mapper {
       auto [cmd, args] = line.split(' ');
     
       if (cmd == "version") return check_version(args);
+      if (cmd == "texture") return add_texture(args);
       if (cmd == "bullet")  return set_id(args, &add_bullet);
       if (cmd == "hall")    return set_id(args, &add_hall);
       if (cmd == "player")  return set_id(args, &add_player);
