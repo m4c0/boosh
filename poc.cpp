@@ -86,18 +86,17 @@ static void process_pickups(auto cb, auto & blt) {
   g_olay = g_olay * 0.9;
 }
 
-struct loader : mapper::loader {
-  using mapper::loader::loader;
-  void error(jute::view msg, jute::view arg) override {
-    auto m = filename() + ": " + msg + ": [" + arg + "]";
-    silog::die("%s", m.cstr().begin());
-  }
-};
+static constexpr const jute::view map_name = "example.map";
 
 struct : public vapp {
   void run() {
     input::setup();
-    loader { sires::real_path_name("example.map") };
+    try {
+      mapper::loader { sires::real_path_name(map_name) };
+    } catch (const mapper::loader::error & e) {
+      auto m = jute::heap{map_name} + ":" + e.line_number + ": " + e.msg + ": [" + e.arg + "]\0";
+      silog::die("%s", m.begin());
+    }
 
     main_loop("poc-voo", [&](auto & dq, auto & sw) {
       unsigned max_dset_imgs = vee::get_physical_device_properties(dq.physical_device())

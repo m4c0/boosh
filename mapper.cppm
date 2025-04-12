@@ -39,20 +39,20 @@ namespace mapper {
 
     void check_version(jute::view arg) {
       arg = arg.trim();
-      if (arg != "0") error("invalid version", arg);
+      if (arg != "0") err("invalid version", arg);
     }
 
-    void error(jute::view msg, char c) {
+    void err(jute::view msg, char c) {
       char cc[2] = { c, 0 };
-      error(msg, jute::view { cc, 1 });
+      err(msg, jute::view { cc, 1 });
     }
     
     void set_id(jute::view arg, auto fn) {
       arg = arg.trim();
-      if (arg.size() != 1) error("invalid character id", arg);
+      if (arg.size() != 1) err("invalid character id", arg);
       
       int id = arg[0];
-      if (m_fns[id]) error("id is being used already", arg);
+      if (m_fns[id]) err("id is being used already", arg);
       m_fns[id] = fn;
     }
     
@@ -68,7 +68,7 @@ namespace mapper {
         x++;
         auto & fn = m_fns[static_cast<unsigned>(c)];
         if (fn) fn(x, y);
-        else error("unknown id in map", c);
+        else err("unknown id in map", c);
       }
     }
 
@@ -93,16 +93,21 @@ namespace mapper {
         return;
       }
     
-      error("unknown command", cmd);
+      err("unknown command", cmd);
     }
 
-  protected:
-    virtual void error(jute::view msg, jute::view arg) = 0;
+    [[noreturn]] void err(jute::view msg, jute::view arg) {
+      throw error { m_filename, m_line_number, msg, arg };
+    }
 
-    auto filename() const { return m_filename; }
-    auto line_number() const { return m_line_number; }
-    
   public:
+    struct error {
+      jute::heap filename;
+      unsigned line_number;
+      jute::heap msg;
+      jute::heap arg;
+    };
+
     explicit loader(jute::view filename) : m_filename { filename } {
       m_fns[' '] = &ignore;
       jojo::readlines(m_filename, [this](auto line) {
