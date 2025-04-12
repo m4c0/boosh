@@ -94,7 +94,7 @@ struct : public vapp {
     input::setup();
     try {
       mapper::loader { sires::real_path_name(map_name) };
-    } catch (const mapper::loader::error & e) {
+    } catch (const mapper::error & e) {
       silog::die("%s", (*e.msg).cstr().begin());
     }
 

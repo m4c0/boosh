@@ -11,7 +11,7 @@ int main() try {
   mapper::loader { filename };
 
   putln("map seems fine");
-} catch (const mapper::loader::error & e) {
+} catch (const mapper::error & e) {
   err(filename, ":", e.line_number, ": ", e.msg);
   return 1;
 } catch (...) {

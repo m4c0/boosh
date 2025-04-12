@@ -29,6 +29,11 @@ namespace mapper {
     tiles[y][x] = tile::wall;
   }
 
+  export struct error {
+    jute::heap msg;
+    unsigned line_number;
+  };
+
   export class loader {
     void (loader::*m_liner)(jute::view) = &loader::take_command;
     unsigned m_line_number = 1;
@@ -102,11 +107,6 @@ namespace mapper {
     }
 
   public:
-    struct error {
-      jute::heap msg;
-      unsigned line_number;
-    };
-
     explicit loader(jute::view filename) {
       m_fns[' '] = &ignore;
       jojo::readlines(filename, [this](auto line) {
