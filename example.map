@@ -4,6 +4,10 @@ bullet B
 hall   .
 player P
 wall   X
+// TODO: door
+wall   O
+// TODO: push wall
+wall   *
 
 map
 XXXXX  XXX
@@ -16,7 +20,7 @@ XXX..B.XXX X....X
   X....X   X.BB.X
   X..XXX   X....X
   X..X     X.XXXX
-  XBXXXXXXXX.X
-  XB.........X
-  XXXXXXXXXXXX
+  XBXXXXXXXX.XX
+  XB.O.*......X
+  XXXXXXXXXXXXX
 .

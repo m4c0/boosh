@@ -74,6 +74,7 @@ namespace mapper {
     void take_command(jute::view line) {
       line = line.trim();
       if (line == "") return;
+      if (line.subview(2).before == "//") return;
       
       auto [cmd, args] = line.split(' ');
     
