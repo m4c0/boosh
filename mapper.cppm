@@ -1,11 +1,11 @@
 export module mapper;
+export import :error;
+import :textures;
 import bullet;
 import dotz;
 import hai;
 import jojo;
 import jute;
-
-using namespace jute::literals;
 
 namespace mapper {
   export dotz::ivec2 initial_pos { -1 };
@@ -30,37 +30,6 @@ namespace mapper {
   static void add_wall(unsigned x, unsigned y) {
     tiles[y][x] = tile::wall;
   }
-
-  export struct error {
-    jute::heap msg;
-    unsigned line_number;
-  };
-
-  struct texture {
-    jute::heap id;
-    jute::heap name;
-  };
-  class textures {
-    static constexpr const auto max = 128;
-    hai::varray<texture> m_list { max };
-
-  public:
-    void add(jute::view arg) {
-      auto [id, name] = arg.split(' ');
-
-      id = id.trim();
-      if (id == "") throw error { "missing texture id"_hs };
-
-      name = name.trim();
-      if (name == "") throw error { "missing texture name"_hs };
-
-      for (auto &[i, n] : m_list) {
-        if (i == id) throw error { "duplicate texture id: "_hs + id };
-        if (n == name) throw error { "duplicate texture name: "_hs + name };
-      }
-      m_list.push_back(texture { id, name });
-    }
-  };
 
   export class loader {
     void (loader::*m_liner)(jute::view) = &loader::take_command;
