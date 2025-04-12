@@ -5,14 +5,10 @@ import jute;
 import mapper;
 import print;
 
-int main() {
-  jute::view filename = "example.map";
+constexpr const jute::view filename = "example.map";
 
-  try {
-    mapper::loader { filename };
-  } catch (const mapper::loader::error & e) {
-    die(filename, ":", e.line_number, ": ", e.msg);
-  }
+int main() try {
+  mapper::loader { filename };
 
   for (auto y = 0; y < 32; y++) {
     for (auto x = 0; x < 64; x++) {
@@ -24,4 +20,9 @@ int main() {
     }
     putln();
   }
+} catch (const mapper::loader::error & e) {
+  err(filename, ":", e.line_number, ": ", e.msg);
+  return 1;
+} catch (...) {
+  return 1;
 }
