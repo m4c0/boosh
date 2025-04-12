@@ -108,11 +108,16 @@ namespace mapper {
 
   public:
     explicit loader(jute::view filename) {
-      m_fns[' '] = &ignore;
-      jojo::readlines(filename, [this](auto line) {
-        (this->*m_liner)(line);
-        m_line_number++;
-      });
+      try {
+        m_fns[' '] = &ignore;
+        jojo::readlines(filename, [this](auto line) {
+          (this->*m_liner)(line);
+          m_line_number++;
+        });
+      } catch (error e) {
+        e.line_number = m_line_number;
+        throw e;
+      }
     }
   };
 }
