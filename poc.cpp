@@ -5,6 +5,7 @@
 #pragma leco add_shader "overlay.frag"
 #pragma leco add_resource "Tiles040_1K-JPG_Color.jpg"
 #pragma leco add_resource "Tiles051_1K-JPG_Color.jpg"
+#pragma leco add_resource "Tiles101_1K-JPG_Color.jpg"
 #pragma leco add_resource "Tiles131_1K-JPG_Color.jpg"
 #pragma leco add_resource "Tiles133D_1K-JPG_Color.jpg"
 #pragma leco add_resource "example.map"
@@ -142,6 +143,7 @@ struct : public vapp {
       hai::view<jute::view> textures {
         "Tiles040_1K-JPG_Color.jpg"_s,
         "Tiles051_1K-JPG_Color.jpg"_s,
+        "Tiles101_1K-JPG_Color.jpg"_s,
         "Tiles131_1K-JPG_Color.jpg"_s,
         "Tiles133D_1K-JPG_Color.jpg"_s,
       };

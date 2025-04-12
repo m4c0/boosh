@@ -28,8 +28,8 @@ namespace mapbuilder {
             break;
 
           case tile::hall:
-            draw_floor(m, x, y, -1, 2);
-            draw_ceiling(m, x, y, 1, 3);
+            draw_floor(m, x, y, -1, 3);
+            draw_ceiling(m, x, y, 1, 4);
             break;
 
           default:
