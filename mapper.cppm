@@ -33,7 +33,6 @@ namespace mapper {
     void (loader::*m_liner)(jute::view) = &loader::take_command;
     unsigned m_line_number = 1;
     unsigned m_map_row = 1;
-    jute::view m_filename;
    
     hai::fn<void, int, int> m_fns[256] {};
 
@@ -97,20 +96,19 @@ namespace mapper {
     }
 
     [[noreturn]] void err(jute::view msg, jute::view arg) {
-      throw error { m_filename, m_line_number, msg, arg };
+      auto m = jute::heap { msg } + " [" + arg + "]";
+      throw error { m, m_line_number };
     }
 
   public:
     struct error {
-      jute::heap filename;
-      unsigned line_number;
       jute::heap msg;
-      jute::heap arg;
+      unsigned line_number;
     };
 
-    explicit loader(jute::view filename) : m_filename { filename } {
+    explicit loader(jute::view filename) {
       m_fns[' '] = &ignore;
-      jojo::readlines(m_filename, [this](auto line) {
+      jojo::readlines(filename, [this](auto line) {
         (this->*m_liner)(line);
         m_line_number++;
       });

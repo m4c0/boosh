@@ -6,10 +6,12 @@ import mapper;
 import print;
 
 int main() {
+  jute::view filename = "example.map";
+
   try {
-    mapper::loader { "example.map" };
+    mapper::loader { filename };
   } catch (const mapper::loader::error & e) {
-    die(e.filename, ":", e.line_number, ": ", e.msg, ": [", e.arg, "]");
+    die(filename, ":", e.line_number, ": ", e.msg);
   }
 
   for (auto y = 0; y < 32; y++) {

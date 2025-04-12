@@ -94,8 +94,7 @@ struct : public vapp {
     try {
       mapper::loader { sires::real_path_name(map_name) };
     } catch (const mapper::loader::error & e) {
-      auto m = jute::heap{map_name} + ":" + e.line_number + ": " + e.msg + ": [" + e.arg + "]\0";
-      silog::die("%s", m.begin());
+      silog::die("%s", (*e.msg).cstr().begin());
     }
 
     main_loop("poc-voo", [&](auto & dq, auto & sw) {
