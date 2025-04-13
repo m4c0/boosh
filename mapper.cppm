@@ -1,5 +1,6 @@
 export module mapper;
 export import :error;
+import :tiledefs;
 import :textures;
 import bullet;
 import dotz;
@@ -38,13 +39,19 @@ namespace mapper {
    
     hai::fn<void, int, int> m_fns[256] {};
     textures m_txts {};
+    tiledefs m_tdefs {};
 
-    void check_version(jute::view arg) {
+    void cmd_version(jute::view arg) {
       arg = arg.trim();
       if (arg != "0") err("invalid version", arg);
     }
 
-    void add_texture(jute::view arg) { m_txts.add(arg); }
+    void cmd_texture(jute::view arg) { m_txts.add(arg); }
+
+    void cmd_define(jute::view arg) {
+      m_tdefs.add(arg);
+      m_liner = &loader::read_define;
+    }
 
     void err(jute::view msg, char c) {
       char cc[2] = { c, 0 };
@@ -58,6 +65,15 @@ namespace mapper {
       int id = arg[0];
       if (m_fns[id]) err("id is being used already", arg);
       m_fns[id] = fn;
+    }
+
+    void read_define(jute::view line) {
+      line = line.trim();
+      if (line == ".") {
+        m_liner = &loader::take_command;
+        return;
+      }
+      err("TBD", line);
     }
     
     void read_map(jute::view line) {
@@ -83,8 +99,10 @@ namespace mapper {
       
       auto [cmd, args] = line.split(' ');
     
-      if (cmd == "version") return check_version(args);
-      if (cmd == "texture") return add_texture(args);
+      if (cmd == "version") return cmd_version(args);
+      if (cmd == "texture") return cmd_texture(args);
+      if (cmd == "define")  return cmd_define(args);
+
       if (cmd == "bullet")  return set_id(args, &add_bullet);
       if (cmd == "hall")    return set_id(args, &add_hall);
       if (cmd == "player")  return set_id(args, &add_player);
