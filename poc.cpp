@@ -43,7 +43,7 @@ struct upc {
 
 dotz::vec4 g_olay {};
 
-static void update_camera(float ms) {
+static void update_camera(const mapper::tilemap & map, float ms) {
   float da = -input::state(input::axis::TURN) * turn_speed * ms / 1000.0;
   g_upc.angle = dotz::mod(360 + g_upc.angle + da, 360);
 
@@ -62,13 +62,13 @@ static void update_camera(float ms) {
     auto cam = g_upc.cam;
     cam.x -= dx * walk_speed * ms / 1000.0;
     cam.z += dy * walk_speed * ms / 1000.0;
-    if (!mapbuilder::walkable(cam.x, cam.z)) return false;
+    if (!map(cam.x, cam.z).walk) return false;
 
     auto adx = player_radius * dotz::sign(-dx);
     auto ady = player_radius * dotz::sign(dy);
-    if (!mapbuilder::walkable(cam.x + adx, cam.z)) return false;
-    if (!mapbuilder::walkable(cam.x, cam.z + ady)) return false;
-    if (!mapbuilder::walkable(cam.x + adx, cam.z + ady)) return false;
+    if (!map(cam.x + adx, cam.z      ).walk) return false;
+    if (!map(cam.x,       cam.z + ady).walk) return false;
+    if (!map(cam.x + adx, cam.z + ady).walk) return false;
 
     g_upc.cam = cam;
     return true;
@@ -165,7 +165,7 @@ struct : public vapp {
       sitime::stopwatch time {};
       bool copied = false;
       ots_loop(dq, sw, [&](auto cb) {
-        update_camera(time.millis());
+        update_camera(map, time.millis());
         process_pickups(cb, blt);
         time = {};
 

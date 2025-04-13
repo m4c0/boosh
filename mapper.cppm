@@ -1,5 +1,6 @@
 export module mapper;
 export import :error;
+export import :tilemap;
 import :loader;
 import jute;
 

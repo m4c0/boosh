@@ -7,11 +7,6 @@ import voo;
 using namespace mapper;
 
 namespace mapbuilder {
-  export bool walkable(unsigned x, unsigned y) {
-    if (x <= 0 || x >= width || y <= 0 || y >= height) return false;
-    return tiles[y][x] == tile::hall;
-  }
-
   export unsigned load(voo::h2l_buffer & buf) {
     unsigned count {};
     voo::memiter<faces::vtx> m { buf.host_memory(), &count };
