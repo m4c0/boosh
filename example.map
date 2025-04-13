@@ -9,6 +9,9 @@ texture t133d Tiles133D_1K-JPG_Color.jpg
 define X
   wall t040
 .
+define W
+  wall t100
+.
 define .
   floor t131
   ceiling t133d
@@ -35,11 +38,11 @@ define *
 
 map
   XXXXX  XXX
-  X...X X..X
-  X....X.B.X
-  X......B.X
-  X.P....B.X
-  X......B.X XXXXXX
+  X...X X..W
+  X....X.B.W
+  X......B.W
+  X.P....B.W
+  X......B.W XXXXXX
   XXX..B.XXX X....X
     X....X   X.BB.X
     X..XXX   X....X
