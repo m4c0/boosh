@@ -15,6 +15,10 @@ define .
   walk
 .
 
+define P
+  copy .
+  entity player
+.
 define B
   copy .
   entity bullet
