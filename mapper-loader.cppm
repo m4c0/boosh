@@ -1,4 +1,4 @@
-module mapper:loader;
+export module mapper:loader;
 import :error;
 import :tiledefs;
 import :tilemap;
@@ -87,6 +87,15 @@ namespace mapper {
       }
     }
 
-    [[nodiscard]] constexpr auto take_map() { return traits::move(m_map); }
+    [[nodiscard]] constexpr auto take() {
+      struct {
+        tilemap map;
+        hai::array<jute::heap> textures;
+      } res {
+        .map = traits::move(m_map),
+        .textures = m_txts.take_list(),
+      };
+      return res;
+    }
   };
 }

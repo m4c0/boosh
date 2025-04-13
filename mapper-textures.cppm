@@ -36,5 +36,11 @@ namespace mapper {
       }
       m_list.push_back(texture { id, name });
     }
+
+    [[nodiscard]] constexpr auto take_list() const {
+      hai::array<jute::heap> list { m_list.size() };
+      for (auto i = 0; i < m_list.size(); i++) list[i] = m_list[i].name;
+      return list;
+    }
   };
 }

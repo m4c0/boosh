@@ -92,7 +92,7 @@ static constexpr const jute::view map_name = "example.map";
 struct : public vapp {
   void run() try {
     input::setup();
-    auto map = mapper::load(sires::real_path_name(map_name));
+    auto [map, textures] = mapper::load(sires::real_path_name(map_name));
 
     main_loop("poc-voo", [&](auto & dq, auto & sw) {
       unsigned max_dset_imgs = vee::get_physical_device_properties(dq.physical_device())
@@ -139,17 +139,10 @@ struct : public vapp {
       auto dpool = vee::create_descriptor_pool(1, { vee::combined_image_sampler(dset_smps) });
       auto dset = vee::allocate_descriptor_set(*dpool, *dsl);
 
-      hai::view<jute::view> textures {
-        "Tiles040_1K-JPG_Color.jpg"_s,
-        "Tiles051_1K-JPG_Color.jpg"_s,
-        "Tiles101_1K-JPG_Color.jpg"_s,
-        "Tiles131_1K-JPG_Color.jpg"_s,
-        "Tiles133D_1K-JPG_Color.jpg"_s,
-      };
       hai::array<voo::h2l_image> imgs { textures.size() };
       hai::array<vee::image_view::type> ivs { dset_smps };
       for (auto i = 0; i < imgs.size(); i++) {
-        imgs[i] = voo::load_sires_image(textures[i], dq.physical_device());
+        imgs[i] = voo::load_sires_image(*textures[i], dq.physical_device());
         ivs[i] = imgs[i].iv();
       }
       for (auto i = imgs.size(); i < dset_smps; i++) {
