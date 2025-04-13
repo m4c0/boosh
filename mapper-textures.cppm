@@ -15,6 +15,12 @@ namespace mapper {
     hai::varray<texture> m_list { max };
 
   public:
+    [[nodiscard]] constexpr auto operator[](jute::view id) const {
+      for (auto i = 0; i < m_list.size(); i++) {
+        if (id == m_list[i].id) return i;
+      }
+      throw error { "texture not defined: "_hs + id };
+    }
     void add(jute::view arg) {
       auto [id, name] = arg.split(' ');
 

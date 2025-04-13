@@ -39,7 +39,7 @@ namespace mapper {
    
     hai::fn<void, int, int> m_fns[256] {};
     textures m_txts {};
-    tiledefs m_tdefs {};
+    tiledefs m_tdefs { &m_txts };
 
     void cmd_version(jute::view arg) {
       arg = arg.trim();
@@ -73,7 +73,7 @@ namespace mapper {
         m_liner = &loader::take_command;
         return;
       }
-      err("TBD", line);
+      m_tdefs.parse(line);
     }
     
     void read_map(jute::view line) {
