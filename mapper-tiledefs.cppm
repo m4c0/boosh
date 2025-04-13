@@ -12,6 +12,7 @@ namespace mapper {
     unsigned wall;
     unsigned floor;
     unsigned ceiling;
+    jute::heap entity;
     bool walk;
   };
   class tiledefs {
@@ -46,11 +47,14 @@ namespace mapper {
     void add(jute::view arg) { m_defs.push_back(tiledef { arg_of(arg) }); }
     void parse(jute::view line) {
       auto [cmd, args] = line.split(' ');
-           if (cmd == "wall")    current().wall    = (*m_txts)[args.trim()];
-      else if (cmd == "floor")   current().floor   = (*m_txts)[args.trim()];
-      else if (cmd == "ceiling") current().ceiling = (*m_txts)[args.trim()];
+      args = args.trim();
+
+           if (cmd == "wall")    current().wall    = (*m_txts)[args];
+      else if (cmd == "floor")   current().floor   = (*m_txts)[args];
+      else if (cmd == "ceiling") current().ceiling = (*m_txts)[args];
       else if (cmd == "walk")    current().walk    = true;
       else if (cmd == "copy")    copy((*this)[arg_of(args)]);
+      else if (cmd == "entity")  current().entity  = args;
       else throw error { "unknown command: "_hs + cmd };
     }
   };
