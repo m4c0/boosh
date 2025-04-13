@@ -109,7 +109,7 @@ struct : public vapp {
         if (*d.entity == "player") g_upc.cam = { x + 0.5f, 0.0f, y + 0.5f };
         if (*d.entity == "bullet") bullet::add({ x + 0.5f, 0.0f, y + 0.5f });
       });
-      auto vcount = mapbuilder::load(buf);
+      auto vcount = mapbuilder::build(map, buf);
 
       bullet::model blt { dq };
 
