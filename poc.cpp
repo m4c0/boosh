@@ -104,8 +104,10 @@ struct : public vapp {
 
       voo::h2l_buffer buf { dq.physical_device(), sizeof(faces::vtx) * max_vertices };
 
-      map.find_entities("player", [](auto x, auto y, auto) {
-        g_upc.cam = { x + 0.5f, 0.0f, y + 0.5f };
+      bullet::clear();
+      map.for_each([](auto x, auto y, auto & d) {
+        if (*d.entity == "player") g_upc.cam = { x + 0.5f, 0.0f, y + 0.5f };
+        if (*d.entity == "bullet") bullet::add({ x + 0.5f, 0.0f, y + 0.5f });
       });
       auto vcount = mapbuilder::load(buf);
 

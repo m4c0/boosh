@@ -19,11 +19,10 @@ namespace mapper {
       return m_data[y * width + x];
     }
 
-    void find_entities(jute::view name, auto && fn) {
+    void for_each(auto && fn) const {
       for (auto y = 0; y < height; y++) {
         for (auto x = 0; x < width; x++) {
-          const auto & d = (*this)(x, y);
-          if (d.entity == name) fn(x, y, d);
+          fn(x, y, (*this)(x, y));
         }
       }
     }
