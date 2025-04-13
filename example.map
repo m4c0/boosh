@@ -6,28 +6,41 @@ texture t100  Tiles101_1K-JPG_Color.jpg
 texture t131  Tiles131_1K-JPG_Color.jpg
 texture t133d Tiles133D_1K-JPG_Color.jpg
 
-bullet B
-hall   .
-player P
-wall   X
+define X
+  wall t040
+.
+define .
+  floor t131
+  ceiling t133d
+  walk
+.
+
+define B
+  copy .
+  entity bullet
+.
 
 // TODO: door
-wall   O
+define O
+  copy X
+.
 // TODO: push wall
-wall   *
+define *
+  copy X
+.
 
 map
-XXXXX  XXX
-X...X X..X
-X....X.B.X
-X......B.X
-X.P....B.X
-X......B.X XXXXXX
-XXX..B.XXX X....X
-  X....X   X.BB.X
-  X..XXX   X....X
-  X..X     X.XXXX
-  XBXXXXXXXX.XX
-  XB.O.*......X
-  XXXXXXXXXXXXX
+  XXXXX  XXX
+  X...X X..X
+  X....X.B.X
+  X......B.X
+  X.P....B.X
+  X......B.X XXXXXX
+  XXX..B.XXX X....X
+    X....X   X.BB.X
+    X..XXX   X....X
+    X..X     X.XXXX
+    XBXXXXXXXX.XX
+    XB.O.*......X
+    XXXXXXXXXXXXX
 .
