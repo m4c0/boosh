@@ -15,6 +15,7 @@ namespace mapper {
   export constexpr const auto height = 256;
   export enum class tile { empty, hall, wall };
   export tile tiles[height][width];
+  export tiledef tiles2[height][width];
 
   static void ignore(unsigned, unsigned) {}
   static void add_bullet(unsigned x, unsigned y) {
@@ -37,13 +38,12 @@ namespace mapper {
     unsigned m_line_number = 1;
     unsigned m_map_row = 1;
    
-    hai::fn<void, int, int> m_fns[256] {};
     textures m_txts {};
     tiledefs m_tdefs { &m_txts };
 
     void cmd_version(jute::view arg) {
       arg = arg.trim();
-      if (arg != "0") err("invalid version", arg);
+      if (arg != "0") throw error { "invalid version: "_hs + arg };
     }
 
     void cmd_texture(jute::view arg) { m_txts.add(arg); }
@@ -51,20 +51,6 @@ namespace mapper {
     void cmd_define(jute::view arg) {
       m_tdefs.add(arg);
       m_liner = &loader::read_define;
-    }
-
-    void err(jute::view msg, char c) {
-      char cc[2] = { c, 0 };
-      err(msg, jute::view { cc, 1 });
-    }
-    
-    void set_id(jute::view arg, auto fn) {
-      arg = arg.trim();
-      if (arg.size() != 1) err("invalid character id", arg);
-      
-      int id = arg[0];
-      if (m_fns[id]) err("id is being used already", arg);
-      m_fns[id] = fn;
     }
 
     void read_define(jute::view line) {
@@ -86,9 +72,7 @@ namespace mapper {
       unsigned y = m_map_row++;
       for (auto c : line) {
         x++;
-        auto & fn = m_fns[static_cast<unsigned>(c)];
-        if (fn) fn(x, y);
-        else err("unknown id in map", c);
+        if (c != ' ') tiles2[y][x] = m_tdefs[c];
       }
     }
 
@@ -103,11 +87,6 @@ namespace mapper {
       if (cmd == "texture") return cmd_texture(args);
       if (cmd == "define")  return cmd_define(args);
 
-      if (cmd == "bullet")  return set_id(args, &add_bullet);
-      if (cmd == "hall")    return set_id(args, &add_hall);
-      if (cmd == "player")  return set_id(args, &add_player);
-      if (cmd == "wall")    return set_id(args, &add_wall);
-    
       if (cmd == "map") {
         bullet::clear();
         m_liner = &loader::read_map;
@@ -117,18 +96,12 @@ namespace mapper {
         return;
       }
     
-      err("unknown command", cmd);
-    }
-
-    [[noreturn]] void err(jute::view msg, jute::view arg) {
-      auto m = jute::heap { msg } + " [" + arg + "]";
-      throw error { m, m_line_number };
+      throw error { "unknown command: "_hs + cmd };
     }
 
   public:
     explicit loader(jute::view filename) {
       try {
-        m_fns[' '] = &ignore;
         jojo::readlines(filename, [this](auto line) {
           (this->*m_liner)(line);
           m_line_number++;
