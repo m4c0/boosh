@@ -8,8 +8,7 @@ import print;
 constexpr const jute::view filename = "example.map";
 
 int main() try {
-  mapper::loader { filename };
-
+  auto _ = mapper::load(filename);
   putln("map seems fine");
 } catch (const mapper::error & e) {
   err(filename, ":", e.line_number, ": ", e.msg);

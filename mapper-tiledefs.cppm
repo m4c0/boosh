@@ -1,4 +1,4 @@
-module mapper:tiledefs;
+export module mapper:tiledefs;
 import :error;
 import :textures;
 import hai;
@@ -7,12 +7,12 @@ import jute;
 using namespace jute::literals;
 
 namespace mapper {
-  struct tiledef {
+  export struct tiledef {
     char id;
     unsigned wall;
     unsigned floor;
     unsigned ceiling;
-    jute::heap entity;
+    jute::heap entity {};
     bool walk;
   };
   class tiledefs {

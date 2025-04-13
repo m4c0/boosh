@@ -1,15 +1,16 @@
-export module mapper:loader;
+module mapper:loader;
 import :error;
 import :tiledefs;
 import :tilemap;
 import :textures;
 import jojo;
 import jute;
+import traits;
 
 using namespace jute::literals;
 
 namespace mapper {
-  export class loader {
+  class loader {
     void (loader::*m_liner)(jute::view) = &loader::take_command;
     unsigned m_line_number = 1;
     unsigned m_map_row = 1;
@@ -86,6 +87,6 @@ namespace mapper {
       }
     }
 
-    [[nodiscard]] constexpr const auto & map() const { return m_map; }
+    [[nodiscard]] constexpr auto take_map() { return traits::move(m_map); }
   };
 }

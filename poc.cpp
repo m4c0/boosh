@@ -90,13 +90,9 @@ static void process_pickups(auto cb, auto & blt) {
 static constexpr const jute::view map_name = "example.map";
 
 struct : public vapp {
-  void run() {
+  void run() try {
     input::setup();
-    try {
-      mapper::loader { sires::real_path_name(map_name) };
-    } catch (const mapper::error & e) {
-      silog::die("%s", (*e.msg).cstr().begin());
-    }
+    auto map = mapper::load(sires::real_path_name(map_name));
 
     main_loop("poc-voo", [&](auto & dq, auto & sw) {
       unsigned max_dset_imgs = vee::get_physical_device_properties(dq.physical_device())
@@ -108,8 +104,9 @@ struct : public vapp {
 
       voo::h2l_buffer buf { dq.physical_device(), sizeof(faces::vtx) * max_vertices };
 
-      auto cam = mapper::initial_pos;
-      g_upc.cam = { cam.x + 0.5f, 0.0f, cam.y + 0.5f };
+      map.find_entities("player", [](auto x, auto y, auto) {
+        g_upc.cam = { x + 0.5f, 0.0f, y + 0.5f };
+      });
       auto vcount = mapbuilder::load(buf);
 
       bullet::model blt { dq };
@@ -197,5 +194,7 @@ struct : public vapp {
         oqr.run(cb);
       });
     });
+  } catch (const mapper::error & e) {
+    silog::die("%s", (*e.msg).cstr().begin());
   }
 } t;
