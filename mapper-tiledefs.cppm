@@ -49,9 +49,9 @@ namespace mapper {
       auto [cmd, args] = line.split(' ');
       args = args.trim();
 
-           if (cmd == "wall")    current().wall    = (*m_txts)[args];
-      else if (cmd == "floor")   current().floor   = (*m_txts)[args];
-      else if (cmd == "ceiling") current().ceiling = (*m_txts)[args];
+           if (cmd == "wall")    current().wall    = (*m_txts)[args] + 1;
+      else if (cmd == "floor")   current().floor   = (*m_txts)[args] + 1;
+      else if (cmd == "ceiling") current().ceiling = (*m_txts)[args] + 1;
       else if (cmd == "walk")    current().walk    = true;
       else if (cmd == "copy")    copy((*this)[arg_of(args)]);
       else if (cmd == "entity")  current().entity  = args;
