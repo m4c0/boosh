@@ -28,6 +28,8 @@ import vapp;
 
 using namespace jute::literals;
 
+static constexpr const jute::view map_name = "example.map";
+
 static constexpr const auto max_vertices = 10240;
 static constexpr const auto turn_speed = 180.0f;
 static constexpr const auto walk_speed = 5.0f;
@@ -86,8 +88,6 @@ static void process_pickups(auto cb, auto & blt) {
   }
   g_olay = g_olay * 0.9;
 }
-
-static constexpr const jute::view map_name = "example.map";
 
 struct : public vapp {
   void run() try {
