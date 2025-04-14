@@ -62,4 +62,11 @@ export namespace faces {
     m += vtx { .pos = { x, c, y0 }, .uv = { 0, 0 }, .txt = t };
     m += vtx { .pos = { x, f, y0 }, .uv = { 0, 1 }, .txt = t };
   }
+
+  void draw_wall(voo::memiter<vtx> & m, float x, float y, float f, float c, unsigned t) {
+    draw_x_wall(m, x,     x + 1, y + 1, -1, 1, t);
+    draw_x_wall(m, x + 1, x,     y,     -1, 1, t);
+    draw_y_wall(m, x,     y,     y + 1, -1, 1, t);
+    draw_y_wall(m, x + 1, y + 1, y,     -1, 1, t);
+  }
 }
