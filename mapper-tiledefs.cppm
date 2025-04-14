@@ -8,7 +8,7 @@ using namespace jute::literals;
 
 namespace mapper {
   export struct tiledef {
-    char id;
+    jute::heap id;
     unsigned wall;
     unsigned floor;
     unsigned ceiling;
@@ -23,12 +23,6 @@ namespace mapper {
 
     [[nodiscard]] constexpr auto & current() { return m_defs[m_defs.size() - 1]; }
 
-    [[nodiscard]] auto arg_of(jute::view arg) {
-      arg = arg.trim();
-      if (arg.size() != 1) throw error { "invalid id for tiledef: "_hs + arg };
-      return arg[0];
-    }
-
     void copy(tiledef o) {
       auto & c = current();
       if (o.wall)    c.wall    = o.wall;
@@ -39,17 +33,22 @@ namespace mapper {
       if (o.entity.size()) c.entity = o.entity;
     }
 
-  public:
-    explicit constexpr tiledefs(textures * t) : m_txts { t } {}
-
-    [[nodiscard]] constexpr auto & operator[](char id) const {
+    [[nodiscard]] constexpr auto & operator[](jute::view id) const {
       for (auto & d: m_defs) {
         if (d.id == id) return d;
       }
       throw error("undefined tiledef: "_hs + id);
     }
 
-    void add(jute::view arg) { m_defs.push_back(tiledef { arg_of(arg) }); }
+  public:
+    explicit constexpr tiledefs(textures * t) : m_txts { t } {}
+
+    [[nodiscard]] constexpr auto & operator[](char id) const {
+      jute::view v { &id, 1 };
+      return (*this)[v];
+    };
+
+    void add(jute::view arg) { m_defs.push_back(tiledef { arg.trim() }); }
     void parse(jute::view line) {
       auto [cmd, args] = line.split(' ');
       args = args.trim();
@@ -58,7 +57,7 @@ namespace mapper {
       else if (cmd == "floor")   current().floor   = (*m_txts)[args] + 1;
       else if (cmd == "ceiling") current().ceiling = (*m_txts)[args] + 1;
       else if (cmd == "walk")    current().walk    = true;
-      else if (cmd == "copy")    copy((*this)[arg_of(args)]);
+      else if (cmd == "copy")    copy((*this)[args.trim()]);
       else if (cmd == "entity")  current().entity  = args;
       else throw error { "unknown command: "_hs + cmd };
     }
