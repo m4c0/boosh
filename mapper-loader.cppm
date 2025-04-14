@@ -34,6 +34,7 @@ namespace mapper {
     void read_define(jute::view line) {
       line = line.trim();
       if (line == ".") {
+        m_tdefs.validate_last();
         m_liner = &loader::take_command;
         return;
       }
