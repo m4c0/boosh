@@ -71,11 +71,16 @@ namespace mapper {
       if (c.ceiling && !c.floor) err("floor must be defined when ceiling is"_hs);
       if (!c.ceiling && c.floor) err("ceiling must be defined when floor is"_hs);
 
-      auto entity = c.entity != ""_hs;
-      if (c.wall && entity) err("entity cannot be placed on walls"_hs);
-      if (entity && !c.floor) err("entity requires ceiling and floor"_hs);
-
-      if (!c.wall && !c.ceiling) err("tile should have a wall or both ceiling and floor"_hs);
+      if (c.entity == "pushwall"_hs) {
+        if (!c.wall || !c.ceiling) err("pushwall must have all of wall, ceiling and floor"_hs);
+      } else if (c.entity == "bullet"_hs) {
+        if (c.wall) err("bullet cannot be placed on walls"_hs);
+        if (!c.floor) err("bullet requires ceiling and floor"_hs);
+      } else if (c.entity.size()) {
+        err("invalid entity"_hs);
+      } else {
+        if (!c.wall && !c.ceiling) err("tile should have a wall or both ceiling and floor"_hs);
+      }
     }
   };
 
