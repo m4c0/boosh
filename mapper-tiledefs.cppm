@@ -30,8 +30,13 @@ namespace mapper {
     }
 
     void copy(tiledef o) {
-      o.id = current().id;
-      current() = o;
+      auto & c = current();
+      if (o.wall)    c.wall    = o.wall;
+      if (o.floor)   c.floor   = o.floor;
+      if (o.ceiling) c.ceiling = o.ceiling;
+      if (o.walk)    c.walk    = o.walk;
+
+      if (o.entity.size()) c.entity = o.entity;
     }
 
   public:
