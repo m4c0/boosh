@@ -17,7 +17,6 @@ import hai;
 import jute;
 import input;
 import mapper;
-import mapbuilder;
 import mapper;
 import silog;
 import sires;
@@ -104,12 +103,20 @@ struct : public vapp {
 
       voo::h2l_buffer buf { dq.physical_device(), sizeof(faces::vtx) * max_vertices };
 
+      unsigned vcount {};
       bullet::clear();
-      map.for_each([](auto x, auto y, auto & d) {
-        if (*d.entity == "player") g_upc.cam = { x + 0.5f, 0.0f, y + 0.5f };
-        if (*d.entity == "bullet") bullet::add({ x + 0.5f, 0.0f, y + 0.5f });
-      });
-      auto vcount = mapbuilder::build(map, buf);
+      {
+        voo::memiter<faces::vtx> m { buf.host_memory(), &vcount };
+        map.for_each([&](auto x, auto y, auto & d) {
+          if (*d.entity == "player") g_upc.cam = { x + 0.5f, 0.0f, y + 0.5f };
+          if (*d.entity == "bullet") bullet::add({ x + 0.5f, 0.0f, y + 0.5f });
+
+          // TODO: optimise walls based on neighbours
+          if (d.wall)    draw_wall   (m, x, y, -1, 1, d.wall - 1);
+          if (d.floor)   draw_floor  (m, x, y, -1, d.floor   - 1);
+          if (d.ceiling) draw_ceiling(m, x, y,  1, d.ceiling - 1);
+        });
+      }
 
       bullet::model blt { dq };
 
