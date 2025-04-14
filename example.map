@@ -9,9 +9,6 @@ texture t133d Tiles133D_1K-JPG_Color.jpg
 define X
   wall t040
 .
-define W
-  wall t100
-.
 define .
   floor t131
   ceiling t133d
@@ -29,25 +26,25 @@ define B
 
 // TODO: door
 define O
-  copy X
+  wall t100
 .
 // TODO: push wall
 define *
-  copy X
+  copy O
 .
 
 map
   XXXXX  XXX
-  X...X X..W
-  X....X.B.W
-  X......B.W
-  X.P....B.W
-  X......B.W XXXXXX
+  X...X X..X
+  X....X.B.X
+  X......B.X
+  X.P....B.X
+  X......B.X XXXXXX
   XXX..B.XXX X....X
     X....X   X.BB.X
     X..XXX   X....X
     X..X     X.XXXX
-    XBXXXXXXXX.XX
-    XB.O.*......X
+    XBXXXXXXXXOXX
+    XB...*......X
     XXXXXXXXXXXXX
 .
