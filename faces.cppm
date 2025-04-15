@@ -35,7 +35,8 @@ export namespace faces {
 
     voo::h2l_buffer m_vtx;
     voo::h2l_buffer m_inst;
-    unsigned m_count;
+    unsigned m_v_count;
+    unsigned m_i_count;
 
   protected:
     [[nodiscard]] auto map_vertex() {
@@ -43,13 +44,14 @@ export namespace faces {
     }
 
   public:
-    explicit instanced(vee::physical_device pd)
-      : m_vtx { pd, sizeof(vtx) * 6 }
+    explicit instanced(vee::physical_device pd, unsigned v)
+      : m_vtx { pd, static_cast<unsigned>(sizeof(vtx) * v) }
       , m_inst { pd, sizeof(inst) * max_inst }
+      , m_v_count { v }
     {}
 
     [[nodiscard]] auto map() {
-      return voo::memiter<inst> { m_inst.host_memory(), &m_count };
+      return voo::memiter<inst> { m_inst.host_memory(), &m_i_count };
     }
 
     void setup_copy(vee::command_buffer cb) {
@@ -60,13 +62,13 @@ export namespace faces {
     void draw(vee::command_buffer cb) {
       vee::cmd_bind_vertex_buffers(cb, 0, m_vtx.local_buffer());
       vee::cmd_bind_vertex_buffers(cb, 1, m_inst.local_buffer());
-      vee::cmd_draw(cb, 6, m_count);
+      vee::cmd_draw(cb, m_v_count, m_i_count);
     }
   };
 
   class ceiling : public instanced {
   public:
-    explicit ceiling(vee::physical_device pd) : instanced { pd } {
+    explicit ceiling(vee::physical_device pd) : instanced { pd, 6 } {
       auto m = map_vertex();
 
       m += vtx { .pos = { 0, 1, 0 }, .uv = { 0, 0 } };
@@ -81,7 +83,7 @@ export namespace faces {
 
   class floor : public instanced {
   public:
-    explicit floor(vee::physical_device pd) : instanced { pd } {
+    explicit floor(vee::physical_device pd) : instanced { pd, 6 } {
       auto m = map_vertex();
 
       m += vtx { .pos = { 0, -1, 0 }, .uv = { 0, 0 } };
