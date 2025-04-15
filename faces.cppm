@@ -3,10 +3,6 @@ import dotz;
 import voo;
 
 export namespace faces {
-  struct mdl {
-    dotz::vec3 pos;
-  };
-
   struct vtx {
     dotz::vec3 pos;
     dotz::vec2 uv;

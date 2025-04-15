@@ -32,7 +32,10 @@ namespace bullet {
       float angle;
     };
 
-    using mdl = faces::mdl;
+    struct mdl {
+      dotz::vec3 pos;
+    };
+
     using vtx = wavefront::vtx;
 
     static constexpr const auto max_models = 128;
