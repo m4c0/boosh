@@ -113,7 +113,6 @@ struct : public vapp {
           if (*d.entity == "player") g_upc.cam = { x + 0.5f, 0.0f, y + 0.5f };
           if (*d.entity == "bullet") bullet::add({ x + 0.5f, 0.0f, y + 0.5f });
 
-          // TODO: optimise walls based on neighbours
           if (d.wall)    w += { { x, 0, y }, d.wall    - 1 };
           if (d.floor)   f += { { x, 0, y }, d.floor   - 1 };
           if (d.ceiling) c += { { x, 0, y }, d.ceiling - 1 };
