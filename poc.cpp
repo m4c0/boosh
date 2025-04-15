@@ -118,8 +118,8 @@ struct : public vapp {
 
           // TODO: optimise walls based on neighbours
           if (d.wall)    draw_wall   (m, x, y, -1, 1, d.wall - 1);
-          if (d.floor)   f += { { x, -1, y }, d.floor   - 1 };
-          if (d.ceiling) c += { { x,  1, y }, d.ceiling - 1 };
+          if (d.floor)   f += { { x, 0, y }, d.floor   - 1 };
+          if (d.ceiling) c += { { x, 0, y }, d.ceiling - 1 };
         });
       }
 

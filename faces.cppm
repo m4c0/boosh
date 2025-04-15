@@ -69,13 +69,13 @@ export namespace faces {
     explicit ceiling(vee::physical_device pd) : instanced { pd } {
       auto m = map_vertex();
 
-      m += vtx { .pos = { 0, 0, 0 }, .uv = { 0, 0 } };
-      m += vtx { .pos = { 1, 0, 0 }, .uv = { 1, 0 } };
-      m += vtx { .pos = { 1, 0, 1 }, .uv = { 1, 1 } };
+      m += vtx { .pos = { 0, 1, 0 }, .uv = { 0, 0 } };
+      m += vtx { .pos = { 1, 1, 0 }, .uv = { 1, 0 } };
+      m += vtx { .pos = { 1, 1, 1 }, .uv = { 1, 1 } };
     
-      m += vtx { .pos = { 1, 0, 1 }, .uv = { 1, 1 } };
-      m += vtx { .pos = { 0, 0, 1 }, .uv = { 0, 1 } };
-      m += vtx { .pos = { 0, 0, 0 }, .uv = { 0, 0 } };
+      m += vtx { .pos = { 1, 1, 1 }, .uv = { 1, 1 } };
+      m += vtx { .pos = { 0, 1, 1 }, .uv = { 0, 1 } };
+      m += vtx { .pos = { 0, 1, 0 }, .uv = { 0, 0 } };
     }
   };
 
@@ -84,13 +84,13 @@ export namespace faces {
     explicit floor(vee::physical_device pd) : instanced { pd } {
       auto m = map_vertex();
 
-      m += vtx { .pos = { 0, 0, 0 }, .uv = { 0, 0 } };
-      m += vtx { .pos = { 1, 0, 1 }, .uv = { 1, 1 } };
-      m += vtx { .pos = { 1, 0, 0 }, .uv = { 1, 0 } };
+      m += vtx { .pos = { 0, -1, 0 }, .uv = { 0, 0 } };
+      m += vtx { .pos = { 1, -1, 1 }, .uv = { 1, 1 } };
+      m += vtx { .pos = { 1, -1, 0 }, .uv = { 1, 0 } };
     
-      m += vtx { .pos = { 1, 0, 1 }, .uv = { 1, 1 } };
-      m += vtx { .pos = { 0, 0, 0 }, .uv = { 0, 0 } };
-      m += vtx { .pos = { 0, 0, 1 }, .uv = { 0, 1 } };
+      m += vtx { .pos = { 1, -1, 1 }, .uv = { 1, 1 } };
+      m += vtx { .pos = { 0, -1, 0 }, .uv = { 0, 0 } };
+      m += vtx { .pos = { 0, -1, 1 }, .uv = { 0, 1 } };
     }
   };
 
