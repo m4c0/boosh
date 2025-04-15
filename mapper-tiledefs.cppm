@@ -76,6 +76,9 @@ namespace mapper {
       } else if (c.entity == "bullet"_hs) {
         if (c.wall) err("bullet cannot be placed on walls"_hs);
         if (!c.floor) err("bullet requires ceiling and floor"_hs);
+      } else if (c.entity == "player"_hs) {
+        if (c.wall) err("player cannot be placed on walls"_hs);
+        if (!c.floor) err("player requires ceiling and floor"_hs);
       } else if (c.entity.size()) {
         err("invalid entity"_hs);
       } else {
