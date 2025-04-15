@@ -29,7 +29,6 @@ using namespace jute::literals;
 
 static constexpr const jute::view map_name = "example.map";
 
-static constexpr const auto max_vertices = 10240;
 static constexpr const auto turn_speed = 180.0f;
 static constexpr const auto walk_speed = 5.0f;
 
@@ -103,21 +102,19 @@ struct : public vapp {
 
       faces::ceiling ceilings { dq.physical_device() };
       faces::floor   floors   { dq.physical_device() };
+      faces::wall    walls    { dq.physical_device() };
 
-      voo::h2l_buffer buf { dq.physical_device(), sizeof(faces::vtx) * max_vertices };
-
-      unsigned vcount {};
       bullet::clear();
       {
         auto c = ceilings.map();
         auto f = floors.map();
-        voo::memiter<faces::vtx> m { buf.host_memory(), &vcount };
+        auto w = walls.map();
         map.for_each([&](auto x, auto y, auto & d) {
           if (*d.entity == "player") g_upc.cam = { x + 0.5f, 0.0f, y + 0.5f };
           if (*d.entity == "bullet") bullet::add({ x + 0.5f, 0.0f, y + 0.5f });
 
           // TODO: optimise walls based on neighbours
-          if (d.wall)    draw_wall   (m, x, y, -1, 1, d.wall - 1);
+          if (d.wall)    w += { { x, 0, y }, d.wall    - 1 };
           if (d.floor)   f += { { x, 0, y }, d.floor   - 1 };
           if (d.ceiling) c += { { x, 0, y }, d.ceiling - 1 };
         });
@@ -171,8 +168,8 @@ struct : public vapp {
         if (!copied) {
           ceilings.setup_copy(cb);
           floors.setup_copy(cb);
+          walls.setup_copy(cb);
           blt.setup_copy(cb);
-          buf.setup_copy(cb);
           for (auto &i : imgs) i.setup_copy(cb);
           copied = true;
         }
@@ -185,13 +182,12 @@ struct : public vapp {
         }};
         vee::cmd_set_viewport(cb, sw.extent());
         vee::cmd_set_scissor(cb, sw.extent());
-        vee::cmd_bind_vertex_buffers(cb, 0, buf.local_buffer());
         vee::cmd_push_vertex_constants(cb, *pl, &g_upc);
         vee::cmd_bind_gr_pipeline(cb, *gp);
         vee::cmd_bind_descriptor_set(cb, *pl, 0, dset);
-        vee::cmd_draw(cb, vcount);
         ceilings.draw(cb);
         floors.draw(cb);
+        walls.draw(cb);
 
         blt.draw(cb, g_upc.cam, g_upc.angle);
 
