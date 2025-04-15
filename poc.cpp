@@ -101,11 +101,14 @@ struct : public vapp {
       if (max_dset_imgs < dset_smps)
         silog::die("Expecting at least 16 images sampled per descriptor set. Please notify the developer");
 
+      faces::ceiling ceilings { dq.physical_device() };
+
       voo::h2l_buffer buf { dq.physical_device(), sizeof(faces::vtx) * max_vertices };
 
       unsigned vcount {};
       bullet::clear();
       {
+        auto c = ceilings.map();
         voo::memiter<faces::vtx> m { buf.host_memory(), &vcount };
         map.for_each([&](auto x, auto y, auto & d) {
           if (*d.entity == "player") g_upc.cam = { x + 0.5f, 0.0f, y + 0.5f };
@@ -114,7 +117,7 @@ struct : public vapp {
           // TODO: optimise walls based on neighbours
           if (d.wall)    draw_wall   (m, x, y, -1, 1, d.wall - 1);
           if (d.floor)   draw_floor  (m, x, y, -1, d.floor   - 1);
-          if (d.ceiling) draw_ceiling(m, x, y,  1, d.ceiling - 1);
+          if (d.ceiling) c += { { x, 1, y }, d.ceiling - 1 };
         });
       }
 
@@ -132,14 +135,8 @@ struct : public vapp {
           voo::shader("poc.vert.spv").pipeline_vert_stage(),
           voo::shader("poc.frag.spv").pipeline_frag_stage(),
         },
-        .bindings {
-          vee::vertex_input_bind(sizeof(faces::vtx)),
-        },
-        .attributes {
-          vee::vertex_attribute_vec3(0, traits::offset_of(&faces::vtx::pos)),
-          vee::vertex_attribute_vec2(0, traits::offset_of(&faces::vtx::uv)),
-          vee::vertex_attribute_uint(0, traits::offset_of(&faces::vtx::txt)),
-        },
+        .bindings   = faces::bindings(),
+        .attributes = faces::attributes(),
       });
 
       auto smp = vee::create_sampler(vee::linear_sampler);
@@ -170,6 +167,7 @@ struct : public vapp {
         time = {};
 
         if (!copied) {
+          ceilings.setup_copy(cb);
           blt.setup_copy(cb);
           buf.setup_copy(cb);
           for (auto &i : imgs) i.setup_copy(cb);
@@ -189,6 +187,7 @@ struct : public vapp {
         vee::cmd_bind_gr_pipeline(cb, *gp);
         vee::cmd_bind_descriptor_set(cb, *pl, 0, dset);
         vee::cmd_draw(cb, vcount);
+        ceilings.draw(cb);
 
         blt.draw(cb, g_upc.cam, g_upc.angle);
 
