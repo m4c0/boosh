@@ -102,6 +102,7 @@ struct : public vapp {
         silog::die("Expecting at least 16 images sampled per descriptor set. Please notify the developer");
 
       faces::ceiling ceilings { dq.physical_device() };
+      faces::floor   floors   { dq.physical_device() };
 
       voo::h2l_buffer buf { dq.physical_device(), sizeof(faces::vtx) * max_vertices };
 
@@ -109,6 +110,7 @@ struct : public vapp {
       bullet::clear();
       {
         auto c = ceilings.map();
+        auto f = floors.map();
         voo::memiter<faces::vtx> m { buf.host_memory(), &vcount };
         map.for_each([&](auto x, auto y, auto & d) {
           if (*d.entity == "player") g_upc.cam = { x + 0.5f, 0.0f, y + 0.5f };
@@ -116,8 +118,8 @@ struct : public vapp {
 
           // TODO: optimise walls based on neighbours
           if (d.wall)    draw_wall   (m, x, y, -1, 1, d.wall - 1);
-          if (d.floor)   draw_floor  (m, x, y, -1, d.floor   - 1);
-          if (d.ceiling) c += { { x, 1, y }, d.ceiling - 1 };
+          if (d.floor)   f += { { x, -1, y }, d.floor   - 1 };
+          if (d.ceiling) c += { { x,  1, y }, d.ceiling - 1 };
         });
       }
 
@@ -168,6 +170,7 @@ struct : public vapp {
 
         if (!copied) {
           ceilings.setup_copy(cb);
+          floors.setup_copy(cb);
           blt.setup_copy(cb);
           buf.setup_copy(cb);
           for (auto &i : imgs) i.setup_copy(cb);
@@ -188,6 +191,7 @@ struct : public vapp {
         vee::cmd_bind_descriptor_set(cb, *pl, 0, dset);
         vee::cmd_draw(cb, vcount);
         ceilings.draw(cb);
+        floors.draw(cb);
 
         blt.draw(cb, g_upc.cam, g_upc.angle);
 
