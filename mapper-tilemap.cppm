@@ -1,5 +1,8 @@
 export module mapper:tilemap;
+import :error;
 export import :tiledefs;
+import jute;
+import hai;
 
 using namespace jute::literals;
 

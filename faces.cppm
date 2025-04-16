@@ -13,13 +13,13 @@ export namespace faces {
     unsigned txt;
   };
 
-  constexpr const auto bindings() {
+  inline const auto bindings() {
     return decltype(vee::gr_pipeline_params::bindings) {
       vee::vertex_input_bind(sizeof(vtx)),
       vee::vertex_input_bind_per_instance(sizeof(inst)),
     };
   }
-  constexpr const auto attributes() {
+  inline const auto attributes() {
     return decltype(vee::gr_pipeline_params::attributes) {
       vee::vertex_attribute_vec3(0, traits::offset_of(&vtx::pos)),
       vee::vertex_attribute_vec2(0, traits::offset_of(&vtx::uv)),

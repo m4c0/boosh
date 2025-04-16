@@ -5,6 +5,7 @@ import :tilemap;
 import :textures;
 import jojo;
 import jute;
+import hai;
 import traits;
 
 using namespace jute::literals;
