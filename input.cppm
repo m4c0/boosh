@@ -35,9 +35,10 @@ static int axis_state(keys n, keys p) {
   return 0;
 }
 
+// TODO: apply smoothing when "speeding up"
 static float mouse_state() {
   auto x = g_mouse_rel_x;
-  g_mouse_rel_x = 0;
+  g_mouse_rel_x *= 0.3;
   return x;
 }
 
