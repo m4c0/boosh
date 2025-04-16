@@ -53,4 +53,6 @@ void input::setup() {
     mouse_pos = window_size / 2.0;
     interrupt(IRQ_MOUSE_POS);
   });
+  cursor_visible = false;
+  interrupt(IRQ_CURSOR);
 }
