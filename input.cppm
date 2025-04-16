@@ -53,4 +53,9 @@ void input::setup() {
   setup_btn(K_D, STRAFE_RIGHT);
   setup_btn(K_W, FORWARD);
   setup_btn(K_S, BACKWARD);
+
+  handle(MOUSE_MOVE, [] {
+    mouse_pos = window_size / 2.0;
+    interrupt(IRQ_MOUSE_POS);
+  });
 }
