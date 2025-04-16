@@ -3,7 +3,9 @@ import casein;
 
 namespace input {
   export enum class axis { WALK, STRAFE, TURN };
+  export enum class buttons { USE };
   export float state(axis a);
+  export bool state(buttons b);
 
   export void setup();
 }
@@ -12,6 +14,7 @@ module :private;
 
 namespace {
   enum keys {
+    USE,
     STRAFE_LEFT,
     STRAFE_RIGHT,
     FORWARD,
@@ -49,6 +52,11 @@ float input::state(axis a) {
     case axis::TURN:   return mouse_state();
   }
 }
+bool input::state(buttons b) {
+  switch (b) {
+    case buttons::USE: return g_state[USE];
+  }
+}
 
 void input::setup() {
   using namespace casein;
@@ -56,6 +64,8 @@ void input::setup() {
   setup_btn(K_D, STRAFE_RIGHT);
   setup_btn(K_W, FORWARD);
   setup_btn(K_S, BACKWARD);
+
+  setup_btn(K_SPACE, USE);
 
   handle(MOUSE_MOVE, [] {
     mouse_pos = window_size / 2.0;
