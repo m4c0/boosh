@@ -3,7 +3,7 @@ import casein;
 
 namespace input {
   export enum class axis { WALK, STRAFE, TURN };
-  export int state(axis a);
+  export float state(axis a);
 
   export void setup();
 }
@@ -12,8 +12,6 @@ module :private;
 
 namespace {
   enum keys {
-    TURN_LEFT,
-    TURN_RIGHT,
     STRAFE_LEFT,
     STRAFE_RIGHT,
     FORWARD,
@@ -36,19 +34,16 @@ static int axis_state(keys n, keys p) {
   return 0;
 }
 
-int input::state(axis a) {
+float input::state(axis a) {
   switch (a) {
     case axis::WALK:   return axis_state(BACKWARD, FORWARD);
     case axis::STRAFE: return axis_state(STRAFE_LEFT, STRAFE_RIGHT);
-    case axis::TURN:   return axis_state(TURN_LEFT, TURN_RIGHT);
+    case axis::TURN:   return casein::mouse_rel.x;
   }
 }
 
 void input::setup() {
   using namespace casein;
-  setup_btn(K_LEFT,  TURN_LEFT);
-  setup_btn(K_RIGHT, TURN_RIGHT);
-
   setup_btn(K_A, STRAFE_LEFT);
   setup_btn(K_D, STRAFE_RIGHT);
   setup_btn(K_W, FORWARD);
