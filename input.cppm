@@ -34,11 +34,17 @@ static int axis_state(keys n, keys p) {
   return 0;
 }
 
+static float mouse_state() {
+  auto x = casein::mouse_rel.x * 0.5;
+  casein::mouse_rel.x = 0;
+  return x;
+}
+
 float input::state(axis a) {
   switch (a) {
     case axis::WALK:   return axis_state(BACKWARD, FORWARD);
     case axis::STRAFE: return axis_state(STRAFE_LEFT, STRAFE_RIGHT);
-    case axis::TURN:   return casein::mouse_rel.x;
+    case axis::TURN:   return mouse_state();
   }
 }
 
