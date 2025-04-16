@@ -21,6 +21,7 @@ namespace {
 }
 
 static bool g_state[MAX_KEYS] {};
+static float g_mouse_rel_x {};
 
 static void setup_btn(casein::keys k, keys i) {
   using namespace casein;
@@ -35,8 +36,8 @@ static int axis_state(keys n, keys p) {
 }
 
 static float mouse_state() {
-  auto x = casein::mouse_rel.x * 0.5;
-  casein::mouse_rel.x = 0;
+  auto x = g_mouse_rel_x;
+  g_mouse_rel_x = 0;
   return x;
 }
 
@@ -58,6 +59,9 @@ void input::setup() {
   handle(MOUSE_MOVE, [] {
     mouse_pos = window_size / 2.0;
     interrupt(IRQ_MOUSE_POS);
+  });
+  handle(MOUSE_MOVE_REL, [] {
+    g_mouse_rel_x = mouse_rel.x * 0.5;
   });
   cursor_visible = false;
   interrupt(IRQ_CURSOR);
