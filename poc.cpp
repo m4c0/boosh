@@ -11,6 +11,7 @@
 #pragma leco add_resource "example.map"
 
 import bullet;
+import collision;
 import dotz;
 import faces;
 import hai;
