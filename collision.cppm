@@ -5,28 +5,34 @@ import hai;
 namespace collision {
   struct overflow {};
 
-  class layer {
-    hai::varray<dotz::vec4> m_data { 1024 };
+  struct item {
+    dotz::vec4 fn;
+    unsigned type;
+    unsigned id;
+  };
 
-    auto add(dotz::vec4 p) {
+  class layer {
+    hai::varray<item> m_data { 1024 };
+
+    auto add(dotz::vec4 p, unsigned type, unsigned id) {
       if (m_data.size() == m_data.capacity()) throw overflow {};
-      m_data.push_back(p);
+      m_data.push_back(item { p, type, id });
       return m_data.size();
     }
 
   public:
-    [[nodiscard]] auto add_aabb(dotz::vec2 aa, dotz::vec2 bb) {
-      return add(dotz::vec4 { aa, bb });
+    [[nodiscard]] auto add_aabb(dotz::vec2 aa, dotz::vec2 bb, unsigned type, unsigned id) {
+      return add(dotz::vec4 { aa, bb }, type, id);
     }
-    [[nodiscard]] auto add_circle(dotz::vec2 c, float r) {
-      return add(dotz::vec4 { c, r, 0 });
+    [[nodiscard]] auto add_circle(dotz::vec2 c, float r, unsigned type, unsigned id) {
+      return add(dotz::vec4 { c, r, 0 }, type, id);
     }
 
-    [[nodiscard]] unsigned closest(dotz::vec2 p) {
-      unsigned res {};
+    [[nodiscard]] item closest(dotz::vec2 p) {
+      item res {};
       float d = 1e20;
-      for (auto i = 0; i < m_data.size(); i++) {
-        auto c = m_data[i];
+      for (auto & i : m_data) {
+        auto c = i.fn;
         float cd = 1e20;
         if (c.w == 0) {
           cd = dotz::length(p - c.xy()) - c.z;
