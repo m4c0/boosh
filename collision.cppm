@@ -3,40 +3,47 @@ import dotz;
 import hai;
 
 namespace collision {
-  static constexpr const auto width = 256;
-  static constexpr const auto height = 256;
+  struct overflow {};
 
-  struct err {};
+  class layer {
+    hai::varray<dotz::vec4> m_data { 1024 };
 
-  struct entity {
-    unsigned id;
-    dotz::vec2 pos;
-  };
-  struct node {
-    hai::varray<entity> data {};
-  };
-  class map {
-    hai::array<node> m_data { width * height };
-
-    auto & nodeof(const entity & e) {
-      int x = e.pos.x;
-      int y = e.pos.y;
-      if (x < 0 || y < 0 || x >= width || y >= height) throw err {};
-      return m_data[y * width + x];
+    auto add(dotz::vec4 p) {
+      if (m_data.size() == m_data.capacity()) throw overflow {};
+      m_data.push_back(p);
+      return m_data.size();
     }
 
   public:
-    void add(const entity & e) {
-      nodeof(e).data.push_back_doubling(e);
+    [[nodiscard]] auto add_aabb(dotz::vec2 aa, dotz::vec2 bb) {
+      return add(dotz::vec4 { aa, bb });
+    }
+    [[nodiscard]] auto add_circle(dotz::vec2 c, float r) {
+      return add(dotz::vec4 { c, r, 0 });
     }
 
-    void remove(const entity & e) {
-      auto & d = nodeof(e).data;
-      for (auto i = 0; i < d.size(); i++) {
-        if (d[i].id != e.id) continue;
-        d[i] = d.pop_back();
-        return;
+    [[nodiscard]] unsigned closest(dotz::vec2 p) {
+      unsigned res {};
+      float d = 1e20;
+      for (auto i = 0; i < m_data.size(); i++) {
+        auto c = m_data[i];
+        float cd = 1e20;
+        if (c.w == 0) {
+          cd = dotz::length(p - c.xy()) - c.z;
+        } else {
+          auto aa = c.xy();
+          auto bb = c.zw();
+          dotz::vec2 cp {
+            p.x > bb.x ? p.x < aa.x ? aa.x : p.x : bb.x,
+            p.y > bb.y ? p.y < aa.y ? aa.y : p.y : bb.y,
+          };
+          cd = dotz::length(p - cp);
+        }
+        if (cd >= d) continue;
+        d = cd;
+        res = i;
       }
+      return res;
     }
   };
 }
