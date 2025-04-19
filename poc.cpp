@@ -18,7 +18,7 @@ import hai;
 import jute;
 import input;
 import mapper;
-import mapper;
+import pushwall;
 import silog;
 import sires;
 import sitime;
@@ -115,6 +115,7 @@ struct : public vapp {
         map.for_each([&](auto x, auto y, auto & d) {
           if (*d.entity == "player") g_upc.cam = { x + 0.5f, 0.0f, y + 0.5f };
           if (*d.entity == "bullet") bullet::add({ x + 0.5f, 0.0f, y + 0.5f });
+          if (*d.entity == "pushwall") pushwall::add({ x, y });
 
           if (d.wall) {
             collision::bodies().add_aabb({ x, y }, { x + 1, y + 1 }, 'wall', 1);
