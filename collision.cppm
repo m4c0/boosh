@@ -27,6 +27,15 @@ namespace collision {
       add(dotz::vec4 { c, r, 0 }, type, id);
     }
 
+    void remove(unsigned type, unsigned id) {
+      for (auto i = 0; i < m_data.size(); i++) {
+        if (m_data[i].type != type) continue;
+        if (m_data[i].id != id) continue;
+        m_data[i] = {};
+        return;
+      }
+    }
+
     [[nodiscard]] item closest(dotz::vec2 p, float max_r) {
       item res {};
       float d = max_r;

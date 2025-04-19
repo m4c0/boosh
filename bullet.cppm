@@ -20,16 +20,9 @@ namespace bullet {
     collision::entities().add_circle({ p.x, p.z }, 0.1, clid, list.size());
     list.push_back(p);
   }
-
-  export bool take(dotz::vec3 p) {
-    for (auto i = 0; i < list.size(); i++) {
-      auto b = list[i];
-      if (dotz::length(p - b) > 0.5) continue;
-
-      list[i] = list.pop_back();
-      return true;
-    }
-    return false;
+  export void remove(unsigned id) {
+    collision::entities().remove(clid, id);
+    list[id] = {};
   }
 
   export class model {
