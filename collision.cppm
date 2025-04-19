@@ -28,9 +28,9 @@ namespace collision {
       return add(dotz::vec4 { c, r, 0 }, type, id);
     }
 
-    [[nodiscard]] item closest(dotz::vec2 p) {
+    [[nodiscard]] item closest(dotz::vec2 p, float max_r) {
       item res {};
-      float d = 1e20;
+      float d = max_r;
       for (auto & i : m_data) {
         auto c = i.fn;
         float cd = 1e20;
