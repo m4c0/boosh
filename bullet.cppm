@@ -3,6 +3,7 @@
 #pragma leco add_resource "bullet.obj"
 #pragma leco add_resource "bullet.uv.png"
 export module bullet;
+import collision;
 import dotz;
 import faces;
 import hai;
@@ -11,9 +12,14 @@ import voo;
 import wavefront;
 
 namespace bullet {
+  export constexpr const auto clid = 'bllt';
+
   hai::varray<dotz::vec3> list { 128 };
-  export void add(dotz::vec3 p) { list.push_back(p); }
-  export void clear() { list.truncate(0); }
+
+  export void add(dotz::vec3 p) { 
+    collision::entities().add_circle({ p.x, p.z }, 0.1, clid, list.size());
+    list.push_back(p);
+  }
 
   export bool take(dotz::vec3 p) {
     for (auto i = 0; i < list.size(); i++) {

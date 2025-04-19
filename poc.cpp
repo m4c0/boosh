@@ -80,6 +80,14 @@ static void update_camera(const mapper::tilemap & map, float ms) {
   walk(dx, dy) || walk(dx, 0) || walk(0, dy);
 }
 
+static void process_collisions() {
+  auto cam = g_upc.cam;
+  auto item = collision::entities().closest({ cam.x, cam.z }, player_radius);
+  switch (item.type) {
+    case bullet::clid: break;
+  }
+}
+
 static void process_pickups(auto cb, auto & blt) {
   if (bullet::take(g_upc.cam)) {
     g_olay = { 1.0f };
@@ -105,7 +113,6 @@ struct : public vapp {
       faces::floor   floors   { dq.physical_device() };
       faces::wall    walls    { dq.physical_device() };
 
-      bullet::clear();
       {
         auto c = ceilings.map();
         auto f = floors.map();
@@ -162,6 +169,7 @@ struct : public vapp {
       bool copied = false;
       ots_loop(dq, sw, [&](auto cb) {
         update_camera(map, time.millis());
+        process_collisions();
         process_pickups(cb, blt);
         time = {};
 

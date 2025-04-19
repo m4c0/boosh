@@ -51,4 +51,9 @@ namespace collision {
       return res;
     }
   };
+
+  export [[nodiscard]] auto & entities() {
+    static layer i {};
+    return i;
+  }
 }
