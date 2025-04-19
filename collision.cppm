@@ -52,6 +52,10 @@ namespace collision {
     }
   };
 
+  export [[nodiscard]] auto & bodies() {
+    static layer i {};
+    return i;
+  }
   export [[nodiscard]] auto & entities() {
     static layer i {};
     return i;

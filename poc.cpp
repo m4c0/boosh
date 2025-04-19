@@ -63,13 +63,11 @@ static void update_camera(const mapper::tilemap & map, float ms) {
     auto cam = g_upc.cam;
     cam.x -= dx * walk_speed * ms / 1000.0;
     cam.z += dy * walk_speed * ms / 1000.0;
-    if (!map(cam.x, cam.z).walk) return false;
 
-    auto adx = player_radius * dotz::sign(-dx);
-    auto ady = player_radius * dotz::sign(dy);
-    if (!map(cam.x + adx, cam.z      ).walk) return false;
-    if (!map(cam.x,       cam.z + ady).walk) return false;
-    if (!map(cam.x + adx, cam.z + ady).walk) return false;
+    dotz::vec2 cxz { cam.x, cam.z };
+    if (collision::bodies().closest(cxz, player_radius).type) {
+      return false;
+    }
 
     g_upc.cam = cam;
     return true;
@@ -121,7 +119,11 @@ struct : public vapp {
           if (*d.entity == "player") g_upc.cam = { x + 0.5f, 0.0f, y + 0.5f };
           if (*d.entity == "bullet") bullet::add({ x + 0.5f, 0.0f, y + 0.5f });
 
-          if (d.wall)    w += { { x, 0, y }, d.wall    - 1 };
+          if (d.wall) {
+            collision::bodies().add_aabb({ x, y }, { x + 1, y + 1 }, 'wall', 1);
+            w += { { x, 0, y }, d.wall    - 1 };
+          }
+
           if (d.floor)   f += { { x, 0, y }, d.floor   - 1 };
           if (d.ceiling) c += { { x, 0, y }, d.ceiling - 1 };
         });
