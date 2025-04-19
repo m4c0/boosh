@@ -39,8 +39,8 @@ namespace collision {
           auto aa = c.xy();
           auto bb = c.zw();
           dotz::vec2 cp {
-            p.x > bb.x ? p.x < aa.x ? aa.x : p.x : bb.x,
-            p.y > bb.y ? p.y < aa.y ? aa.y : p.y : bb.y,
+            p.x > bb.x ? bb.x : (p.x < aa.x ? aa.x : p.x),
+            p.y > bb.y ? bb.y : (p.y < aa.y ? aa.y : p.y),
           };
           cd = dotz::length(p - cp);
         }
