@@ -14,18 +14,17 @@ namespace collision {
   class layer {
     hai::varray<item> m_data { 1024 };
 
-    auto add(dotz::vec4 p, unsigned type, unsigned id) {
+    void add(dotz::vec4 p, unsigned type, unsigned id) {
       if (m_data.size() == m_data.capacity()) throw overflow {};
       m_data.push_back(item { p, type, id });
-      return m_data.size();
     }
 
   public:
-    [[nodiscard]] auto add_aabb(dotz::vec2 aa, dotz::vec2 bb, unsigned type, unsigned id) {
-      return add(dotz::vec4 { aa, bb }, type, id);
+    void add_aabb(dotz::vec2 aa, dotz::vec2 bb, unsigned type, unsigned id) {
+      add(dotz::vec4 { aa, bb }, type, id);
     }
-    [[nodiscard]] auto add_circle(dotz::vec2 c, float r, unsigned type, unsigned id) {
-      return add(dotz::vec4 { c, r, 0 }, type, id);
+    void add_circle(dotz::vec2 c, float r, unsigned type, unsigned id) {
+      add(dotz::vec4 { c, r, 0 }, type, id);
     }
 
     [[nodiscard]] item closest(dotz::vec2 p, float max_r) {
