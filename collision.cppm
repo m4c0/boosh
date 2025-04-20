@@ -36,6 +36,28 @@ namespace collision {
       }
     }
 
+    [[nodiscard]] item hitscan(dotz::vec2 p, float rad, float max_dist) {
+      dotz::vec2 l { dotz::cosf(rad), dotz::sinf(rad) };
+      auto tan = l.y / l.x;
+      auto den = dotz::sqrt(1 + tan * tan);
+
+      item res {};
+      float min_dist = max_dist;
+      for (auto & i : m_data) {
+        auto c = i.fn;
+        if (c.w == 0) {
+          auto pc = p - i.fn.xy();
+          if ((pc.y - tan * pc.x) / den > c.z) continue;
+
+          auto dist = dotz::dot(l, pc);
+          if (dist < 0 || dist > min_dist) continue;
+
+          min_dist = dist;
+          res = i;
+        }
+      }
+      return res;
+    }
     [[nodiscard]] item closest(dotz::vec2 p, float max_r) {
       item res {};
       float d = max_r;
