@@ -39,13 +39,13 @@ namespace collision {
     [[nodiscard]] item hitscan(dotz::vec2 p, float rad, float max_dist) {
       dotz::vec2 l { dotz::cosf(rad), dotz::sinf(rad) };
       auto tan = l.y / l.x;
-      auto den = dotz::sqrt(1 + tan * tan);
 
       item res {};
       float min_dist = max_dist;
       for (auto & i : m_data) {
         if (i.fn.w == 0) {
           auto pc = p - i.fn.xy();
+          auto den = dotz::sqrt(1 + tan * tan);
           if ((pc.y - tan * pc.x) / den > i.fn.z) continue;
 
           auto dist = dotz::dot(l, pc);
@@ -58,9 +58,9 @@ namespace collision {
           auto thigh = (i.fn.zw() - p) / l;
           auto tclose = dotz::min(tlow, thigh);
           auto tfar   = dotz::max(tlow, thigh);
-          auto tc = dotz::min(tclose.x, tclose.y);
+          auto tc = dotz::max(tclose.x, tclose.y);
           auto tf = dotz::min(tfar.x, tfar.y);
-          if (tf > tc) continue;
+          if (tc > tf) continue;
 
           min_dist = tc;
           res = i;
