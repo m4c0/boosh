@@ -1,11 +1,14 @@
 export module input;
 import casein;
+import hai;
 
 namespace input {
   export enum class axis { WALK, STRAFE, TURN };
   export enum class buttons { USE };
   export float state(axis a);
   export bool state(buttons b);
+
+  export void on_button_down(buttons b, hai::fn<void> fn);
 
   export void setup();
 }
@@ -23,12 +26,17 @@ namespace {
   };
 }
 
+static hai::fn<void> g_btn_down_cb[MAX_KEYS] {};
 static bool g_state[MAX_KEYS] {};
 static float g_mouse_rel_x {};
 
 static void setup_btn(casein::keys k, keys i) {
   using namespace casein;
-  handle(KEY_DOWN, k, [i] { g_state[i] = true;  });
+  handle(KEY_DOWN, k, [i] {
+    auto old = g_state[i];
+    g_state[i] = true;
+    if (!old && g_btn_down_cb[i]) g_btn_down_cb[i]();
+  });
   handle(KEY_UP,   k, [i] { g_state[i] = false; });
 }
 
@@ -55,6 +63,12 @@ float input::state(axis a) {
 bool input::state(buttons b) {
   switch (b) {
     case buttons::USE: return g_state[USE];
+  }
+}
+
+void input::on_button_down(buttons b, hai::fn<void> fn) {
+  switch (b) {
+    case buttons::USE: g_btn_down_cb[USE] = fn; break;
   }
 }
 

@@ -165,6 +165,10 @@ struct : public vapp {
       });
       voo::one_quad_render oqr { "overlay", &dq, *opl };
 
+      input::on_button_down(input::buttons::USE, [] {
+        silog::trace("ouch");
+      });
+
       sitime::stopwatch time {};
       bool copied = false;
       ots_loop(dq, sw, [&](auto cb) {
