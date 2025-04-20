@@ -34,6 +34,7 @@ static constexpr const auto turn_speed = 180.0f;
 static constexpr const auto walk_speed = 5.0f;
 
 static constexpr const auto player_radius = 0.2f;
+static constexpr const auto max_use_dist = 1.0f;
 
 static constexpr const auto dset_smps = 16;
 
@@ -166,7 +167,11 @@ struct : public vapp {
       voo::one_quad_render oqr { "overlay", &dq, *opl };
 
       input::on_button_down(input::buttons::USE, [] {
-        silog::trace("ouch");
+        auto cam = g_upc.cam.xz();
+        auto angle = dotz::radians(g_upc.angle);
+        auto c = collision::entities().hitscan(cam, angle, max_use_dist);
+        if (!c.type) return;
+        silog::trace("ok");
       });
 
       sitime::stopwatch time {};
