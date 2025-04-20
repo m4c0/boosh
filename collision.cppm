@@ -44,15 +44,25 @@ namespace collision {
       item res {};
       float min_dist = max_dist;
       for (auto & i : m_data) {
-        auto c = i.fn;
-        if (c.w == 0) {
+        if (i.fn.w == 0) {
           auto pc = p - i.fn.xy();
-          if ((pc.y - tan * pc.x) / den > c.z) continue;
+          if ((pc.y - tan * pc.x) / den > i.fn.z) continue;
 
           auto dist = dotz::dot(l, pc);
           if (dist < 0 || dist > min_dist) continue;
 
           min_dist = dist;
+          res = i;
+        } else {
+          auto tlow  = (i.fn.xy() - p) / l;
+          auto thigh = (i.fn.zw() - p) / l;
+          auto tclose = dotz::min(tlow, thigh);
+          auto tfar   = dotz::max(tlow, thigh);
+          auto tc = dotz::min(tclose.x, tclose.y);
+          auto tf = dotz::min(tfar.x, tfar.y);
+          if (tf > tc) continue;
+
+          min_dist = tc;
           res = i;
         }
       }
