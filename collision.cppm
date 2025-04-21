@@ -18,6 +18,14 @@ namespace collision {
       if (m_data.size() == m_data.capacity()) throw overflow {};
       m_data.push_back(item { p, type, id });
     }
+    void set(dotz::vec4 p, unsigned type, unsigned id) {
+      for (auto i = 0; i < m_data.size(); i++) {
+        if (m_data[i].type != type) continue;
+        if (m_data[i].id != id) continue;
+        m_data[i].fn = p;
+        return;
+      }
+    }
 
   public:
     void add_aabb(dotz::vec2 aa, dotz::vec2 bb, unsigned type, unsigned id) {
@@ -27,13 +35,15 @@ namespace collision {
       add(dotz::vec4 { c, r, 0 }, type, id);
     }
 
+    void set_aabb(dotz::vec2 aa, dotz::vec2 bb, unsigned type, unsigned id) {
+      set(dotz::vec4 { aa, bb }, type, id);
+    }
+    void set_circle(dotz::vec2 c, float r, unsigned type, unsigned id) {
+      set(dotz::vec4 { c, r, 0 }, type, id);
+    }
+
     void remove(unsigned type, unsigned id) {
-      for (auto i = 0; i < m_data.size(); i++) {
-        if (m_data[i].type != type) continue;
-        if (m_data[i].id != id) continue;
-        m_data[i] = {};
-        return;
-      }
+      set(dotz::vec4 {}, type, id);
     }
 
     [[nodiscard]] item hitscan(dotz::vec2 p, float rad, float max_dist) {
