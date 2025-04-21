@@ -92,6 +92,17 @@ static void process_collisions(auto cb, auto & blt) {
   g_olay = g_olay * 0.9;
 }
 
+static void process_use() {
+  auto cam = g_upc.cam.xz();
+  auto angle = dotz::radians(g_upc.angle);
+  auto c = collision::entities().hitscan(cam, angle, max_use_dist);
+  switch (c.type) {
+    case pushwall::clid:
+      g_olay = { 0.0f, 1.0f, 0.0f, 1.0f };
+      break;
+  }
+}
+
 struct : public vapp {
   void run() try {
     input::setup();
@@ -167,11 +178,7 @@ struct : public vapp {
       voo::one_quad_render oqr { "overlay", &dq, *opl };
 
       input::on_button_down(input::buttons::USE, [] {
-        auto cam = g_upc.cam.xz();
-        auto angle = dotz::radians(g_upc.angle);
-        auto c = collision::entities().hitscan(cam, angle, max_use_dist);
-        if (!c.type) return;
-        silog::trace("ok");
+        process_use();
       });
 
       sitime::stopwatch time {};
