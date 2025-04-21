@@ -51,6 +51,9 @@ export namespace faces {
     [[nodiscard]] auto map() {
       return voo::memiter<inst> { m_inst.host_memory(), &m_i_count };
     }
+    [[nodiscard]] auto remap() {
+      return voo::memiter<inst> { m_inst.host_memory() };
+    }
 
     void setup_copy(vee::command_buffer cb) {
       m_vtx.setup_copy(cb);

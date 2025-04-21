@@ -98,7 +98,7 @@ static void process_use() {
   auto c = collision::entities().hitscan(cam, angle, max_use_dist);
   switch (c.type) {
     case pushwall::clid:
-      g_olay = { 0.0f, 1.0f, 0.0f, 1.0f };
+      pushwall::push(cam, c.id);
       break;
   }
 }
@@ -184,16 +184,18 @@ struct : public vapp {
       ots_loop(dq, sw, [&](auto cb) {
         update_camera(map, time.millis());
         process_collisions(cb, blt);
+        // TODO: squish
+        pushwall::tick(walls, time.millis());
         time = {};
 
         if (!copied) {
           ceilings.setup_copy(cb);
           floors.setup_copy(cb);
-          walls.setup_copy(cb);
           blt.setup_copy(cb);
           for (auto &i : imgs) i.setup_copy(cb);
           copied = true;
         }
+        walls.setup_copy(cb);
 
         voo::cmd_render_pass rp {{
           .command_buffer = cb,

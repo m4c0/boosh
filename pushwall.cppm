@@ -1,16 +1,19 @@
 export module pushwall;
 import collision;
 import dotz;
+import faces;
 import hai;
 
 namespace pushwall {
   export constexpr const auto clid = 'push';
 
+  constexpr const auto wall_speed = 1.0f;
   constexpr const auto max = 128;
 
   struct item {
-    dotz::vec2 pos;
-    unsigned iid;
+    dotz::vec2 pos {};
+    unsigned iid {};
+    dotz::vec2 movement {};
   };
   hai::varray<item> list { max };
 
@@ -20,8 +23,20 @@ namespace pushwall {
     collision::bodies().add_aabb(aa, bb, clid, list.size());
     list.push_back(item { aa, instance });
   }
-  export void remove(unsigned id) {
-    collision::entities().remove(clid, id);
-    list[id] = {};
+
+  export void push(dotz::vec2 from, unsigned id) {
+    auto & i = list[id];
+    float x = from.x < i.pos.x ? 1 : from.x > i.pos.x ? -1 : 0;
+    float y = from.y < i.pos.y ? 1 : from.y > i.pos.y ? -1 : 0;
+    i.movement = { x, y };
+  }
+
+  export void tick(faces::wall & walls, float ms) {
+    auto w = walls.remap();
+    for (auto & i : list) {
+      i.pos = i.pos + i.movement * wall_speed * ms / 1000.0;
+      w[i.iid].pos.x = i.pos.x;
+      w[i.iid].pos.z = i.pos.y;
+    }
   }
 }
