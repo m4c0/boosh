@@ -26,6 +26,7 @@ namespace pushwall {
 
   export void push(dotz::vec2 from, unsigned id) {
     auto & i = list[id];
+    from = dotz::floor(from);
     float x = from.x < i.pos.x ? 1 : from.x > i.pos.x ? -1 : 0;
     float y = from.y < i.pos.y ? 1 : from.y > i.pos.y ? -1 : 0;
     i.movement = { x, y };
