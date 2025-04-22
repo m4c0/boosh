@@ -100,7 +100,19 @@ namespace collision {
     }
 
     [[nodiscard]] bool collides_aabb(dotz::vec2 aa, dotz::vec2 bb) {
-      return true;
+      for (auto & i : m_data) {
+        if (i.fn.w == 0) {
+        } else {
+          auto iaa = i.fn.xy();
+          auto ibb = i.fn.zw();
+          if (iaa.x > bb.x) continue;
+          if (aa.x > ibb.x) continue;
+          if (iaa.y > bb.y) continue;
+          if (aa.y > ibb.y) continue;
+          return true;
+        }
+      }
+      return false;
     }
   };
 
