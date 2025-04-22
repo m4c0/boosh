@@ -105,10 +105,10 @@ namespace collision {
         } else {
           auto iaa = i.fn.xy();
           auto ibb = i.fn.zw();
-          if (iaa.x > bb.x) continue;
-          if (ibb.x < aa.x) continue;
-          if (iaa.y > bb.y) continue;
-          if (ibb.y < aa.y) continue;
+          if (iaa.x >= bb.x) continue;
+          if (ibb.x <= aa.x) continue;
+          if (iaa.y >= bb.y) continue;
+          if (ibb.y <= aa.y) continue;
           if (!fn(i.type, i.id)) return;
         }
       }
