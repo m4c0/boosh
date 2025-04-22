@@ -50,12 +50,14 @@ namespace pushwall {
         it.movement = {};
         aa = dotz::floor(it.pos);
         bb = aa + 1;
+        collision::entities().remove(clid, i);
+      } else {
+        collision::entities().set_aabb(aa, bb, clid, i);
       }
 
-      it.pos = aa;
-
-      collision::entities().set_aabb(it.pos, bb, clid, i);
       collision::bodies().set_aabb(it.pos, bb, clid, i);
+
+      it.pos = aa;
 
       w[it.iid].pos.x = it.pos.x;
       w[it.iid].pos.z = it.pos.y;
