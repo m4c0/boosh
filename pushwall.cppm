@@ -39,7 +39,13 @@ namespace pushwall {
       if (0 == dotz::length(it.movement)) continue;
       auto aa = it.pos + it.movement * wall_speed * ms / 1000.0;
       auto bb = it.pos + 1;
-      if (collision::bodies().collides_aabb(aa, bb)) continue;
+      bool hit = false;
+      collision::bodies().collides_aabb(aa, bb, [&](auto type, auto id) {
+        if (type == clid && id == i) return true;
+        hit = true;
+        return false;
+      });
+      if (hit) continue;
 
       it.pos = aa;
 
