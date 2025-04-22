@@ -102,6 +102,8 @@ namespace collision {
     void collides_aabb(dotz::vec2 aa, dotz::vec2 bb, auto fn) {
       for (auto & i : m_data) {
         if (i.fn.w == 0) {
+          // TODO: sdf between mid(aa, bb) and i.fn.xy
+          throw 0;
         } else {
           auto iaa = i.fn.xy();
           auto ibb = i.fn.zw();
