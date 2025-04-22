@@ -37,6 +37,7 @@ namespace pushwall {
     for (auto i = 0; i < list.size(); i++) {
       auto & it = list[i];
       if (0 == dotz::length(it.movement)) continue;
+
       auto aa = it.pos + it.movement * wall_speed * ms / 1000.0;
       auto bb = it.pos + 1;
       bool hit = false;
@@ -45,7 +46,11 @@ namespace pushwall {
         hit = true;
         return false;
       });
-      if (hit) continue;
+      if (hit) {
+        it.movement = {};
+        aa = dotz::floor(it.pos);
+        bb = aa + 1;
+      }
 
       it.pos = aa;
 
