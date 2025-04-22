@@ -98,6 +98,10 @@ namespace collision {
       }
       return res;
     }
+
+    [[nodiscard]] bool collides_aabb(dotz::vec2 aa, dotz::vec2 bb) {
+      return true;
+    }
   };
 
   export [[nodiscard]] auto & bodies() {

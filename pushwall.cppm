@@ -37,8 +37,12 @@ namespace pushwall {
     for (auto i = 0; i < list.size(); i++) {
       auto & it = list[i];
       if (0 == dotz::length(it.movement)) continue;
-      it.pos = it.pos + it.movement * wall_speed * ms / 1000.0;
+      auto aa = it.pos + it.movement * wall_speed * ms / 1000.0;
       auto bb = it.pos + 1;
+      if (collision::bodies().collides_aabb(aa, bb)) continue;
+
+      it.pos = aa;
+
       collision::entities().set_aabb(it.pos, bb, clid, i);
       collision::bodies().set_aabb(it.pos, bb, clid, i);
 
