@@ -83,7 +83,7 @@ namespace mapper {
         if (!c.wall) err("door require a wall texture"_hs);
         if (!c.floor) err("door requires ceiling and floor"_hs);
       } else if (c.entity.size()) {
-        err("invalid entity"_hs);
+        err("invalid entity named "_hs + c.entity);
       } else {
         if (!c.wall && !c.ceiling) err("tile should have a wall or both ceiling and floor"_hs);
       }
