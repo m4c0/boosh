@@ -12,6 +12,7 @@
 
 import bullet;
 import collision;
+import door;
 import dotz;
 import faces;
 import hai;
@@ -127,6 +128,7 @@ struct : public vapp {
         map.for_each([&](auto x, auto y, auto & d) {
           if (*d.entity == "player") g_upc.cam = { x + 0.5f, 0.0f, y + 0.5f };
           if (*d.entity == "bullet") bullet::add({ x + 0.5f, 0.0f, y + 0.5f });
+          if (*d.entity == "door") door::add({ x, 0, y });
 
           if (*d.entity == "pushwall") pushwall::add({ x, y }, w.count());
           else if (d.wall) collision::bodies().add_aabb({ x, y }, { x + 1, y + 1 }, 'wall', 1);
@@ -138,6 +140,7 @@ struct : public vapp {
       }
 
       bullet::model blt { dq };
+      door::model dr { dq };
 
       auto dsl = vee::create_descriptor_set_layout({
         vee::dsl_fragment_sampler(dset_smps)
@@ -192,6 +195,7 @@ struct : public vapp {
           ceilings.setup_copy(cb);
           floors.setup_copy(cb);
           blt.setup_copy(cb);
+          dr.setup_copy(cb);
           for (auto &i : imgs) i.setup_copy(cb);
           copied = true;
         }
@@ -212,6 +216,7 @@ struct : public vapp {
         floors.draw(cb);
         walls.draw(cb);
 
+        dr.draw(cb, g_upc.cam, g_upc.angle);
         blt.draw(cb, g_upc.cam, g_upc.angle);
 
         vee::cmd_push_fragment_constants(cb, *opl, &g_olay);

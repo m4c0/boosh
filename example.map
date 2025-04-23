@@ -31,12 +31,10 @@ define B
 // TODO: door
 define -
   copy main_hall_fc
-  wall t100
   entity door
 .
 define |
   copy main_hall_fc
-  wall t100
   entity door
 .
 
