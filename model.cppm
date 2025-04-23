@@ -5,6 +5,7 @@ import collision;
 import dotz;
 import faces;
 import hai;
+import jute;
 import traits;
 import voo;
 import wavefront;
@@ -38,7 +39,7 @@ namespace model {
     virtual void load(voo::memiter<mdl> & m) = 0;
 
   public:
-    explicit batch(voo::device_and_queue & dq)
+    batch(voo::device_and_queue & dq, jute::view model, const char * txt)
       : m_gp { vee::create_graphics_pipeline({
         .pipeline_layout = *m_pl,
         .render_pass = dq.render_pass(),
@@ -58,9 +59,9 @@ namespace model {
         },
       }) }
       , m_mdl { dq.physical_device(), max_models * sizeof(mdl) }
-      , m_txt { voo::load_image_file("bullet.uv.png", dq.physical_device()) }
+      , m_txt { voo::load_image_file(txt, dq.physical_device()) }
     {
-      auto [buf, count] = wavefront::load_model(dq.physical_device(), "bullet.obj");
+      auto [buf, count] = wavefront::load_model(dq.physical_device(), model);
       m_buf = traits::move(buf);
       m_vcount = count;
 
