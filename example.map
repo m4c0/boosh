@@ -29,13 +29,20 @@ define B
 .
 
 // TODO: door
-define O
-  wall t100
-.
-// TODO: push wall
-define *
-  copy O
+define -
   copy main_hall_fc
+  wall t100
+  entity door
+.
+define |
+  copy main_hall_fc
+  wall t100
+  entity door
+.
+
+define *
+  copy main_hall_fc
+  wall t100
   entity pushwall
 .
 
@@ -50,7 +57,7 @@ map
     X....X   X.BB.X
     X..XXX   X....X
     X..X     X.XXXX
-    XBXXXXXXXXOXX
-    XB...*......X
+    XBXXXXXXXX-XX
+    XB|..*......X
     XXXXXXXXXXXXX
 .
