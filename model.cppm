@@ -22,8 +22,8 @@ namespace model {
     static constexpr const auto max_models = 128;
 
     vee::sampler m_smp = vee::create_sampler(vee::linear_sampler);
-    voo::single_frag_dset m_ds { 1 };
-    vee::pipeline_layout m_pl = vee::create_pipeline_layout(m_ds.descriptor_set_layout(), vee::vertex_push_constant_range<upc>());
+    voo::single_frag_dset m_ds;
+    vee::pipeline_layout m_pl;
     vee::gr_pipeline m_gp;
     voo::h2l_buffer m_buf;
     voo::h2l_buffer m_mdl;
@@ -40,7 +40,9 @@ namespace model {
 
   public:
     batch(voo::device_and_queue & dq, auto * k, jute::view model, const char * txt)
-      : m_gp { vee::create_graphics_pipeline({
+      : m_ds { 1 }
+      , m_pl { vee::create_pipeline_layout(m_ds.descriptor_set_layout(), vee::vertex_push_constant_range<upc>()) }
+      , m_gp { vee::create_graphics_pipeline({
         .pipeline_layout = *m_pl,
         .render_pass = dq.render_pass(),
         .shaders {

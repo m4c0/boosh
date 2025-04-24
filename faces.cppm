@@ -87,34 +87,34 @@ export namespace faces {
     explicit floor(vee::physical_device pd) : instanced { pd, 6 } {
       auto m = map_vertex();
 
-      m += vtx { .pos = { 0, -1, 0 }, .uv = { 0, 0 } };
-      m += vtx { .pos = { 1, -1, 1 }, .uv = { 1, 1 } };
-      m += vtx { .pos = { 1, -1, 0 }, .uv = { 1, 0 } };
+      m += vtx { .pos = { 0, 0, 0 }, .uv = { 0, 0 } };
+      m += vtx { .pos = { 1, 0, 1 }, .uv = { 1, 1 } };
+      m += vtx { .pos = { 1, 0, 0 }, .uv = { 1, 0 } };
     
-      m += vtx { .pos = { 1, -1, 1 }, .uv = { 1, 1 } };
-      m += vtx { .pos = { 0, -1, 0 }, .uv = { 0, 0 } };
-      m += vtx { .pos = { 0, -1, 1 }, .uv = { 0, 1 } };
+      m += vtx { .pos = { 1, 0, 1 }, .uv = { 1, 1 } };
+      m += vtx { .pos = { 0, 0, 0 }, .uv = { 0, 0 } };
+      m += vtx { .pos = { 0, 0, 1 }, .uv = { 0, 1 } };
     }
   };
 
   class wall : public instanced {
     static void x_wall(voo::memiter<vtx> & m, float x0, float x1, float y) {
-      m += vtx { .pos = { x0, -1.f, y }, .uv = { 0, 1 } };
-      m += vtx { .pos = { x1, -1.f, y }, .uv = { 1, 1 } };
-      m += vtx { .pos = { x1,  1.f, y }, .uv = { 1, 0 } };
+      m += vtx { .pos = { x0, 0.f, y }, .uv = { 0, 1 } };
+      m += vtx { .pos = { x1, 0.f, y }, .uv = { 1, 1 } };
+      m += vtx { .pos = { x1, 1.f, y }, .uv = { 1, 0 } };
     
-      m += vtx { .pos = { x1,  1.f, y }, .uv = { 1, 0 } };
-      m += vtx { .pos = { x0,  1.f, y }, .uv = { 0, 0 } };
-      m += vtx { .pos = { x0, -1.f, y }, .uv = { 0, 1 } };
+      m += vtx { .pos = { x1, 1.f, y }, .uv = { 1, 0 } };
+      m += vtx { .pos = { x0, 1.f, y }, .uv = { 0, 0 } };
+      m += vtx { .pos = { x0, 0.f, y }, .uv = { 0, 1 } };
     }
     static void y_wall(voo::memiter<vtx> & m, float x, float y0, float y1) {
-      m += vtx { .pos = { x, -1.f, y0 }, .uv = { 0, 1 } };
-      m += vtx { .pos = { x, -1.f, y1 }, .uv = { 1, 1 } };
-      m += vtx { .pos = { x,  1.f, y1 }, .uv = { 1, 0 } };
+      m += vtx { .pos = { x, 0.f, y0 }, .uv = { 0, 1 } };
+      m += vtx { .pos = { x, 0.f, y1 }, .uv = { 1, 1 } };
+      m += vtx { .pos = { x, 1.f, y1 }, .uv = { 1, 0 } };
 
-      m += vtx { .pos = { x,  1.f, y1 }, .uv = { 1, 0 } };
-      m += vtx { .pos = { x,  1.f, y0 }, .uv = { 0, 0 } };
-      m += vtx { .pos = { x, -1.f, y0 }, .uv = { 0, 1 } };
+      m += vtx { .pos = { x, 1.f, y1 }, .uv = { 1, 0 } };
+      m += vtx { .pos = { x, 1.f, y0 }, .uv = { 0, 0 } };
+      m += vtx { .pos = { x, 0.f, y0 }, .uv = { 0, 1 } };
     }
 
   public:

@@ -126,7 +126,8 @@ struct : public vapp {
         auto f = floors.map();
         auto w = walls.map();
         map.for_each([&](auto x, auto y, auto & d) {
-          if (*d.entity == "player") g_upc.cam = { x + 0.5f, 0.0f, y + 0.5f };
+          // TODO: fix inverted camera Y
+          if (*d.entity == "player") g_upc.cam = { x + 0.5f, -0.5f, y + 0.5f };
           if (*d.entity == "bullet") bullet::add({ x + 0.5f, 0.0f, y + 0.5f });
           if (*d.entity == "door") door::add({ x, 0, y });
 
