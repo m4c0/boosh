@@ -1,4 +1,5 @@
 #pragma leco add_resource "door.obj"
+#pragma leco add_resource "door.uv.png"
 export module door;
 import dotz;
 import hai;
@@ -21,7 +22,7 @@ namespace door {
 
   public:
     explicit model(voo::device_and_queue & dq)
-      : batch { dq, "door.obj", "bullet.uv.png" }
+      : batch { dq, "door.obj", "door.uv.png" }
     {}
   };
 }
