@@ -1,7 +1,8 @@
 #include "../glslinc/3d.glsl"
 
+layout(constant_id = 0) const float aspect = 1.0;
+
 const float fov_rad = radians(90);
-const float aspect = 1;
 const float far = 100.0;
 const float near = 0.01;
 

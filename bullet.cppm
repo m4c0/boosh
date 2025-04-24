@@ -27,8 +27,8 @@ namespace bullet {
     }
 
   public:
-    explicit model(voo::device_and_queue & dq)
-      : batch { dq, "bullet.obj", "bullet.uv.png" }
+    explicit model(voo::device_and_queue & dq, auto * k)
+      : batch { dq, k, "bullet.obj", "bullet.uv.png" }
     {}
   };
 }
