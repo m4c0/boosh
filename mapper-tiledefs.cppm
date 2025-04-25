@@ -75,8 +75,10 @@ namespace mapper {
       if (!c.ceiling && c.floor) err("ceiling must be defined when floor is"_hs);
 
       if (c.entity == "pushwall"_hs) {
+        if (c.rotate) err("pushwalls can't be rotated yet"_hs);
         if (!c.wall || !c.ceiling) err("pushwall must have all of wall, ceiling and floor"_hs);
       } else if (c.entity == "bullet"_hs) {
+        if (c.rotate) err("bullets can't be rotated yet"_hs);
         if (c.wall) err("bullet cannot be placed on walls"_hs);
         if (!c.floor) err("bullet requires ceiling and floor"_hs);
       } else if (c.entity == "player"_hs) {
@@ -88,6 +90,7 @@ namespace mapper {
       } else if (c.entity.size()) {
         err("invalid entity named "_hs + c.entity);
       } else {
+        if (c.rotate) err("tiles can't be rotated yet"_hs);
         if (!c.wall && !c.ceiling) err("tile should have a wall or both ceiling and floor"_hs);
       }
     }
