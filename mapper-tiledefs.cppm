@@ -12,6 +12,7 @@ namespace mapper {
     unsigned wall;
     unsigned floor;
     unsigned ceiling;
+    unsigned rotate;
     jute::heap entity {};
     bool walk;
   };
@@ -28,6 +29,7 @@ namespace mapper {
       if (o.wall)    c.wall    = o.wall;
       if (o.floor)   c.floor   = o.floor;
       if (o.ceiling) c.ceiling = o.ceiling;
+      if (o.rotate)  c.rotate  = o.rotate;
       if (o.walk)    c.walk    = o.walk;
 
       if (o.entity.size()) c.entity = o.entity;
@@ -56,6 +58,7 @@ namespace mapper {
            if (cmd == "wall")    current().wall    = (*m_txts)[args] + 1;
       else if (cmd == "floor")   current().floor   = (*m_txts)[args] + 1;
       else if (cmd == "ceiling") current().ceiling = (*m_txts)[args] + 1;
+      else if (cmd == "rotate")  current().rotate  = jute::to_f(args);
       else if (cmd == "walk")    current().walk    = true;
       else if (cmd == "copy")    copy((*this)[args.trim()]);
       else if (cmd == "entity")  current().entity  = args;
