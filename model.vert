@@ -15,7 +15,13 @@ layout(location = 0) out vec2 f_txt;
 layout(location = 1) out vec3 f_nrm;
 
 void main() {
-  mat4 model = translation(mdl);
+  mat4 rot = mat4(
+    cos(mdl.w), 0, sin(mdl.w), 0,
+    0, 1, 0, 0,
+    -sin(mdl.w), 0, cos(mdl.w), 0,
+    0, 0, 0, 1
+  );
+  mat4 model = rot * translation(mdl.xyz);
 
   mvp(cam, model, pos);
   f_txt = txt;
