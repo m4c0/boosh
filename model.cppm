@@ -39,6 +39,8 @@ namespace model {
 
     virtual void load(voo::memiter<mdl> & m) = 0;
 
+    auto memiter() { return voo::memiter<mdl> { m_mdl.host_memory() }; }
+
   public:
     batch(voo::device_and_queue & dq, auto * k, jute::view model, const char * txt)
       : m_ds { 1 }
@@ -79,6 +81,9 @@ namespace model {
       m_buf.setup_copy(cb);
       m_mdl.setup_copy(cb);
       m_txt.setup_copy(cb);
+    }
+    void copy_models(vee::command_buffer cb) {
+      m_mdl.setup_copy(cb);
     }
 
     void draw(vee::command_buffer cb, dotz::vec3 cam, float angle) {

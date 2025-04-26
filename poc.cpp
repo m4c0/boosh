@@ -98,6 +98,9 @@ static void process_use() {
   auto angle = dotz::radians(g_upc.angle);
   auto c = collision::entities().hitscan(cam, angle, max_use_dist);
   switch (c.type) {
+    case door::clid:
+      door::open(c.id);
+      break;
     case pushwall::clid:
       pushwall::push(cam, c.id);
       break;
@@ -194,6 +197,7 @@ struct : public vapp {
         process_collisions(cb, blt);
         // TODO: squish
         pushwall::tick(walls, time.millis());
+        dr.tick(time.millis());
         time = {};
 
         if (!copied) {
@@ -205,6 +209,7 @@ struct : public vapp {
           copied = true;
         }
         walls.setup_copy(cb);
+        dr.copy_models(cb);
 
         voo::cmd_render_pass rp {{
           .command_buffer = cb,
