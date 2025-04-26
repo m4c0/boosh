@@ -129,7 +129,7 @@ struct : public vapp {
           // TODO: fix inverted camera Y
           if (*d.entity == "player") g_upc.cam = { x + 0.5f, -0.5f, y + 0.5f };
           if (*d.entity == "bullet") bullet::add({ x + 0.5f, 0.0f, y + 0.5f });
-          if (*d.entity == "door") door::add({ x, 0, y }, dotz::radians(d.rotate));
+          if (*d.entity == "door") door::add({ x + 0.5f, 0.0f, y + 0.5f }, dotz::radians(d.rotate));
 
           if (*d.entity == "pushwall") pushwall::add({ x, y }, w.count());
           else if (d.wall) collision::bodies().add_aabb({ x, y }, { x + 1, y + 1 }, 'wall', 1);
