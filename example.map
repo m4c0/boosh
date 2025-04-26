@@ -32,11 +32,11 @@ define B
 define -
   copy main_hall_fc
   entity door
+  rotate 90
 .
 define |
   copy main_hall_fc
   entity door
-  rotate 90
 .
 
 define *
