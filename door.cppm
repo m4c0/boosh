@@ -9,15 +9,15 @@ import voo;
 namespace door {
   export constexpr const auto clid = 'door';
 
-  hai::varray<dotz::vec3> list { 128 };
+  hai::varray<dotz::vec4> list { 128 };
 
-  export void add(dotz::vec3 p) {
-    list.push_back(p);
+  export void add(dotz::vec3 p, float r) {
+    list.push_back(dotz::vec4 { p, r });
   }
 
   export class model : public ::model::batch {
     void load(voo::memiter<mdl> & m) override {
-      for (auto p : list) m += { .pos = p };
+      for (auto p : list) m += { .pos = p.xyz(), .rot = p.w };
     }
 
   public:

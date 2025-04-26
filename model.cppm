@@ -34,6 +34,7 @@ namespace model {
   protected:
     struct mdl {
       dotz::vec3 pos;
+      float rot;
     };
 
     virtual void load(voo::memiter<mdl> & m) = 0;
@@ -54,7 +55,7 @@ namespace model {
           vee::vertex_input_bind(sizeof(vtx)),
         },
         .attributes {
-          vee::vertex_attribute_vec3(0, traits::offset_of(&mdl::pos)),
+          vee::vertex_attribute_vec4(0, traits::offset_of(&mdl::pos)),
           vee::vertex_attribute_vec3(1, traits::offset_of(&vtx::pos)),
           vee::vertex_attribute_vec2(1, traits::offset_of(&vtx::txt)),
           vee::vertex_attribute_vec3(1, traits::offset_of(&vtx::nrm)),
