@@ -87,6 +87,7 @@ namespace mapper {
       } else if (c.entity == "door"_hs) {
         if (c.wall) err("door cannot be placed on walls"_hs);
         if (!c.floor) err("door requires ceiling and floor"_hs);
+        if (c.rotate != 0 && c.rotate != 90) err("door can only be rotated 0 or 90 degrees"_hs);
       } else if (c.entity.size()) {
         err("invalid entity named "_hs + c.entity);
       } else {
