@@ -7,20 +7,20 @@ namespace collision {
 
   struct item {
     dotz::vec4 fn;
-    unsigned type;
+    unsigned owner;
     unsigned id;
   };
 
   class layer {
     hai::varray<item> m_data { 1024 };
 
-    void add(dotz::vec4 p, unsigned type, unsigned id) {
+    void add(dotz::vec4 p, unsigned owner, unsigned id) {
       if (m_data.size() == m_data.capacity()) throw overflow {};
-      m_data.push_back(item { p, type, id });
+      m_data.push_back(item { p, owner, id });
     }
-    void set(dotz::vec4 p, unsigned type, unsigned id) {
+    void set(dotz::vec4 p, unsigned owner, unsigned id) {
       for (auto i = 0; i < m_data.size(); i++) {
-        if (m_data[i].type != type) continue;
+        if (m_data[i].owner != owner) continue;
         if (m_data[i].id != id) continue;
         m_data[i].fn = p;
         return;
@@ -28,22 +28,22 @@ namespace collision {
     }
 
   public:
-    void add_aabb(dotz::vec2 aa, dotz::vec2 bb, unsigned type, unsigned id) {
-      add(dotz::vec4 { aa, bb }, type, id);
+    void add_aabb(dotz::vec2 aa, dotz::vec2 bb, unsigned owner, unsigned id) {
+      add(dotz::vec4 { aa, bb }, owner, id);
     }
-    void add_circle(dotz::vec2 c, float r, unsigned type, unsigned id) {
-      add(dotz::vec4 { c, r, 0 }, type, id);
-    }
-
-    void set_aabb(dotz::vec2 aa, dotz::vec2 bb, unsigned type, unsigned id) {
-      set(dotz::vec4 { aa, bb }, type, id);
-    }
-    void set_circle(dotz::vec2 c, float r, unsigned type, unsigned id) {
-      set(dotz::vec4 { c, r, 0 }, type, id);
+    void add_circle(dotz::vec2 c, float r, unsigned owner, unsigned id) {
+      add(dotz::vec4 { c, r, 0 }, owner, id);
     }
 
-    void remove(unsigned type, unsigned id) {
-      set(dotz::vec4 {}, type, id);
+    void set_aabb(dotz::vec2 aa, dotz::vec2 bb, unsigned owner, unsigned id) {
+      set(dotz::vec4 { aa, bb }, owner, id);
+    }
+    void set_circle(dotz::vec2 c, float r, unsigned owner, unsigned id) {
+      set(dotz::vec4 { c, r, 0 }, owner, id);
+    }
+
+    void remove(unsigned owner, unsigned id) {
+      set(dotz::vec4 {}, owner, id);
     }
 
     [[nodiscard]] item hitscan(dotz::vec2 p, float rad, float max_dist) {
@@ -111,7 +111,7 @@ namespace collision {
           if (ibb.x <= aa.x) continue;
           if (iaa.y >= bb.y) continue;
           if (ibb.y <= aa.y) continue;
-          if (!fn(i.type, i.id)) return;
+          if (!fn(i.owner, i.id)) return;
         }
       }
     }

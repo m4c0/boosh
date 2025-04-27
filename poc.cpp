@@ -67,7 +67,7 @@ static void update_camera(const mapper::tilemap & map, float ms) {
     cam.z += dy * walk_speed * ms / 1000.0;
 
     dotz::vec2 cxz { cam.x, cam.z };
-    if (collision::bodies().closest(cxz, player_radius).type) {
+    if (collision::bodies().closest(cxz, player_radius).owner) {
       return false;
     }
 
@@ -83,7 +83,7 @@ static void update_camera(const mapper::tilemap & map, float ms) {
 static void process_collisions(auto cb, auto & blt) {
   auto cam = g_upc.cam;
   auto item = collision::entities().closest({ cam.x, cam.z }, player_radius);
-  switch (item.type) {
+  switch (item.owner) {
     case bullet::clid:
       bullet::remove(item.id);
       g_olay = { 1.0f };
@@ -97,7 +97,7 @@ static void process_use() {
   auto cam = g_upc.cam.xz();
   auto angle = dotz::radians(g_upc.angle);
   auto c = collision::entities().hitscan(cam, angle, max_use_dist);
-  switch (c.type) {
+  switch (c.owner) {
     case door::clid:
       door::open(c.id);
       break;
