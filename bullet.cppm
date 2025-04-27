@@ -10,10 +10,12 @@ import voo;
 namespace bullet {
   export constexpr const auto clid = 'bllt';
 
+  static constexpr const auto radius = 0.2;
+
   hai::varray<dotz::vec3> list { 128 };
 
   export void add(dotz::vec3 p) { 
-    collision::entities().add_circle({ p.x, p.z }, 0.1, clid, list.size());
+    collision::entities().add_circle({ p.x, p.z }, radius, clid, list.size());
     list.push_back(p);
   }
   export void remove(unsigned id) {
