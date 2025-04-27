@@ -1,6 +1,7 @@
 export module collision;
 import dotz;
 import hai;
+import silog;
 
 namespace collision {
   struct overflow {};
@@ -55,25 +56,31 @@ namespace collision {
       item res {};
       float min_dist = max_dist;
       for (auto & i : m_data) {
-        if (i.fn.w == 0) {
-          auto t = dotz::dot(l, i.fn.xy() - p);
-          if (t < 0 || t > min_dist) continue;
-          auto pp = p + l * t;
-          if (dotz::length(pp - i.fn.xy()) > i.fn.z) continue;
+        switch (i.type) {
+          case type::none: break;
+          case type::circle: {
+            auto t = dotz::dot(l, i.fn.xy() - p);
+            if (t < 0 || t > min_dist) continue;
+            auto pp = p + l * t;
+            if (dotz::length(pp - i.fn.xy()) > i.fn.z) continue;
 
-          min_dist = t;
-          res = i;
-        } else {
-          auto tlow  = (i.fn.xy() - p) / l;
-          auto thigh = (i.fn.zw() - p) / l;
-          auto tclose = dotz::min(tlow, thigh);
-          auto tfar   = dotz::max(tlow, thigh);
-          auto tc = dotz::max(tclose.x, tclose.y);
-          auto tf = dotz::min(tfar.x, tfar.y);
-          if (tc < 0 || tc > tf || tc > min_dist) continue;
+            min_dist = t;
+            res = i;
+            break;
+          }
+          case type::aabb: {
+            auto tlow  = (i.fn.xy() - p) / l;
+            auto thigh = (i.fn.zw() - p) / l;
+            auto tclose = dotz::min(tlow, thigh);
+            auto tfar   = dotz::max(tlow, thigh);
+            auto tc = dotz::max(tclose.x, tclose.y);
+            auto tf = dotz::min(tfar.x, tfar.y);
+            if (tc < 0 || tc > tf || tc > min_dist) continue;
 
-          min_dist = tc;
-          res = i;
+            min_dist = tc;
+            res = i;
+            break;
+          }
         }
       }
       return res;
@@ -84,16 +91,22 @@ namespace collision {
       for (auto & i : m_data) {
         auto c = i.fn;
         float cd = 1e20;
-        if (c.w == 0) {
-          cd = dotz::length(p - c.xy()) - c.z;
-        } else {
-          auto aa = c.xy();
-          auto bb = c.zw();
-          dotz::vec2 cp {
-            p.x > bb.x ? bb.x : (p.x < aa.x ? aa.x : p.x),
-            p.y > bb.y ? bb.y : (p.y < aa.y ? aa.y : p.y),
-          };
-          cd = dotz::length(p - cp);
+        switch (i.type) {
+          case type::none: break;
+          case type::circle: {
+            cd = dotz::length(p - c.xy()) - c.z;
+            break;
+          }
+          case type::aabb: {
+            auto aa = c.xy();
+            auto bb = c.zw();
+            dotz::vec2 cp {
+              p.x > bb.x ? bb.x : (p.x < aa.x ? aa.x : p.x),
+                p.y > bb.y ? bb.y : (p.y < aa.y ? aa.y : p.y),
+            };
+            cd = dotz::length(p - cp);
+            break;
+          }
         }
         if (cd >= d) continue;
         d = cd;
@@ -104,17 +117,21 @@ namespace collision {
 
     void collides_aabb(dotz::vec2 aa, dotz::vec2 bb, auto fn) {
       for (auto & i : m_data) {
-        if (i.fn.w == 0) {
+        switch (i.type) {
+          case type::none: break;
+          case type::circle:
           // TODO: sdf between mid(aa, bb) and i.fn.xy
-          throw 0;
-        } else {
-          auto iaa = i.fn.xy();
-          auto ibb = i.fn.zw();
-          if (iaa.x >= bb.x) continue;
-          if (ibb.x <= aa.x) continue;
-          if (iaa.y >= bb.y) continue;
-          if (ibb.y <= aa.y) continue;
-          if (!fn(i.owner, i.id)) return;
+            silog::log(silog::error, "TODO: AABB-circle collision");
+            throw 0;
+          case type::aabb:
+            auto iaa = i.fn.xy();
+            auto ibb = i.fn.zw();
+            if (iaa.x >= bb.x) continue;
+            if (ibb.x <= aa.x) continue;
+            if (iaa.y >= bb.y) continue;
+            if (ibb.y <= aa.y) continue;
+            if (!fn(i.owner, i.id)) return;
+            break;
         }
       }
     }
