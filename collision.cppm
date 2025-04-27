@@ -5,8 +5,11 @@ import hai;
 namespace collision {
   struct overflow {};
 
+  enum class type { none, circle, aabb };
+
   struct item {
     dotz::vec4 fn;
+    type type;
     unsigned owner;
     unsigned id;
   };
@@ -14,36 +17,36 @@ namespace collision {
   class layer {
     hai::varray<item> m_data { 1024 };
 
-    void add(dotz::vec4 p, unsigned owner, unsigned id) {
+    void add(item it) {
       if (m_data.size() == m_data.capacity()) throw overflow {};
-      m_data.push_back(item { p, owner, id });
+      m_data.push_back(it);
     }
-    void set(dotz::vec4 p, unsigned owner, unsigned id) {
+    void set(item it) {
       for (auto i = 0; i < m_data.size(); i++) {
-        if (m_data[i].owner != owner) continue;
-        if (m_data[i].id != id) continue;
-        m_data[i].fn = p;
+        if (m_data[i].owner != it.owner) continue;
+        if (m_data[i].id != it.id) continue;
+        m_data[i] = it;
         return;
       }
     }
 
   public:
     void add_aabb(dotz::vec2 aa, dotz::vec2 bb, unsigned owner, unsigned id) {
-      add(dotz::vec4 { aa, bb }, owner, id);
+      add(item { { aa, bb }, type::aabb, owner, id });
     }
     void add_circle(dotz::vec2 c, float r, unsigned owner, unsigned id) {
-      add(dotz::vec4 { c, r, 0 }, owner, id);
+      add(item { { c, r, 0 }, type::circle, owner, id });
     }
 
     void set_aabb(dotz::vec2 aa, dotz::vec2 bb, unsigned owner, unsigned id) {
-      set(dotz::vec4 { aa, bb }, owner, id);
+      set(item { { aa, bb }, type::aabb, owner, id });
     }
     void set_circle(dotz::vec2 c, float r, unsigned owner, unsigned id) {
-      set(dotz::vec4 { c, r, 0 }, owner, id);
+      set(item { { c, r, 0 }, type::circle, owner, id });
     }
 
     void remove(unsigned owner, unsigned id) {
-      set(dotz::vec4 {}, owner, id);
+      set(item { {}, type::none, owner, id });
     }
 
     [[nodiscard]] item hitscan(dotz::vec2 p, float rad, float max_dist) {
