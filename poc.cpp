@@ -16,6 +16,7 @@ import door;
 import dotz;
 import faces;
 import hai;
+import hand;
 import jute;
 import input;
 import mapper;
@@ -149,6 +150,7 @@ struct : public vapp {
 
       bullet::model blt { dq, &aspect_k };
       door::model dr { dq, &aspect_k };
+      hand::model hnd { dq };
 
       auto dsl = vee::create_descriptor_set_layout({
         vee::dsl_fragment_sampler(dset_smps)
@@ -205,6 +207,7 @@ struct : public vapp {
           floors.setup_copy(cb);
           blt.setup_copy(cb);
           dr.setup_copy(cb);
+          hnd.setup_copy(cb);
           for (auto &i : imgs) i.setup_copy(cb);
           copied = true;
         }
@@ -228,6 +231,8 @@ struct : public vapp {
 
         dr.draw(cb, g_upc.cam, g_upc.angle);
         blt.draw(cb, g_upc.cam, g_upc.angle);
+
+        hnd.run(cb);
 
         vee::cmd_push_fragment_constants(cb, *opl, &g_olay);
         oqr.run(cb);
