@@ -9,6 +9,7 @@ namespace hand {
   export class model {
     struct upc {
       dotz::vec2 pos { 0.2f };
+      dotz::vec2 size { 0.8f };
     } m_pc {};
 
     vee::sampler m_smp = vee::create_sampler(vee::linear_sampler);
