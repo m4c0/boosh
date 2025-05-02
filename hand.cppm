@@ -17,11 +17,10 @@ namespace hand {
       vee::dsl_fragment_sampler(),
       vee::combined_image_sampler()
     };
-    vee::pipeline_layout m_pl = vee::create_pipeline_layout({
-      m_ds.descriptor_set_layout()
-    }, {
+    vee::pipeline_layout m_pl = vee::create_pipeline_layout(
+      m_ds.descriptor_set_layout(),
       vee::vertex_push_constant_range<upc>()
-    });
+    );
     voo::one_quad_render m_oqr;
     voo::h2l_image m_txt;
 
