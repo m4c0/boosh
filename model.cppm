@@ -37,13 +37,13 @@ namespace model {
     auto memiter() { return voo::memiter<mdl> { m_mdl.host_memory() }; }
 
   public:
-    batch(voo::device_and_queue & dq, auto * k, jute::view model, const char * txt)
+    batch(voo::device_and_queue & dq, jute::view model, const char * txt)
       : m_x { &dq, txt }
       , m_gp { vee::create_graphics_pipeline({
         .pipeline_layout = *m_x.m_pl,
         .render_pass = dq.render_pass(),
         .shaders {
-          voo::shader("model.vert.spv").pipeline_vert_stage("main", k),
+          voo::shader("model.vert.spv").pipeline_vert_stage("main", vee::specialisation_info<float>(dq.aspect_of())),
           voo::shader("model.frag.spv").pipeline_frag_stage(),
         },
         .bindings {

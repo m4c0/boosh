@@ -16,7 +16,7 @@ namespace hand {
     vee::gr_pipeline m_pipeline;
 
   public:
-    explicit model(const voo::device_and_queue & dq, auto * aspect_k)
+    explicit model(const voo::device_and_queue & dq)
       : m_x { &dq, "hand.png" }
       , m_quad { dq.physical_device() }
       , m_pipeline {

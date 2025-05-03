@@ -144,13 +144,9 @@ struct : public vapp {
         });
       }
 
-      auto aspect = sw.aspect();
-      auto aspect_s = hai::view { vee::specialisation_map_entry<float>() };
-      auto aspect_k = vee::specialisation_info(&aspect, aspect_s);
-
-      bullet::model blt { dq, &aspect_k };
-      door::model dr { dq, &aspect_k };
-      hand::model hnd { dq, &aspect_k };
+      bullet::model blt { dq };
+      door::model dr { dq };
+      hand::model hnd { dq };
 
       auto dsl = vee::create_descriptor_set_layout({
         vee::dsl_fragment_sampler(dset_smps)
@@ -161,7 +157,7 @@ struct : public vapp {
         .render_pass = dq.render_pass(),
         //.back_face_cull = false,
         .shaders {
-          voo::shader("poc.vert.spv").pipeline_vert_stage("main", &aspect_k),
+          voo::shader("poc.vert.spv").pipeline_vert_stage("main", vee::specialisation_info<float>(dq.aspect_of())),
           voo::shader("poc.frag.spv").pipeline_frag_stage(),
         },
         .bindings   = faces::bindings(),
