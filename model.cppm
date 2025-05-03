@@ -4,7 +4,6 @@ export module model;
 import collision;
 import faces;
 import hai;
-import jute;
 import traits;
 import v;
 import wavefront;
@@ -24,7 +23,6 @@ namespace model {
     vee::gr_pipeline m_gp;
     voo::h2l_buffer m_buf;
     voo::h2l_buffer m_mdl;
-    voo::h2l_image m_txt;
     unsigned m_vcount;
     unsigned m_icount;
 
@@ -40,7 +38,7 @@ namespace model {
 
   public:
     batch(voo::device_and_queue & dq, auto * k, jute::view model, const char * txt)
-      : m_x {}
+      : m_x { &dq, txt }
       , m_gp { vee::create_graphics_pipeline({
         .pipeline_layout = *m_x.m_pl,
         .render_pass = dq.render_pass(),
@@ -60,12 +58,10 @@ namespace model {
         },
       }) }
       , m_mdl { dq.physical_device(), max_models * sizeof(mdl) }
-      , m_txt { voo::load_image_file(txt, dq.physical_device()) }
     {
       auto [buf, count] = wavefront::load_model(dq.physical_device(), model);
       m_buf = traits::move(buf);
       m_vcount = count;
-      m_x.update_descriptor_set(m_txt.iv());
     }
 
     void setup_copy(vee::command_buffer cb) {
@@ -75,7 +71,7 @@ namespace model {
       }
       m_buf.setup_copy(cb);
       m_mdl.setup_copy(cb);
-      m_txt.setup_copy(cb);
+      m_x.setup_copy(cb);
     }
     void copy_models(vee::command_buffer cb) {
       m_mdl.setup_copy(cb);

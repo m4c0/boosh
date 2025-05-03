@@ -11,34 +11,30 @@ namespace hand {
       dotz::vec2 size { 0.8f };
     } m_pc {};
 
-    v::x<upc> m_x {};
+    v::x<upc> m_x;
     voo::one_quad m_quad;
     vee::gr_pipeline m_pipeline;
-    voo::h2l_image m_txt;
 
   public:
     explicit model(const voo::device_and_queue & dq, auto * aspect_k)
-      : m_x {}
+      : m_x { &dq, "hand.png" }
       , m_quad { dq.physical_device() }
       , m_pipeline {
         vee::create_graphics_pipeline({
           .pipeline_layout = *m_x.m_pl,
           .render_pass = dq.render_pass(),
           .shaders {
-            voo::shader("hand.frag.spv").pipeline_vert_stage(),
-            voo::shader("hand.vert.spv").pipeline_frag_stage(),
+            voo::shader("hand.vert.spv").pipeline_vert_stage(),
+            voo::shader("hand.frag.spv").pipeline_frag_stage(),
           },
           .bindings { m_quad.vertex_input_bind() },
           .attributes { m_quad.vertex_attribute(0) },
         })
       }
-      , m_txt { voo::load_image_file("hand.png", dq.physical_device()) }
-    {
-      m_x.update_descriptor_set(m_txt.iv());
-    }
+    {}
 
     void setup_copy(vee::command_buffer cb) {
-      m_txt.setup_copy(cb);
+      m_x.setup_copy(cb);
     }
 
     void run(vee::command_buffer cb) {
