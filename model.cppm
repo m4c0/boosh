@@ -2,12 +2,11 @@
 #pragma leco add_shader "model.vert"
 export module model;
 import collision;
-import dotz;
 import faces;
 import hai;
 import jute;
 import traits;
-import voo;
+import v;
 import wavefront;
 
 namespace model {
@@ -21,9 +20,7 @@ namespace model {
 
     static constexpr const auto max_models = 128;
 
-    vee::sampler m_smp = vee::create_sampler(vee::linear_sampler);
-    voo::single_frag_dset m_ds;
-    vee::pipeline_layout m_pl;
+    v::x<upc> m_x;
     vee::gr_pipeline m_gp;
     voo::h2l_buffer m_buf;
     voo::h2l_buffer m_mdl;
@@ -43,10 +40,9 @@ namespace model {
 
   public:
     batch(voo::device_and_queue & dq, auto * k, jute::view model, const char * txt)
-      : m_ds { 1 }
-      , m_pl { vee::create_pipeline_layout(m_ds.descriptor_set_layout(), vee::vertex_push_constant_range<upc>()) }
+      : m_x {}
       , m_gp { vee::create_graphics_pipeline({
-        .pipeline_layout = *m_pl,
+        .pipeline_layout = *m_x.pl,
         .render_pass = dq.render_pass(),
         .shaders {
           voo::shader("model.vert.spv").pipeline_vert_stage("main", k),
@@ -69,8 +65,9 @@ namespace model {
       auto [buf, count] = wavefront::load_model(dq.physical_device(), model);
       m_buf = traits::move(buf);
       m_vcount = count;
+      m_x.update_descriptor_set(m_txt.iv());
 
-      vee::update_descriptor_set(m_ds.descriptor_set(), 0, m_txt.iv(), *m_smp);
+      vee::update_descriptor_set(m_x.ds.descriptor_set(), 0, m_txt.iv(), *m_x.smp);
     }
 
     void setup_copy(vee::command_buffer cb) {
@@ -90,8 +87,8 @@ namespace model {
       upc pc { cam, angle };
       vee::cmd_bind_vertex_buffers(cb, 0, m_mdl.local_buffer());
       vee::cmd_bind_vertex_buffers(cb, 1, m_buf.local_buffer());
-      vee::cmd_push_vertex_constants(cb, *m_pl, &pc);
-      vee::cmd_bind_descriptor_set(cb, *m_pl, 0, m_ds.descriptor_set());
+      vee::cmd_push_vertex_constants(cb, *m_x.pl, &pc);
+      vee::cmd_bind_descriptor_set(cb, *m_x.pl, 0, m_x.ds.descriptor_set());
       vee::cmd_bind_gr_pipeline(cb, *m_gp);
       vee::cmd_draw(cb, m_vcount, m_icount);
     }
