@@ -24,7 +24,7 @@ namespace hand {
           .pipeline_layout = *m_x.m_pl,
           .render_pass = dq.render_pass(),
           .shaders {
-            voo::shader("hand.vert.spv").pipeline_vert_stage(),
+            voo::shader("hand.vert.spv").pipeline_vert_stage("main", vee::specialisation_info<float>(dq.aspect_of())),
             voo::shader("hand.frag.spv").pipeline_frag_stage(),
           },
           .bindings { m_quad.vertex_input_bind() },
