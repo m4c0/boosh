@@ -12,13 +12,26 @@ namespace hand {
     } m_pc {};
 
     v::x<upc> m_x {};
-    voo::one_quad_render m_oqr;
+    voo::one_quad m_quad;
+    vee::gr_pipeline m_pipeline;
     voo::h2l_image m_txt;
 
   public:
     explicit model(const voo::device_and_queue & dq, auto * aspect_k)
       : m_x {}
-      , m_oqr { "hand", &dq, *m_x.pl }
+      , m_quad { dq.physical_device() }
+      , m_pipeline {
+        vee::create_graphics_pipeline({
+          .pipeline_layout = *m_x.m_pl,
+          .render_pass = dq.render_pass(),
+          .shaders {
+            voo::shader("hand.frag.spv").pipeline_vert_stage(),
+            voo::shader("hand.vert.spv").pipeline_frag_stage(),
+          },
+          .bindings { m_quad.vertex_input_bind() },
+          .attributes { m_quad.vertex_attribute(0) },
+        })
+      }
       , m_txt { voo::load_image_file("hand.png", dq.physical_device()) }
     {
       m_x.update_descriptor_set(m_txt.iv());
@@ -29,9 +42,10 @@ namespace hand {
     }
 
     void run(vee::command_buffer cb) {
-      vee::cmd_bind_descriptor_set(cb, *m_x.pl, 0, m_x.ds.descriptor_set());
-      vee::cmd_push_vertex_constants(cb, *m_x.pl, &m_pc);
-      m_oqr.run(cb);
+      vee::cmd_bind_descriptor_set(cb, *m_x.m_pl, 0, m_x.m_ds.descriptor_set());
+      vee::cmd_push_vertex_constants(cb, *m_x.m_pl, &m_pc);
+      vee::cmd_bind_gr_pipeline(cb, *m_pipeline);
+      m_quad.run(cb, 0, 1);
     }
   };
 }

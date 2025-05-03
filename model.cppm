@@ -42,7 +42,7 @@ namespace model {
     batch(voo::device_and_queue & dq, auto * k, jute::view model, const char * txt)
       : m_x {}
       , m_gp { vee::create_graphics_pipeline({
-        .pipeline_layout = *m_x.pl,
+        .pipeline_layout = *m_x.m_pl,
         .render_pass = dq.render_pass(),
         .shaders {
           voo::shader("model.vert.spv").pipeline_vert_stage("main", k),
@@ -66,8 +66,6 @@ namespace model {
       m_buf = traits::move(buf);
       m_vcount = count;
       m_x.update_descriptor_set(m_txt.iv());
-
-      vee::update_descriptor_set(m_x.ds.descriptor_set(), 0, m_txt.iv(), *m_x.smp);
     }
 
     void setup_copy(vee::command_buffer cb) {
@@ -87,8 +85,8 @@ namespace model {
       upc pc { cam, angle };
       vee::cmd_bind_vertex_buffers(cb, 0, m_mdl.local_buffer());
       vee::cmd_bind_vertex_buffers(cb, 1, m_buf.local_buffer());
-      vee::cmd_push_vertex_constants(cb, *m_x.pl, &pc);
-      vee::cmd_bind_descriptor_set(cb, *m_x.pl, 0, m_x.ds.descriptor_set());
+      vee::cmd_push_vertex_constants(cb, *m_x.m_pl, &pc);
+      vee::cmd_bind_descriptor_set(cb, *m_x.m_pl, 0, m_x.m_ds.descriptor_set());
       vee::cmd_bind_gr_pipeline(cb, *m_gp);
       vee::cmd_draw(cb, m_vcount, m_icount);
     }
