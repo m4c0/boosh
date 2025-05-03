@@ -1,4 +1,6 @@
 #version 450
+#extension GL_GOOGLE_include_directive : require
+#include "mvp.glsl"
 
 layout(push_constant) uniform upc {
   vec2 pos;
@@ -10,7 +12,7 @@ layout(location = 0) in vec2 position;
 layout(location = 0) out vec2 frag_coord;
 
 void main() {
-  vec2 p = size * position + pos;
+  vec2 p = vec2(1.0 / aspect, 1) * size * position + pos;
   gl_Position = vec4(p, 0, 1);
   frag_coord = position;
 }

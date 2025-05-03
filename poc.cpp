@@ -150,7 +150,7 @@ struct : public vapp {
 
       bullet::model blt { dq, &aspect_k };
       door::model dr { dq, &aspect_k };
-      hand::model hnd { dq };
+      hand::model hnd { dq, &aspect_k };
 
       auto dsl = vee::create_descriptor_set_layout({
         vee::dsl_fragment_sampler(dset_smps)

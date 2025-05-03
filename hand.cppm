@@ -25,7 +25,7 @@ namespace hand {
     voo::h2l_image m_txt;
 
   public:
-    explicit model(const voo::device_and_queue & dq)
+    explicit model(const voo::device_and_queue & dq, auto * aspect_k)
       : m_oqr { "hand", &dq, *m_pl }
       , m_txt { voo::load_image_file("hand.png", dq.physical_device()) }
     {
