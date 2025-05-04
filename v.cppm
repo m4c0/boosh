@@ -40,6 +40,7 @@ namespace v {
       vee::update_descriptor_set(m_ds.descriptor_set(), 0, m_txt.iv(), *m_smp);
     }
 
+    // TODO: do this in ctor
     void setup_copy(vee::command_buffer cb) {
       m_txt.setup_copy(cb);
     }
