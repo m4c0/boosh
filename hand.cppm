@@ -12,7 +12,7 @@ namespace hand {
     } m_pc {};
 
     voo::one_quad m_quad;
-    v::x<upc> m_x;
+    v::simple_pipeline<upc> m_x;
 
   public:
     explicit model(const voo::device_and_queue & dq)

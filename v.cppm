@@ -6,7 +6,7 @@ export import voo;
 import wagen;
 
 namespace v {
-  export template<typename PC> struct x {
+  export template<typename PC> struct simple_pipeline {
     vee::sampler m_smp = vee::create_sampler(vee::linear_sampler);
     voo::single_frag_dset m_ds { 1 };
     vee::pipeline_layout m_pl = vee::create_pipeline_layout(
@@ -24,7 +24,7 @@ namespace v {
     }
 
   public:
-    x(const voo::device_and_queue * dq, const char * txt, jute::view shader, const vee::gr_pipeline_params & p) 
+    simple_pipeline(const voo::device_and_queue * dq, const char * txt, jute::view shader, const vee::gr_pipeline_params & p) 
       : m_txt { voo::load_image_file(txt, dq->physical_device()) }
       , m_pipeline {
         vee::create_graphics_pipeline(merge(p, {
