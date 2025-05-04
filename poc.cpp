@@ -13,11 +13,8 @@
 import bullet;
 import collision;
 import door;
-import dotz;
 import faces;
-import hai;
 import hand;
-import jute;
 import input;
 import mapper;
 import pushwall;
@@ -25,7 +22,7 @@ import silog;
 import sires;
 import sitime;
 import traits;
-import voo;
+import v;
 import vapp;
 
 using namespace jute::literals;
@@ -148,6 +145,8 @@ struct : public vapp {
       door::model dr { dq };
       hand::model hnd { dq };
 
+      // TODO: refactor to use v::x
+      // TODO: move to faces
       auto dsl = vee::create_descriptor_set_layout({
         vee::dsl_fragment_sampler(dset_smps)
       });
