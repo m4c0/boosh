@@ -15,7 +15,7 @@ namespace hand {
     v::simple_pipeline<upc> m_ppl;
 
   public:
-    explicit model(const voo::device_and_queue & dq)
+    explicit model(voo::device_and_queue & dq)
       : m_quad { dq.physical_device() }
       , m_ppl { &dq, "hand.png", "hand", {
         .bindings { m_quad.vertex_input_bind() },
