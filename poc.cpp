@@ -229,6 +229,7 @@ struct : public vapp {
 
         hnd.run(cb);
 
+        // TODO: remove depth test
         vee::cmd_push_fragment_constants(cb, *opl, &g_olay);
         oqr.run(cb);
       });
