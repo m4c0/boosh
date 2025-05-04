@@ -19,7 +19,7 @@ namespace model {
 
     static constexpr const auto max_models = 128;
 
-    v::simple_pipeline<upc> m_x;
+    v::simple_pipeline<upc> m_ppl;
     voo::h2l_buffer m_buf;
     voo::h2l_buffer m_mdl;
     unsigned m_vcount;
@@ -37,7 +37,7 @@ namespace model {
 
   public:
     batch(voo::device_and_queue & dq, jute::view model, const char * txt)
-      : m_x { &dq, txt, "model", {
+      : m_ppl { &dq, txt, "model", {
         .bindings {
           vee::vertex_input_bind_per_instance(sizeof(mdl)),
           vee::vertex_input_bind(sizeof(vtx)),
@@ -63,19 +63,16 @@ namespace model {
       }
       m_buf.setup_copy(cb);
       m_mdl.setup_copy(cb);
-      m_x.setup_copy(cb);
+      m_ppl.setup_copy(cb);
     }
     void copy_models(vee::command_buffer cb) {
       m_mdl.setup_copy(cb);
     }
 
     void draw(vee::command_buffer cb, dotz::vec3 cam, float angle) {
-      upc pc { cam, angle };
+      m_ppl.cmd_bind(cb, { cam, angle });
       vee::cmd_bind_vertex_buffers(cb, 0, m_mdl.local_buffer());
       vee::cmd_bind_vertex_buffers(cb, 1, m_buf.local_buffer());
-      vee::cmd_push_vertex_constants(cb, *m_x.m_pl, &pc);
-      vee::cmd_bind_descriptor_set(cb, *m_x.m_pl, 0, m_x.m_ds.descriptor_set());
-      vee::cmd_bind_gr_pipeline(cb, *m_x.m_pipeline);
       vee::cmd_draw(cb, m_vcount, m_icount);
     }
   };

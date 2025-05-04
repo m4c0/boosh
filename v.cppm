@@ -43,5 +43,11 @@ namespace v {
     void setup_copy(vee::command_buffer cb) {
       m_txt.setup_copy(cb);
     }
+
+    void cmd_bind(vee::command_buffer cb, const PC & pc) {
+      vee::cmd_bind_descriptor_set(cb, *m_pl, 0, m_ds.descriptor_set());
+      vee::cmd_push_vertex_constants(cb, *m_pl, &pc);
+      vee::cmd_bind_gr_pipeline(cb, *m_pipeline);
+    }
   };
 }
