@@ -8,17 +8,31 @@ namespace overlay {
     vee::pipeline_layout m_pl = vee::create_pipeline_layout({
       vee::fragment_push_constant_range<dotz::vec4>()
     });
-    voo::one_quad_render m_oqr;
+    voo::one_quad m_quad;
+    vee::gr_pipeline m_pipeline;
 
   public:
     explicit model(voo::device_and_queue & dq)
-      : m_oqr { "overlay", &dq, *m_pl }
+      : m_quad { dq.physical_device() }
+      , m_pipeline {
+        vee::create_graphics_pipeline({
+          .pipeline_layout = *m_pl,
+          .render_pass = dq.render_pass(),
+          .depth_test = false,
+          .shaders {
+            voo::shader("overlay.vert.spv").pipeline_vert_stage(),
+            voo::shader("overlay.frag.spv").pipeline_frag_stage(),
+          },
+          .bindings { m_quad.vertex_input_bind() },
+          .attributes { m_quad.vertex_attribute(0) },
+        })
+      }
     {}
 
     void run(vee::command_buffer cb, dotz::vec4 olay) {
-      // TODO: remove depth test
       vee::cmd_push_fragment_constants(cb, *m_pl, &olay);
-      m_oqr.run(cb);
+      vee::cmd_bind_gr_pipeline(cb, *m_pipeline);
+      m_quad.run(cb, 0, 1);
     }
   };
 }

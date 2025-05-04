@@ -18,6 +18,7 @@ namespace hand {
     explicit model(voo::device_and_queue & dq)
       : m_quad { dq.physical_device() }
       , m_ppl { &dq, "hand.png", "hand", {
+        .depth_test = false,
         .bindings { m_quad.vertex_input_bind() },
         .attributes { m_quad.vertex_attribute(0) },
       }}
