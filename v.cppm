@@ -6,7 +6,7 @@ export import voo;
 import wagen;
 
 namespace v {
-  export template<typename PC> struct simple_pipeline {
+  export template<typename PC> class simple_pipeline {
     vee::sampler m_smp = vee::create_sampler(vee::linear_sampler);
     voo::single_frag_dset m_ds { 1 };
     vee::pipeline_layout m_pl = vee::create_pipeline_layout(
