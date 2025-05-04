@@ -1,8 +1,6 @@
 #pragma leco app
 #pragma leco add_shader "poc.vert"
 #pragma leco add_shader "poc.frag"
-#pragma leco add_shader "overlay.vert"
-#pragma leco add_shader "overlay.frag"
 #pragma leco add_resource "Tiles040_1K-JPG_Color.jpg"
 #pragma leco add_resource "Tiles051_1K-JPG_Color.jpg"
 #pragma leco add_resource "Tiles101_1K-JPG_Color.jpg"
@@ -17,6 +15,7 @@ import faces;
 import hand;
 import input;
 import mapper;
+import overlay;
 import pushwall;
 import silog;
 import sires;
@@ -144,6 +143,7 @@ struct : public vapp {
       bullet::model blt { dq };
       door::model dr { dq };
       hand::model hnd { dq };
+      overlay::model olay { dq };
 
       // TODO: refactor to use v::x
       // TODO: move to faces
@@ -177,11 +177,6 @@ struct : public vapp {
         ivs[i] = imgs[0].iv();
       }
       vee::update_descriptor_set(dset, 0, ivs, *smp);
-
-      auto opl = vee::create_pipeline_layout({
-        vee::fragment_push_constant_range<dotz::vec4>()
-      });
-      voo::one_quad_render oqr { "overlay", &dq, *opl };
 
       input::on_button_down(input::buttons::USE, [] {
         process_use();
@@ -227,10 +222,7 @@ struct : public vapp {
         blt.draw(cb, g_upc.cam, g_upc.angle);
 
         hnd.run(cb);
-
-        // TODO: remove depth test
-        vee::cmd_push_fragment_constants(cb, *opl, &g_olay);
-        oqr.run(cb);
+        olay.run(cb, g_olay);
       });
     });
   } catch (const mapper::error & e) {
