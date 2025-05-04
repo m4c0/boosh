@@ -20,7 +20,6 @@ namespace model {
     static constexpr const auto max_models = 128;
 
     v::x<upc> m_x;
-    vee::gr_pipeline m_gp;
     voo::h2l_buffer m_buf;
     voo::h2l_buffer m_mdl;
     unsigned m_vcount;
@@ -38,14 +37,7 @@ namespace model {
 
   public:
     batch(voo::device_and_queue & dq, jute::view model, const char * txt)
-      : m_x { &dq, txt }
-      , m_gp { vee::create_graphics_pipeline({
-        .pipeline_layout = *m_x.m_pl,
-        .render_pass = dq.render_pass(),
-        .shaders {
-          voo::shader("model.vert.spv").pipeline_vert_stage("main", vee::specialisation_info<float>(dq.aspect_of())),
-          voo::shader("model.frag.spv").pipeline_frag_stage(),
-        },
+      : m_x { &dq, txt, "model", {
         .bindings {
           vee::vertex_input_bind_per_instance(sizeof(mdl)),
           vee::vertex_input_bind(sizeof(vtx)),
@@ -56,7 +48,7 @@ namespace model {
           vee::vertex_attribute_vec2(1, traits::offset_of(&vtx::txt)),
           vee::vertex_attribute_vec3(1, traits::offset_of(&vtx::nrm)),
         },
-      }) }
+      }}
       , m_mdl { dq.physical_device(), max_models * sizeof(mdl) }
     {
       auto [buf, count] = wavefront::load_model(dq.physical_device(), model);
@@ -83,7 +75,7 @@ namespace model {
       vee::cmd_bind_vertex_buffers(cb, 1, m_buf.local_buffer());
       vee::cmd_push_vertex_constants(cb, *m_x.m_pl, &pc);
       vee::cmd_bind_descriptor_set(cb, *m_x.m_pl, 0, m_x.m_ds.descriptor_set());
-      vee::cmd_bind_gr_pipeline(cb, *m_gp);
+      vee::cmd_bind_gr_pipeline(cb, *m_x.m_pipeline);
       vee::cmd_draw(cb, m_vcount, m_icount);
     }
   };

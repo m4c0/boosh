@@ -1,7 +1,9 @@
 export module v;
 export import dotz;
+export import hai;
 export import jute;
 export import voo;
+import wagen;
 
 namespace v {
   export template<typename PC> struct x {
@@ -12,10 +14,28 @@ namespace v {
       vee::vertex_push_constant_range<PC>()
     );
     voo::h2l_image m_txt;
+    vee::gr_pipeline m_pipeline;
+
+    static auto merge(vee::gr_pipeline_params into, const vee::gr_pipeline_params & from) {
+      into.pipeline_layout = from.pipeline_layout;
+      into.render_pass     = from.render_pass;
+      into.shaders         = from.shaders;
+      return into;
+    }
 
   public:
-    x(const voo::device_and_queue * dq, const char * txt) 
+    x(const voo::device_and_queue * dq, const char * txt, jute::view shader, const vee::gr_pipeline_params & p) 
       : m_txt { voo::load_image_file(txt, dq->physical_device()) }
+      , m_pipeline {
+        vee::create_graphics_pipeline(merge(p, {
+          .pipeline_layout = *m_pl,
+          .render_pass = dq->render_pass(),
+          .shaders {
+            voo::shader(*(jute::heap(shader) + ".vert.spv")).pipeline_vert_stage("main", vee::specialisation_info<float>(dq->aspect_of())),
+            voo::shader(*(jute::heap(shader) + ".frag.spv")).pipeline_frag_stage(),
+          },
+        }))
+      }
     {
       vee::update_descriptor_set(m_ds.descriptor_set(), 0, m_txt.iv(), *m_smp);
     }
