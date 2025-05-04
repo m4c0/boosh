@@ -63,7 +63,6 @@ namespace model {
       }
       m_buf.setup_copy(cb);
       m_mdl.setup_copy(cb);
-      m_ppl.setup_copy(cb);
     }
     void copy_models(vee::command_buffer cb) {
       m_mdl.setup_copy(cb);

@@ -23,10 +23,6 @@ namespace hand {
       }}
     {}
 
-    void setup_copy(vee::command_buffer cb) {
-      m_ppl.setup_copy(cb);
-    }
-
     void run(vee::command_buffer cb) {
       m_ppl.cmd_bind(cb, m_pc);
       m_quad.run(cb, 0, 1);

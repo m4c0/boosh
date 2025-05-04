@@ -202,7 +202,6 @@ struct : public vapp {
           floors.setup_copy(cb);
           blt.setup_copy(cb);
           dr.setup_copy(cb);
-          hnd.setup_copy(cb);
           for (auto &i : imgs) i.setup_copy(cb);
           copied = true;
         }

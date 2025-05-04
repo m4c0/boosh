@@ -7,6 +7,8 @@ import wagen;
 
 namespace v {
   export template<typename PC> class simple_pipeline {
+    voo::single_cb m_cb;
+
     vee::sampler m_smp = vee::create_sampler(vee::linear_sampler);
     voo::single_frag_dset m_ds { 1 };
     vee::pipeline_layout m_pl = vee::create_pipeline_layout(
@@ -24,8 +26,9 @@ namespace v {
     }
 
   public:
-    simple_pipeline(const voo::device_and_queue * dq, const char * txt, jute::view shader, const vee::gr_pipeline_params & p) 
-      : m_txt { voo::load_image_file(txt, dq->physical_device()) }
+    simple_pipeline(voo::device_and_queue * dq, const char * txt, jute::view shader, const vee::gr_pipeline_params & p) 
+      : m_cb { dq->queue_family() }
+      , m_txt { voo::load_image_file(txt, dq->physical_device()) }
       , m_pipeline {
         vee::create_graphics_pipeline(merge(p, {
           .pipeline_layout = *m_pl,
@@ -38,11 +41,11 @@ namespace v {
       }
     {
       vee::update_descriptor_set(m_ds.descriptor_set(), 0, m_txt.iv(), *m_smp);
-    }
 
-    // TODO: do this in ctor
-    void setup_copy(vee::command_buffer cb) {
-      m_txt.setup_copy(cb);
+      voo::cmd_buf_one_time_submit::build(m_cb.cb(), [this](auto cb) {
+        m_txt.setup_copy(cb);
+      });
+      dq->queue()->queue_submit({ .command_buffer = m_cb.cb() });
     }
 
     void cmd_bind(vee::command_buffer cb, const PC & pc) {
