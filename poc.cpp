@@ -43,7 +43,7 @@ struct upc {
 
 dotz::vec4 g_olay {};
 
-static void update_camera(const mapper::tilemap & map, float ms) {
+static bool update_camera(const mapper::tilemap & map, float ms) {
   float da = -input::state(input::axis::TURN) * turn_speed * ms / 1000.0;
   g_upc.angle = dotz::mod(360 + g_upc.angle + da, 360);
 
@@ -51,7 +51,7 @@ static void update_camera(const mapper::tilemap & map, float ms) {
     input::state(input::axis::STRAFE),
     input::state(input::axis::WALK)
   };
-  if (dotz::sq_length(dr) == 0) return;
+  if (dotz::sq_length(dr) == 0) return false;
 
   float a = dotz::radians(g_upc.angle);
   float c = dotz::cos(a);
@@ -74,7 +74,7 @@ static void update_camera(const mapper::tilemap & map, float ms) {
 
   auto dx = d.x * c - d.y * s;
   auto dy = d.x * s + d.y * c;
-  walk(dx, dy) || walk(dx, 0) || walk(0, dy);
+  return walk(dx, dy) || walk(dx, 0) || walk(0, dy);
 }
 
 static void process_collisions(auto cb, auto & blt) {
@@ -185,11 +185,12 @@ struct : public vapp {
       sitime::stopwatch time {};
       bool copied = false;
       ots_loop(dq, sw, [&](auto cb) {
-        update_camera(map, time.millis());
+        bool moved = update_camera(map, time.millis());
         process_collisions(cb, blt);
         // TODO: squish
         pushwall::tick(walls, time.millis());
         dr.tick(time.millis());
+        hnd.tick(time.millis(), moved);
         time = {};
 
         if (!copied) {
