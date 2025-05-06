@@ -20,6 +20,7 @@ namespace hand {
 
     voo::one_quad m_quad;
     v::simple_pipeline<upc> m_ppl;
+    voo::host_buffer_for_image m_atk_img;
     float m_theta = 0;
 
   public:
@@ -30,6 +31,7 @@ namespace hand {
         .bindings { m_quad.vertex_input_bind() },
         .attributes { m_quad.vertex_attribute(0) },
       }}
+      , m_atk_img { voo::load_image_file_as_buffer("hand-attack.png", dq.physical_device()) }
     {}
 
     void tick(float ms, bool moved) {
