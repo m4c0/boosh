@@ -1,4 +1,5 @@
 #pragma leco add_resource "hand.png"
+#pragma leco add_resource "hand-attack.png"
 #pragma leco add_shader "hand.vert"
 #pragma leco add_shader "hand.frag"
 export module hand;
