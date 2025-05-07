@@ -4,7 +4,7 @@ import hai;
 
 namespace input {
   export enum class axis { WALK, STRAFE, TURN };
-  export enum class buttons { USE };
+  export enum class buttons { ATTACK, USE };
   export float state(axis a);
   export bool state(buttons b);
 
@@ -17,6 +17,7 @@ module :private;
 
 namespace {
   enum keys {
+    ATTACK,
     USE,
     STRAFE_LEFT,
     STRAFE_RIGHT,
@@ -38,6 +39,15 @@ static void setup_btn(casein::keys k, keys i) {
     if (!old && g_btn_down_cb[i]) g_btn_down_cb[i]();
   });
   handle(KEY_UP,   k, [i] { g_state[i] = false; });
+}
+static void setup_btn(casein::mouse_buttons m, keys i) {
+  using namespace casein;
+  handle(MOUSE_DOWN, m, [i] {
+    auto old = g_state[i];
+    g_state[i] = true;
+    if (!old && g_btn_down_cb[i]) g_btn_down_cb[i]();
+  });
+  handle(MOUSE_UP,   m, [i] { g_state[i] = false; });
 }
 
 static int axis_state(keys n, keys p) {
@@ -62,13 +72,15 @@ float input::state(axis a) {
 }
 bool input::state(buttons b) {
   switch (b) {
-    case buttons::USE: return g_state[USE];
+    case buttons::ATTACK: return g_state[ATTACK];
+    case buttons::USE:    return g_state[USE];
   }
 }
 
 void input::on_button_down(buttons b, hai::fn<void> fn) {
   switch (b) {
-    case buttons::USE: g_btn_down_cb[USE] = fn; break;
+    case buttons::ATTACK: g_btn_down_cb[ATTACK] = fn; break;
+    case buttons::USE:    g_btn_down_cb[USE]    = fn; break;
   }
 }
 
@@ -80,6 +92,7 @@ void input::setup() {
   setup_btn(K_S, BACKWARD);
 
   setup_btn(K_SPACE, USE);
+  setup_btn(M_LEFT, ATTACK);
 
   handle(MOUSE_MOVE, [] {
     mouse_pos = window_size / 2.0;
