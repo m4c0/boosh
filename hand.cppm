@@ -6,6 +6,9 @@ export module hand;
 import v;
 
 namespace hand {
+  export void attack() {
+  }
+
   export class model {
     static constexpr const dotz::vec2 neutral_pos { 0.2f };
     static constexpr const float return_speed = 10.0f;
