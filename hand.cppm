@@ -6,7 +6,10 @@ export module hand;
 import v;
 
 namespace hand {
+  bool attacking = false;
+
   export void attack() {
+    attacking = true;
   }
 
   export class model {
@@ -53,6 +56,9 @@ namespace hand {
     }
 
     void run(vee::command_buffer cb) {
+      if (attacking) {
+        m_ppl.copy_image(m_atk_img);
+      }
       m_ppl.cmd_bind(cb, m_pc);
       m_quad.run(cb, 0, 1);
     }
