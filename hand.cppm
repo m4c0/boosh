@@ -6,16 +6,28 @@ export module hand;
 import v;
 
 namespace hand {
-  bool attacking = false;
+  enum class states {
+    walking,
+    to_attack,
+    attacking,
+    to_walk,
+  } state;
 
   export void attack() {
-    attacking = true;
+    if (state != states::walking) return;
+    state = states::to_attack;
   }
 
   export class model {
     static constexpr const dotz::vec2 neutral_pos { 0.2f };
+    static constexpr const dotz::vec2 holster_pos = neutral_pos + dotz::vec2 { 0.0f, 1.0f };
+    static constexpr const dotz::vec2 attack_start_pos { -0.2f, 1.0 };
+    static constexpr const dotz::vec2 attack_end_pos { 0.0f, -1.0f };
+
     static constexpr const float return_speed = 10.0f;
     static constexpr const float follow_speed = 10.0f;
+    static constexpr const float holster_speed = 10.0f;
+    static constexpr const float attack_speed = 10.0f;
     static constexpr const float theta_speed = 10.0f;
     static constexpr const float move_radius_x = 0.2f;
 
@@ -41,6 +53,22 @@ namespace hand {
     {}
 
     void tick(float ms, bool moved) {
+      if (state == states::to_attack) {
+        m_pc.pos = dotz::mix(m_pc.pos, holster_pos, ms * holster_speed / 1000.0f);
+        if (dotz::length(m_pc.pos - holster_pos) < 0.01) {
+          state = states::attacking;
+          m_pc.pos = attack_start_pos;
+          m_ppl.copy_image(m_atk_img);
+        }
+        return;
+      } else if (state == states::attacking) {
+        m_pc.pos = dotz::mix(m_pc.pos, attack_end_pos, ms * attack_speed / 1000.0f);
+        if (dotz::length(m_pc.pos - holster_pos) < 0.01) {
+          m_ppl.copy_image();
+        }
+        return;
+      }
+
       // TODO: make movement speed proportial to player speed
       if (moved) {
         dotz::vec2 target = neutral_pos;
@@ -56,9 +84,6 @@ namespace hand {
     }
 
     void run(vee::command_buffer cb) {
-      if (attacking) {
-        m_ppl.copy_image(m_atk_img);
-      }
       m_ppl.cmd_bind(cb, m_pc);
       m_quad.run(cb, 0, 1);
     }

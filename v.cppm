@@ -43,13 +43,15 @@ namespace v {
       }
     {
       vee::update_descriptor_set(m_ds.descriptor_set(), 0, m_txt.iv(), *m_smp);
-
-      voo::cmd_buf_one_time_submit::build(m_cb.cb(), [this](auto cb) {
-        m_txt.setup_copy(cb);
-      });
-      dq->queue()->queue_submit({ .command_buffer = m_cb.cb() });
+      copy_image();
     }
 
+    void copy_image() {
+      voo::cmd_buf_one_time_submit::build(m_cb.cb(), [&](auto cb) {
+        m_txt.setup_copy(cb);
+      });
+      m_q->queue_submit({ .command_buffer = m_cb.cb() });
+    }
     void copy_image(const voo::host_buffer_for_image & img) {
       voo::cmd_buf_one_time_submit::build(m_cb.cb(), [&](auto cb) {
         img.setup_copy(cb, m_txt.image());
