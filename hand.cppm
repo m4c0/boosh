@@ -14,6 +14,7 @@ namespace hand {
   } state;
 
   export void attack() {
+    // TODO: enable attack when hand is returning
     if (state != states::walking) return;
     state = states::to_attack;
   }
@@ -29,7 +30,7 @@ namespace hand {
 
     static constexpr const float return_speed = 10.0f;
     static constexpr const float follow_speed = 10.0f;
-    static constexpr const float holster_speed = 10.0f;
+    static constexpr const float holster_speed = 20.0f;
     static constexpr const float attack_speed = 20.0f;
     static constexpr const float theta_speed = 10.0f;
     static constexpr const float move_radius_x = 0.2f;
@@ -56,6 +57,7 @@ namespace hand {
     {}
 
     void tick(float ms, bool moved) {
+      // TODO: improve easy in/out of attack
       if (state == states::to_attack) {
         m_pc.pos = dotz::mix(m_pc.pos, holster_pos, ms * holster_speed / 1000.0f);
         if (dotz::length(m_pc.pos - holster_pos) < 0.01) {
