@@ -21,19 +21,22 @@ namespace hand {
   export class model {
     static constexpr const dotz::vec2 neutral_pos { 0.2f };
     static constexpr const dotz::vec2 holster_pos = neutral_pos + dotz::vec2 { 0.0f, 1.0f };
-    static constexpr const dotz::vec2 attack_start_pos { -0.2f, 1.0 };
-    static constexpr const dotz::vec2 attack_end_pos { 0.0f, -1.0f };
+    static constexpr const dotz::vec2 attack_start_pos { -1.8f, 1.0f };
+    static constexpr const dotz::vec2 attack_end_pos { -0.8f, -0.5f };
+
+    static constexpr const dotz::vec2 neutral_size { 0.8f };
+    static constexpr const dotz::vec2 attack_size { 1.5f };
 
     static constexpr const float return_speed = 10.0f;
     static constexpr const float follow_speed = 10.0f;
     static constexpr const float holster_speed = 10.0f;
-    static constexpr const float attack_speed = 10.0f;
+    static constexpr const float attack_speed = 20.0f;
     static constexpr const float theta_speed = 10.0f;
     static constexpr const float move_radius_x = 0.2f;
 
     struct upc {
       dotz::vec2 pos { neutral_pos };
-      dotz::vec2 size { 0.8f };
+      dotz::vec2 size { neutral_size };
     } m_pc {};
 
     voo::one_quad m_quad;
@@ -58,21 +61,23 @@ namespace hand {
         if (dotz::length(m_pc.pos - holster_pos) < 0.01) {
           state = states::attacking;
           m_pc.pos = attack_start_pos;
-          //m_ppl.copy_image(m_atk_img);
+          m_pc.size = attack_size;
+          m_ppl.copy_image(m_atk_img);
         }
         return;
       } else if (state == states::attacking) {
         m_pc.pos = dotz::mix(m_pc.pos, attack_end_pos, ms * attack_speed / 1000.0f);
         if (dotz::length(m_pc.pos - attack_end_pos) < 0.01) {
           state = states::to_walk;
-          //m_ppl.copy_image();
         }
         return;
       } else if (state == states::to_walk) {
-        m_pc.pos = dotz::mix(m_pc.pos, attack_start_pos, ms * holster_speed / 1000.0f);
+        m_pc.pos = dotz::mix(m_pc.pos, attack_start_pos, ms * attack_speed / 1000.0f);
         if (dotz::length(m_pc.pos - attack_start_pos) < 0.01) {
           state = states::walking;
           m_pc.pos = holster_pos;
+          m_pc.size = neutral_size;
+          m_ppl.copy_image();
         }
         return;
       }
