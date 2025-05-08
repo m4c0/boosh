@@ -58,13 +58,21 @@ namespace hand {
         if (dotz::length(m_pc.pos - holster_pos) < 0.01) {
           state = states::attacking;
           m_pc.pos = attack_start_pos;
-          m_ppl.copy_image(m_atk_img);
+          //m_ppl.copy_image(m_atk_img);
         }
         return;
       } else if (state == states::attacking) {
         m_pc.pos = dotz::mix(m_pc.pos, attack_end_pos, ms * attack_speed / 1000.0f);
-        if (dotz::length(m_pc.pos - holster_pos) < 0.01) {
-          m_ppl.copy_image();
+        if (dotz::length(m_pc.pos - attack_end_pos) < 0.01) {
+          state = states::to_walk;
+          //m_ppl.copy_image();
+        }
+        return;
+      } else if (state == states::to_walk) {
+        m_pc.pos = dotz::mix(m_pc.pos, attack_start_pos, ms * holster_speed / 1000.0f);
+        if (dotz::length(m_pc.pos - attack_start_pos) < 0.01) {
+          state = states::walking;
+          m_pc.pos = holster_pos;
         }
         return;
       }
