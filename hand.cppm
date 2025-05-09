@@ -3,9 +3,16 @@
 #pragma leco add_shader "hand.vert"
 #pragma leco add_shader "hand.frag"
 export module hand;
+import mtx;
+import silog;
+import sith;
 import v;
 
 namespace hand {
+  mtx::mutex on_attack_mtx {};
+  mtx::cond on_attack {};
+  volatile bool attacking = false;
+
   enum class states {
     walking,
     to_attack,
@@ -14,6 +21,9 @@ namespace hand {
   } state;
 
   export void attack() {
+    attacking = true;
+    on_attack.wake_all();
+
     // TODO: enable attack when hand is returning
     if (state != states::walking) return;
     state = states::to_attack;
@@ -45,6 +55,20 @@ namespace hand {
     voo::host_buffer_for_image m_atk_img;
     float m_theta = 0;
 
+    sith::memfn_thread<model> m_thread;
+    sith::run_guard m_thguard;
+
+    void attack_loop(sith::thread * t) {
+      while (!t->interrupted()) {
+        mtx::lock l { &on_attack_mtx };
+        on_attack.wait(&l, 1);
+        if (!attacking) continue;
+
+        silog::trace("<<<<<<<<<<<<<<<<<<<<< ATTACK");
+        attacking = false;
+      }
+    }
+
   public:
     explicit model(voo::device_and_queue & dq)
       : m_quad { dq.physical_device() }
@@ -54,7 +78,10 @@ namespace hand {
         .attributes { m_quad.vertex_attribute(0) },
       }}
       , m_atk_img { voo::load_image_file_as_buffer("hand-attack.png", dq.physical_device()) }
+      , m_thread { this, &model::attack_loop }
+      , m_thguard { &m_thread }
     {}
+    ~model() { on_attack.wake_all(); }
 
     void tick(float ms, bool moved) {
       // TODO: improve easy in/out of attack
