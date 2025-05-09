@@ -1,4 +1,4 @@
-module mapper:textures;
+export module mapper:textures;
 import :error;
 import hai;
 import jute;
