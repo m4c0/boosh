@@ -51,7 +51,7 @@ namespace hand {
     } m_pc {};
 
     voo::one_quad m_quad;
-    v::simple_pipeline<upc> m_ppl;
+    v::ppl_with_txt<upc> m_ppl;
     voo::host_buffer_for_image m_atk_img;
     float m_theta = 0;
 

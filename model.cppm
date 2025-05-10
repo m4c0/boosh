@@ -19,7 +19,7 @@ namespace model {
 
     static constexpr const auto max_models = 128;
 
-    v::simple_pipeline<upc> m_ppl;
+    v::ppl_with_txt<upc> m_ppl;
     voo::h2l_buffer m_buf;
     voo::h2l_buffer m_mdl;
     unsigned m_vcount;

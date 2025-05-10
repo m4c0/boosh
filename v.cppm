@@ -6,7 +6,7 @@ export import voo;
 import wagen;
 
 namespace v {
-  export template<typename PC> class simple_pipeline {
+  export template<typename PC> class ppl_with_txt {
     voo::single_cb m_cb;
     voo::queue * m_q;
 
@@ -27,7 +27,7 @@ namespace v {
     }
 
   public:
-    simple_pipeline(voo::device_and_queue * dq, const char * txt, jute::view shader, const vee::gr_pipeline_params & p) 
+    ppl_with_txt(voo::device_and_queue * dq, const char * txt, jute::view shader, const vee::gr_pipeline_params & p) 
       : m_cb { dq->queue_family() }
       , m_q { dq->queue() }
       , m_txt { voo::load_image_file(txt, dq->physical_device()) }
