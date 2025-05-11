@@ -30,15 +30,16 @@ namespace lightmap {
     static constexpr const vee::extent extent { mapper::width * 2, mapper::height * 2 };
  
     explicit output(voo::device_and_queue * dq)
-      : colour_buffer { dq->physical_device(), extent, rgba_fmt }
+      : colour_buffer { dq->physical_device(), extent, rgba_fmt, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL }
     {}
 
     using colour_buffer::image_view;
+    using colour_buffer::image;
   };
 
   export class pipeline {
     v::linear_sampler m_smp {};
-    voo::single_frag_dset m_ds { 2 };
+    voo::single_frag_dset m_ds { 1 };
     vee::pipeline_layout m_pl = vee::create_pipeline_layout(
       m_ds.descriptor_set_layout()
     );
@@ -68,38 +69,51 @@ namespace lightmap {
     });
 
     voo::one_quad m_quad; 
-    vee::framebuffer m_fb;
     input m_input;
+    output m_output;
+    vee::framebuffer m_fb;
 
   public:
-    explicit pipeline(voo::device_and_queue * dq, mapper::tilemap * map, output & out)
+    explicit pipeline(voo::device_and_queue * dq, mapper::tilemap * map)
       : m_quad { dq->physical_device() }
+      , m_input { dq, map }
+      , m_output { dq }
       , m_fb { vee::create_framebuffer({
         .render_pass = *m_rp,
-        .attachments = {{ out.image_view() } },
+        .attachments = {{ m_output.image_view() } },
         .extent = output::extent,
       }) }
-      , m_input { dq, map }
     {
       vee::update_descriptor_set(m_ds.descriptor_set(), 0, m_input.iv(), m_smp);
     }
 
+    [[nodiscard]] constexpr auto output_iv() const { return m_output.image_view(); }
+
     void run(vee::command_buffer cb) {
       m_input.setup_copy(cb);
 
-      voo::cmd_render_pass rp {{
-        .command_buffer = cb,
-        .render_pass = *m_rp,
-        .framebuffer = *m_fb,
-        .extent = output::extent,
-      }};
+      {
+        voo::cmd_render_pass rp {{
+          .command_buffer = cb,
+          .render_pass = *m_rp,
+          .framebuffer = *m_fb,
+          .extent = output::extent,
+        }};
 
-      vee::cmd_bind_gr_pipeline(cb, *m_ppl);
-      vee::cmd_bind_descriptor_set(cb, *m_pl, 0, m_ds.descriptor_set());
-      m_quad.run(cb, 0, 1);
-      // TODO: add barrier
+        vee::cmd_bind_gr_pipeline(cb, *m_ppl);
+        vee::cmd_bind_descriptor_set(cb, *m_pl, 0, m_ds.descriptor_set());
+        m_quad.run(cb, 0, 1);
+      }
+
+      constexpr const auto stage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+      vee::cmd_pipeline_barrier(cb, stage, stage, {
+        .srcAccessMask = VK_ACCESS_SHADER_READ_BIT,
+        .dstAccessMask = VK_ACCESS_SHADER_WRITE_BIT,
+        .oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+        .newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+        .image = m_output.image(),
+      });
     }
   };
-
 }
 
