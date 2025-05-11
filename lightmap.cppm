@@ -27,8 +27,10 @@ namespace lightmap {
 
   export class output : voo::offscreen::colour_buffer {
   public:
+    static constexpr const vee::extent extent { mapper::width * 2, mapper::height * 2 };
+ 
     explicit output(voo::device_and_queue * dq)
-      : colour_buffer { dq->physical_device(), { mapper::width * 2, mapper::height * 2 }, rgba_fmt }
+      : colour_buffer { dq->physical_device(), extent, rgba_fmt }
     {}
 
     using colour_buffer::image_view;
@@ -57,21 +59,38 @@ namespace lightmap {
       .pipeline_layout = *m_pl,
       .render_pass = *m_rp,
       .shaders {
-        voo::shader("lightmape.vert.spv").pipeline_vert_stage(),
-        voo::shader("lightmape.frag.spv").pipeline_frag_stage(),
+        voo::shader("lightmap.vert.spv").pipeline_vert_stage(),
+        voo::shader("lightmap.frag.spv").pipeline_frag_stage(),
       },
       .bindings { voo::one_quad::vertex_input_bind() },
       .attributes { voo::one_quad::vertex_attribute(0) },
     });
 
     voo::one_quad m_quad; 
+    vee::framebuffer m_fb;
 
   public:
-    explicit pipeline(voo::device_and_queue * dq)
+    explicit pipeline(voo::device_and_queue * dq, output & out)
       : m_quad { dq->physical_device() }
+      , m_fb { vee::create_framebuffer({
+        .render_pass = *m_rp,
+        .attachments = {{ out.image_view() } },
+        .extent = output::extent,
+      }) }
     {}
 
     void run(vee::command_buffer cb) {
+      voo::cmd_render_pass rp {{
+        .command_buffer = cb,
+        .render_pass = *m_rp,
+        .framebuffer = *m_fb,
+        .extent = output::extent,
+      }};
+
+      vee::cmd_bind_gr_pipeline(cb, *m_ppl);
+      vee::cmd_set_scissor(cb, output::extent);
+      vee::cmd_set_viewport(cb, output::extent);
+      m_quad.run(cb, 0, 1);
     }
   };
 

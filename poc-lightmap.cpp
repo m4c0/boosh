@@ -19,6 +19,8 @@ struct app : public vapp {
     main_loop("poc-lightmap", [&](auto & dq, auto & sw) {
       auto [map, textures] = mapper::load(sires::real_path_name("example.map"));
       lightmap::input txt { &dq, &map };
+      lightmap::output out { &dq };
+      lightmap::pipeline ppl { &dq, out };
 
       auto smp = vee::create_sampler(vee::nearest_sampler);
 
@@ -30,6 +32,8 @@ struct app : public vapp {
       extent_loop(dq.queue(), sw, [&] {
         sw.queue_one_time_submit(dq.queue(), [&](auto pcb) {
           txt.setup_copy(*pcb);
+
+          ppl.run(*pcb);
 
           auto scb = sw.cmd_render_pass({ *pcb });
           vee::cmd_set_viewport(*pcb, sw.extent());
