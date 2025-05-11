@@ -17,6 +17,7 @@ namespace lightmap {
       });
     }
 
+    using voo::h2l_image::iv;
     using voo::h2l_image::setup_copy;
   };
 
