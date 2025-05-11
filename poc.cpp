@@ -167,7 +167,7 @@ struct : public vapp {
         .attributes = faces::attributes(),
       });
 
-      auto smp = vee::create_sampler(vee::linear_sampler);
+      v::linear_sampler smp {};
       auto dpool = vee::create_descriptor_pool(1, { vee::combined_image_sampler(dset_smps) });
       auto dset = vee::allocate_descriptor_set(*dpool, *dsl);
 
@@ -180,7 +180,7 @@ struct : public vapp {
       for (auto i = imgs.size(); i < dset_smps; i++) {
         ivs[i] = imgs[0].iv();
       }
-      vee::update_descriptor_set(dset, 0, ivs, *smp);
+      vee::update_descriptor_set(dset, 0, ivs, smp);
 
       input::on_button_down(input::buttons::ATTACK, process_attack);
       input::on_button_down(input::buttons::USE,    process_use);

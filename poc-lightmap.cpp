@@ -7,9 +7,8 @@ import casein;
 import lightmap;
 import mapper;
 import sires;
-import vee;
-import voo;
 import vapp;
+import v;
 
 struct app : public vapp {
   app() {
@@ -21,10 +20,10 @@ struct app : public vapp {
       lightmap::output out { &dq };
       lightmap::pipeline ppl { &dq, &map, out };
 
-      auto smp = vee::create_sampler(vee::nearest_sampler);
+      v::nearest_sampler smp {};
 
       voo::single_frag_dset ds { 1 };
-      vee::update_descriptor_set(ds.descriptor_set(), 0, out.image_view(), *smp);
+      vee::update_descriptor_set(ds.descriptor_set(), 0, out.image_view(), smp);
 
       auto pl = vee::create_pipeline_layout(ds.descriptor_set_layout());
       voo::one_quad_render oqr { "poc-lightmap", &dq, *pl };

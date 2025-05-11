@@ -37,7 +37,7 @@ namespace lightmap {
   };
 
   export class pipeline {
-    vee::sampler m_smp = vee::create_sampler(vee::linear_sampler);
+    v::linear_sampler m_smp {};
     voo::single_frag_dset m_ds { 2 };
     vee::pipeline_layout m_pl = vee::create_pipeline_layout(
       m_ds.descriptor_set_layout()
@@ -80,7 +80,7 @@ namespace lightmap {
       }) }
       , m_input { dq, map }
     {
-      vee::update_descriptor_set(m_ds.descriptor_set(), 0, m_input.iv(), *m_smp);
+      vee::update_descriptor_set(m_ds.descriptor_set(), 0, m_input.iv(), m_smp);
     }
 
     void run(vee::command_buffer cb) {
