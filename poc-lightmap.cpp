@@ -2,12 +2,16 @@
 #pragma leco add_shader "poc-lightmap.frag"
 #pragma leco add_shader "poc-lightmap.vert"
 
+import casein;
 import lightmap;
 import vee;
 import voo;
 import vapp;
 
 struct app : public vapp {
+  app() {
+    casein::window_size = { 800 };
+  }
   void run() override {
     main_loop("poc-lightmap", [&](auto & dq, auto & sw) {
       lightmap::texture txt { &dq };
