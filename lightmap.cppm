@@ -12,7 +12,7 @@ namespace lightmap {
       map->for_each([m = voo::memiter<pix>(host_memory())](auto x, auto y, auto tile) mutable {
         m[y * mapper::width + x] = {
           .lvl  = *tile.entity == "" ? '\x00' : '\xFF',
-          .trns = tile.wall ? '\x00' : '\xFF',
+          .trns = !tile.ceiling ? '\x00' : '\xFF',
         };
       });
     }
