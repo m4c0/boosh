@@ -58,6 +58,7 @@ namespace lightmap {
     vee::gr_pipeline m_ppl = vee::create_graphics_pipeline({
       .pipeline_layout = *m_pl,
       .render_pass = *m_rp,
+      .extent = output::extent,
       .shaders {
         voo::shader("lightmap.vert.spv").pipeline_vert_stage(),
         voo::shader("lightmap.frag.spv").pipeline_frag_stage(),
@@ -95,9 +96,8 @@ namespace lightmap {
 
       vee::cmd_bind_gr_pipeline(cb, *m_ppl);
       vee::cmd_bind_descriptor_set(cb, *m_pl, 0, m_ds.descriptor_set());
-      vee::cmd_set_scissor(cb, output::extent);
-      vee::cmd_set_viewport(cb, output::extent);
       m_quad.run(cb, 0, 1);
+      // TODO: add barrier
     }
   };
 
