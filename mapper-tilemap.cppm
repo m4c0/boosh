@@ -7,10 +7,10 @@ import hai;
 using namespace jute::literals;
 
 namespace mapper {
-  export class tilemap {
-    static constexpr const auto width = 256;
-    static constexpr const auto height = 256;
+  export constexpr const auto width = 256;
+  export constexpr const auto height = 256;
 
+  export class tilemap {
     hai::array<tiledef> m_data { width * height };
   public:
     [[nodiscard]] constexpr const auto & operator()(unsigned x, unsigned y) const {
