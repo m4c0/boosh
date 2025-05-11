@@ -1,6 +1,6 @@
 #version 450
 
-layout(push_constant) uniform upc { vec2 extent; };
+layout(push_constant) uniform upc { ivec2 extent; };
 
 layout(set = 0, binding = 0) uniform sampler2D txt;
 
@@ -21,6 +21,6 @@ void main() {
   b = max(b, max(cl.r, cl.b));
   b = max(b, max(cr.r, cr.b));
   b = clamp(b, 0, 1);
-  //b = b * 0.9 * c.g;
+  b = b * 0.9 * c.g;
   colour = vec4(c.rg, b, 1);
 }
