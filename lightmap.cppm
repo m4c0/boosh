@@ -127,7 +127,7 @@ namespace lightmap {
       vee::update_descriptor_set(m_ds, 0, m_input.iv(), m_smp);
     }
 
-    [[nodiscard]] constexpr auto output_iv() const { return m_fbout[1].iv(); }
+    [[nodiscard]] constexpr auto output_iv() const { return m_fbout[0].iv(); }
 
     void run(vee::command_buffer cb) {
       m_input.setup_copy(cb);
@@ -146,19 +146,35 @@ namespace lightmap {
       }
       m_fbout[1].cmd_pipeline_barrier(cb);
 
-      {
-        voo::cmd_render_pass rp {{
-          .command_buffer = cb,
-          .render_pass = *m_rp,
-          .framebuffer = m_fbout[0].fb(),
-          .extent = output::extent,
-        }};
+      for (auto i = 0; i < 4; i++) {
+        {
+          voo::cmd_render_pass rp {{
+            .command_buffer = cb,
+            .render_pass = *m_rp,
+            .framebuffer = m_fbout[0].fb(),
+            .extent = output::extent,
+          }};
 
-        vee::cmd_bind_gr_pipeline(cb, *m_ppl);
-        vee::cmd_bind_descriptor_set(cb, *m_pl, 0, m_fbout[1].ds());
-        m_quad.run(cb, 0, 1);
+          vee::cmd_bind_gr_pipeline(cb, *m_ppl);
+          vee::cmd_bind_descriptor_set(cb, *m_pl, 0, m_fbout[1].ds());
+          m_quad.run(cb, 0, 1);
+        }
+        m_fbout[0].cmd_pipeline_barrier(cb);
+
+        {
+          voo::cmd_render_pass rp {{
+            .command_buffer = cb,
+            .render_pass = *m_rp,
+            .framebuffer = m_fbout[1].fb(),
+            .extent = output::extent,
+          }};
+
+          vee::cmd_bind_gr_pipeline(cb, *m_ppl);
+          vee::cmd_bind_descriptor_set(cb, *m_pl, 0, m_fbout[0].ds());
+          m_quad.run(cb, 0, 1);
+        }
+        m_fbout[1].cmd_pipeline_barrier(cb);
       }
-      m_fbout[0].cmd_pipeline_barrier(cb);
     }
   };
 }
