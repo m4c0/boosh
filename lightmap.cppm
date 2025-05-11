@@ -127,7 +127,7 @@ namespace lightmap {
       vee::update_descriptor_set(m_ds, 0, m_input.iv(), m_smp);
     }
 
-    [[nodiscard]] constexpr auto output_iv() const { return m_fbout[0].iv(); }
+    [[nodiscard]] constexpr auto output_iv() const { return m_fbout[1].iv(); }
 
     void run(vee::command_buffer cb) {
       m_input.setup_copy(cb);
