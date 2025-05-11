@@ -51,14 +51,20 @@ namespace lightmap {
   };
 
   class fbout {
+    v::linear_sampler m_smp {};
     output m_output;
     framebuffer m_fb;
+    vee::descriptor_set m_ds;
   public:
-    fbout(voo::device_and_queue * dq, vee::render_pass::type rp)
+    fbout(voo::device_and_queue * dq, vee::render_pass::type rp, vee::descriptor_set ds)
       : m_output { dq }
       , m_fb { rp, m_output.image_view() }
-    {}
+      , m_ds { ds }
+    {
+      vee::update_descriptor_set(m_ds, 0, m_output.image_view(), m_smp);
+    }
 
+    [[nodiscard]] constexpr auto ds() const { return m_ds; }
     [[nodiscard]] constexpr auto & fb() const { return m_fb; }
     [[nodiscard]] constexpr auto iv() const { return m_output.image_view(); }
 
@@ -76,10 +82,10 @@ namespace lightmap {
 
   export class pipeline {
     v::linear_sampler m_smp {};
-    voo::single_frag_dset m_ds { 1 };
-    vee::pipeline_layout m_pl = vee::create_pipeline_layout(
-      m_ds.descriptor_set_layout()
-    );
+    vee::descriptor_set_layout m_dsl = vee::create_descriptor_set_layout({ vee::dsl_fragment_sampler() });
+    vee::descriptor_pool m_dpool = vee::create_descriptor_pool(3, { vee::combined_image_sampler(3) });
+    vee::descriptor_set m_ds = vee::allocate_descriptor_set(*m_dpool, *m_dsl);
+    vee::pipeline_layout m_pl = vee::create_pipeline_layout(*m_dsl);
     vee::render_pass m_rp = vee::create_render_pass({
       .attachments {{
         vee::create_colour_attachment(rgba_fmt, vee::image_layout_color_attachment_optimal),
@@ -107,18 +113,21 @@ namespace lightmap {
 
     voo::one_quad m_quad; 
     input m_input;
-    fbout m_fbout;
+    fbout m_fbout[2];
 
   public:
     explicit pipeline(voo::device_and_queue * dq, mapper::tilemap * map)
       : m_quad { dq->physical_device() }
       , m_input { dq, map }
-      , m_fbout { dq, *m_rp }
+      , m_fbout {
+        fbout { dq, *m_rp, vee::allocate_descriptor_set(*m_dpool, *m_dsl) },
+        fbout { dq, *m_rp, vee::allocate_descriptor_set(*m_dpool, *m_dsl) },
+      }
     {
-      vee::update_descriptor_set(m_ds.descriptor_set(), 0, m_input.iv(), m_smp);
+      vee::update_descriptor_set(m_ds, 0, m_input.iv(), m_smp);
     }
 
-    [[nodiscard]] constexpr auto output_iv() const { return m_fbout.iv(); }
+    [[nodiscard]] constexpr auto output_iv() const { return m_fbout[1].iv(); }
 
     void run(vee::command_buffer cb) {
       m_input.setup_copy(cb);
@@ -127,16 +136,29 @@ namespace lightmap {
         voo::cmd_render_pass rp {{
           .command_buffer = cb,
           .render_pass = *m_rp,
-          .framebuffer = m_fbout.fb(),
+          .framebuffer = m_fbout[1].fb(),
           .extent = output::extent,
         }};
 
         vee::cmd_bind_gr_pipeline(cb, *m_ppl);
-        vee::cmd_bind_descriptor_set(cb, *m_pl, 0, m_ds.descriptor_set());
+        vee::cmd_bind_descriptor_set(cb, *m_pl, 0, m_ds);
         m_quad.run(cb, 0, 1);
       }
+      m_fbout[1].cmd_pipeline_barrier(cb);
 
-      m_fbout.cmd_pipeline_barrier(cb);
+      {
+        voo::cmd_render_pass rp {{
+          .command_buffer = cb,
+          .render_pass = *m_rp,
+          .framebuffer = m_fbout[0].fb(),
+          .extent = output::extent,
+        }};
+
+        vee::cmd_bind_gr_pipeline(cb, *m_ppl);
+        vee::cmd_bind_descriptor_set(cb, *m_pl, 0, m_fbout[1].ds());
+        m_quad.run(cb, 0, 1);
+      }
+      m_fbout[0].cmd_pipeline_barrier(cb);
     }
   };
 }
