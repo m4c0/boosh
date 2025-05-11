@@ -18,21 +18,18 @@ struct app : public vapp {
   void run() override {
     main_loop("poc-lightmap", [&](auto & dq, auto & sw) {
       auto [map, textures] = mapper::load(sires::real_path_name("example.map"));
-      lightmap::input txt { &dq, &map };
       lightmap::output out { &dq };
-      lightmap::pipeline ppl { &dq, out };
+      lightmap::pipeline ppl { &dq, &map, out };
 
       auto smp = vee::create_sampler(vee::nearest_sampler);
 
       voo::single_frag_dset ds { 1 };
-      vee::update_descriptor_set(ds.descriptor_set(), 0, txt.iv(), *smp);
+      vee::update_descriptor_set(ds.descriptor_set(), 0, out.image_view(), *smp);
 
       auto pl = vee::create_pipeline_layout(ds.descriptor_set_layout());
       voo::one_quad_render oqr { "poc-lightmap", &dq, *pl };
       extent_loop(dq.queue(), sw, [&] {
         sw.queue_one_time_submit(dq.queue(), [&](auto pcb) {
-          txt.setup_copy(*pcb);
-
           ppl.run(*pcb);
 
           auto scb = sw.cmd_render_pass({ *pcb });

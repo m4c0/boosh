@@ -7,7 +7,7 @@ import v;
 namespace lightmap {
   static constexpr const auto rgba_fmt = VK_FORMAT_R8G8B8A8_UNORM;
 
-  export class input : voo::h2l_image {
+  class input : voo::h2l_image {
   public:
     explicit input(voo::device_and_queue * dq, mapper::tilemap * map)
       : voo::h2l_image { dq->physical_device(), mapper::width, mapper::height, rgba_fmt }
@@ -68,18 +68,24 @@ namespace lightmap {
 
     voo::one_quad m_quad; 
     vee::framebuffer m_fb;
+    input m_input;
 
   public:
-    explicit pipeline(voo::device_and_queue * dq, output & out)
+    explicit pipeline(voo::device_and_queue * dq, mapper::tilemap * map, output & out)
       : m_quad { dq->physical_device() }
       , m_fb { vee::create_framebuffer({
         .render_pass = *m_rp,
         .attachments = {{ out.image_view() } },
         .extent = output::extent,
       }) }
-    {}
+      , m_input { dq, map }
+    {
+      vee::update_descriptor_set(m_ds.descriptor_set(), 0, m_input.iv(), *m_smp);
+    }
 
     void run(vee::command_buffer cb) {
+      m_input.setup_copy(cb);
+
       voo::cmd_render_pass rp {{
         .command_buffer = cb,
         .render_pass = *m_rp,
@@ -88,6 +94,7 @@ namespace lightmap {
       }};
 
       vee::cmd_bind_gr_pipeline(cb, *m_ppl);
+      vee::cmd_bind_descriptor_set(cb, *m_pl, 0, m_ds.descriptor_set());
       vee::cmd_set_scissor(cb, output::extent);
       vee::cmd_set_viewport(cb, output::extent);
       m_quad.run(cb, 0, 1);
