@@ -85,7 +85,7 @@ namespace lightmap {
     vee::descriptor_set_layout m_dsl = vee::create_descriptor_set_layout({ vee::dsl_fragment_sampler() });
     vee::descriptor_pool m_dpool = vee::create_descriptor_pool(3, { vee::combined_image_sampler(3) });
     vee::descriptor_set m_ds = vee::allocate_descriptor_set(*m_dpool, *m_dsl);
-    vee::pipeline_layout m_pl = vee::create_pipeline_layout(*m_dsl);
+    vee::pipeline_layout m_pl = vee::create_pipeline_layout(*m_dsl, vee::fragment_push_constant_range<dotz::vec2>());
     vee::render_pass m_rp = vee::create_render_pass({
       .attachments {{
         vee::create_colour_attachment(rgba_fmt, vee::image_layout_color_attachment_optimal),
@@ -142,6 +142,7 @@ namespace lightmap {
 
         vee::cmd_bind_gr_pipeline(cb, *m_ppl);
         vee::cmd_bind_descriptor_set(cb, *m_pl, 0, m_ds);
+        vee::cmd_push_fragment_constants(cb, *m_pl, &output::extent);
         m_quad.run(cb, 0, 1);
       }
       m_fbout[1].cmd_pipeline_barrier(cb);
@@ -157,6 +158,7 @@ namespace lightmap {
 
           vee::cmd_bind_gr_pipeline(cb, *m_ppl);
           vee::cmd_bind_descriptor_set(cb, *m_pl, 0, m_fbout[1].ds());
+          vee::cmd_push_fragment_constants(cb, *m_pl, &output::extent);
           m_quad.run(cb, 0, 1);
         }
         m_fbout[0].cmd_pipeline_barrier(cb);
@@ -171,6 +173,7 @@ namespace lightmap {
 
           vee::cmd_bind_gr_pipeline(cb, *m_ppl);
           vee::cmd_bind_descriptor_set(cb, *m_pl, 0, m_fbout[0].ds());
+          vee::cmd_push_fragment_constants(cb, *m_pl, &output::extent);
           m_quad.run(cb, 0, 1);
         }
         m_fbout[1].cmd_pipeline_barrier(cb);
