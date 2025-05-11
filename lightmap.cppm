@@ -27,7 +27,7 @@ namespace lightmap {
 
   class output : voo::offscreen::colour_buffer {
   public:
-    static constexpr const vee::extent extent { mapper::width * 2, mapper::height * 2 };
+    static constexpr const vee::extent extent { mapper::width * 4, mapper::height * 4 };
  
     explicit output(voo::device_and_queue * dq)
       : colour_buffer { dq->physical_device(), extent, rgba_fmt, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL }
@@ -81,7 +81,7 @@ namespace lightmap {
   };
 
   export class pipeline {
-    v::linear_sampler m_smp {};
+    v::nearest_sampler m_smp {};
     vee::descriptor_set_layout m_dsl = vee::create_descriptor_set_layout({ vee::dsl_fragment_sampler() });
     vee::descriptor_pool m_dpool = vee::create_descriptor_pool(3, { vee::combined_image_sampler(3) });
     vee::descriptor_set m_ds = vee::allocate_descriptor_set(*m_dpool, *m_dsl);
@@ -147,7 +147,7 @@ namespace lightmap {
       }
       m_fbout[1].cmd_pipeline_barrier(cb);
 
-      for (auto i = 0; i < 4; i++) {
+      for (auto i = 0; i < 16; i++) {
         {
           voo::cmd_render_pass rp {{
             .command_buffer = cb,
