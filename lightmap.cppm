@@ -3,7 +3,7 @@ import mapper;
 import v;
 
 namespace lightmap {
-  class input : voo::h2l_image {
+  export class input : voo::h2l_image {
   public:
     explicit input(voo::device_and_queue * dq, mapper::tilemap * map)
       : voo::h2l_image { dq->physical_device(), mapper::width, mapper::height, VK_FORMAT_R8G8B8A8_UNORM }
