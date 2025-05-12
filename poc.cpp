@@ -14,6 +14,7 @@ import door;
 import faces;
 import hand;
 import input;
+import lightmap;
 import mapper;
 import overlay;
 import pushwall;
@@ -34,7 +35,7 @@ static constexpr const auto walk_speed = 5.0f;
 static constexpr const auto player_radius = 0.2f;
 static constexpr const auto max_use_dist = 1.0f;
 
-static constexpr const auto dset_smps = 16;
+static constexpr const auto dset_smps = 8;
 
 struct upc {
   dotz::vec3 cam {};
@@ -119,7 +120,7 @@ struct : public vapp {
         .maxDescriptorSetSampledImages;
       silog::log(silog::info, "Max descriptor set sampled images: %u", max_dset_imgs);
       if (max_dset_imgs < dset_smps)
-        silog::die("Expecting at least 16 images sampled per descriptor set. Please notify the developer");
+        silog::die("Expecting at least 8 images sampled per descriptor set. Please notify the developer");
 
       faces::ceiling ceilings { dq.physical_device() };
       faces::floor   floors   { dq.physical_device() };
@@ -144,6 +145,8 @@ struct : public vapp {
         });
       }
 
+      lightmap::pipeline lgm { &dq, &map };
+
       bullet::model blt { dq };
       door::model dr { dq };
       hand::model hnd { dq };
@@ -152,7 +155,8 @@ struct : public vapp {
       // TODO: refactor to use v::x
       // TODO: move to faces
       auto dsl = vee::create_descriptor_set_layout({
-        vee::dsl_fragment_sampler(dset_smps)
+        vee::dsl_fragment_sampler(dset_smps),
+        vee::dsl_fragment_sampler(),
       });
       auto pl = vee::create_pipeline_layout(*dsl, vee::vertex_push_constant_range<upc>());
       auto gp = vee::create_graphics_pipeline({
@@ -168,7 +172,7 @@ struct : public vapp {
       });
 
       v::linear_sampler smp {};
-      auto dpool = vee::create_descriptor_pool(1, { vee::combined_image_sampler(dset_smps) });
+      auto dpool = vee::create_descriptor_pool(2, { vee::combined_image_sampler(dset_smps + 1) });
       auto dset = vee::allocate_descriptor_set(*dpool, *dsl);
 
       hai::array<voo::h2l_image> imgs { textures.size() };
@@ -181,6 +185,7 @@ struct : public vapp {
         ivs[i] = imgs[0].iv();
       }
       vee::update_descriptor_set(dset, 0, ivs, smp);
+      vee::update_descriptor_set(dset, 1, lgm.output_iv(), smp);
 
       input::on_button_down(input::buttons::ATTACK, process_attack);
       input::on_button_down(input::buttons::USE,    process_use);
@@ -204,6 +209,7 @@ struct : public vapp {
           for (auto &i : imgs) i.setup_copy(cb);
           copied = true;
         }
+        lgm.run(cb);
         walls.setup_copy(cb);
         dr.copy_models(cb);
 
