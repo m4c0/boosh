@@ -7,8 +7,8 @@ import hai;
 using namespace jute::literals;
 
 namespace mapper {
-  export constexpr const auto width = 256;
-  export constexpr const auto height = 256;
+  export constexpr const auto width = 32;
+  export constexpr const auto height = 32;
 
   export class tilemap {
     hai::array<tiledef> m_data { width * height };
