@@ -122,6 +122,9 @@ struct : public vapp {
       if (max_dset_imgs < dset_smps)
         silog::die("Expecting at least 8 images sampled per descriptor set. Please notify the developer");
 
+      v::globals vg { dq.physical_device() };
+      v::g = &vg;
+
       faces::ceiling ceilings { dq.physical_device() };
       faces::floor   floors   { dq.physical_device() };
       faces::wall    walls    { dq.physical_device() };
@@ -171,7 +174,6 @@ struct : public vapp {
         .attributes = faces::attributes(),
       });
 
-      v::linear_sampler smp {};
       auto dpool = vee::create_descriptor_pool(2, { vee::combined_image_sampler(dset_smps + 1) });
       auto dset = vee::allocate_descriptor_set(*dpool, *dsl);
 
@@ -184,8 +186,8 @@ struct : public vapp {
       for (auto i = imgs.size(); i < dset_smps; i++) {
         ivs[i] = imgs[0].iv();
       }
-      vee::update_descriptor_set(dset, 0, ivs, smp);
-      vee::update_descriptor_set(dset, 1, lgm.output_iv(), smp);
+      vee::update_descriptor_set(dset, 0, ivs, *v::g->linear_sampler);
+      vee::update_descriptor_set(dset, 1, lgm.output_iv(), *v::g->linear_sampler);
 
       input::on_button_down(input::buttons::ATTACK, process_attack);
       input::on_button_down(input::buttons::USE,    process_use);

@@ -19,10 +19,8 @@ struct app : public vapp {
       auto [map, textures] = mapper::load(sires::real_path_name("example.map"));
       lightmap::pipeline ppl { &dq, &map };
 
-      v::nearest_sampler smp {};
-
       voo::single_frag_dset ds { 1 };
-      vee::update_descriptor_set(ds.descriptor_set(), 0, ppl.output_iv(), smp);
+      vee::update_descriptor_set(ds.descriptor_set(), 0, ppl.output_iv(), *v::g->nearest_sampler);
 
       auto pl = vee::create_pipeline_layout(ds.descriptor_set_layout());
       voo::one_quad_render oqr { "poc-lightmap", &dq, *pl };

@@ -51,7 +51,6 @@ namespace lightmap {
   };
 
   class fbout {
-    v::linear_sampler m_smp {};
     output m_output;
     framebuffer m_fb;
     vee::descriptor_set m_ds;
@@ -61,7 +60,7 @@ namespace lightmap {
       , m_fb { rp, m_output.image_view() }
       , m_ds { ds }
     {
-      vee::update_descriptor_set(m_ds, 0, m_output.image_view(), m_smp);
+      vee::update_descriptor_set(m_ds, 0, m_output.image_view(), *v::g->linear_sampler);
     }
 
     [[nodiscard]] constexpr auto ds() const { return m_ds; }
@@ -81,7 +80,6 @@ namespace lightmap {
   };
 
   export class pipeline {
-    v::nearest_sampler m_smp {};
     vee::descriptor_set_layout m_dsl = vee::create_descriptor_set_layout({ vee::dsl_fragment_sampler() });
     vee::descriptor_pool m_dpool = vee::create_descriptor_pool(3, { vee::combined_image_sampler(3) });
     vee::descriptor_set m_ds = vee::allocate_descriptor_set(*m_dpool, *m_dsl);
@@ -124,7 +122,7 @@ namespace lightmap {
         fbout { dq, *m_rp, vee::allocate_descriptor_set(*m_dpool, *m_dsl) },
       }
     {
-      vee::update_descriptor_set(m_ds, 0, m_input.iv(), m_smp);
+      vee::update_descriptor_set(m_ds, 0, m_input.iv(), *v::g->nearest_sampler);
     }
 
     [[nodiscard]] constexpr auto output_iv() const { return m_fbout[1].iv(); }

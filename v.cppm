@@ -6,22 +6,18 @@ export import voo;
 import wagen;
 
 namespace v {
-  export class linear_sampler : vee::sampler {
-  public:
-    linear_sampler() : vee::sampler { vee::create_sampler(vee::linear_sampler) } {}
-    operator vee::sampler::type() const { return **this; }
+  export struct globals {
+    vee::physical_device pd;
+
+    vee::sampler linear_sampler = vee::create_sampler(vee::linear_sampler);
+    vee::sampler nearest_sampler = vee::create_sampler(vee::nearest_sampler);
   };
-  export class nearest_sampler : vee::sampler {
-  public:
-    nearest_sampler() : vee::sampler { vee::create_sampler(vee::nearest_sampler) } {}
-    operator vee::sampler::type() const { return **this; }
-  };
+  export globals * g;
 
   export template<typename PC> class ppl_with_txt {
     voo::single_cb m_cb;
     voo::queue * m_q;
 
-    v::linear_sampler m_smp {};
     voo::single_frag_dset m_ds { 1 };
     vee::pipeline_layout m_pl = vee::create_pipeline_layout(
       m_ds.descriptor_set_layout(),
@@ -53,7 +49,7 @@ namespace v {
         }))
       }
     {
-      vee::update_descriptor_set(m_ds.descriptor_set(), 0, m_txt.iv(), m_smp);
+      vee::update_descriptor_set(m_ds.descriptor_set(), 0, m_txt.iv(), *v::g->linear_sampler);
       copy_image();
     }
 
