@@ -71,13 +71,13 @@ namespace hand {
 
   public:
     explicit model(voo::device_and_queue & dq)
-      : m_quad { dq.physical_device() }
+      : m_quad { v::g->pd }
       , m_ppl { &dq, "hand.png", "hand", {
         .depth_test = false,
         .bindings { m_quad.vertex_input_bind() },
         .attributes { m_quad.vertex_attribute(0) },
       }}
-      , m_atk_img { voo::load_image_file_as_buffer("hand-attack.png", dq.physical_device()) }
+      , m_atk_img { voo::load_image_file_as_buffer("hand-attack.png", v::g->pd) }
       , m_thread { this, &model::attack_loop }
       , m_thguard { &m_thread }
     {}

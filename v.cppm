@@ -37,7 +37,7 @@ namespace v {
     ppl_with_txt(voo::device_and_queue * dq, const char * txt, jute::view shader, const vee::gr_pipeline_params & p) 
       : m_cb { dq->queue_family() }
       , m_q { dq->queue() }
-      , m_txt { voo::load_image_file(txt, dq->physical_device()) }
+      , m_txt { voo::load_image_file(txt, v::g->pd) }
       , m_pipeline {
         vee::create_graphics_pipeline(merge(p, {
           .pipeline_layout = *m_pl,

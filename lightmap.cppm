@@ -9,8 +9,8 @@ namespace lightmap {
 
   class input : voo::h2l_image {
   public:
-    explicit input(voo::device_and_queue * dq, mapper::tilemap * map)
-      : voo::h2l_image { dq->physical_device(), mapper::width, mapper::height, rgba_fmt }
+    explicit input(mapper::tilemap * map)
+      : voo::h2l_image { v::g->pd, mapper::width, mapper::height, rgba_fmt }
     {
       struct pix { char lvl; char trns; char pad[2]; };
       map->for_each([m = voo::memiter<pix>(host_memory())](auto x, auto y, auto tile) mutable {
@@ -29,9 +29,7 @@ namespace lightmap {
   public:
     static constexpr const vee::extent extent { mapper::width * 4, mapper::height * 4 };
  
-    explicit output(voo::device_and_queue * dq)
-      : colour_buffer { dq->physical_device(), extent, rgba_fmt, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL }
-    {}
+    output() : colour_buffer { v::g->pd, extent, rgba_fmt, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL } {}
 
     using colour_buffer::image_view;
     using colour_buffer::image;
@@ -51,13 +49,12 @@ namespace lightmap {
   };
 
   class fbout {
-    output m_output;
+    output m_output {};
     framebuffer m_fb;
     vee::descriptor_set m_ds;
   public:
-    fbout(voo::device_and_queue * dq, vee::render_pass::type rp, vee::descriptor_set ds)
-      : m_output { dq }
-      , m_fb { rp, m_output.image_view() }
+    fbout(vee::render_pass::type rp, vee::descriptor_set ds)
+      : m_fb { rp, m_output.image_view() }
       , m_ds { ds }
     {
       vee::update_descriptor_set(m_ds, 0, m_output.image_view(), *v::g->linear_sampler);
@@ -109,19 +106,15 @@ namespace lightmap {
       .attributes { voo::one_quad::vertex_attribute(0) },
     });
 
-    voo::one_quad m_quad; 
+    voo::one_quad m_quad { v::g->pd }; 
     input m_input;
-    fbout m_fbout[2];
+    fbout m_fbout[2] {
+      fbout { *m_rp, vee::allocate_descriptor_set(*m_dpool, *m_dsl) },
+      fbout { *m_rp, vee::allocate_descriptor_set(*m_dpool, *m_dsl) },
+    };
 
   public:
-    explicit pipeline(voo::device_and_queue * dq, mapper::tilemap * map)
-      : m_quad { dq->physical_device() }
-      , m_input { dq, map }
-      , m_fbout {
-        fbout { dq, *m_rp, vee::allocate_descriptor_set(*m_dpool, *m_dsl) },
-        fbout { dq, *m_rp, vee::allocate_descriptor_set(*m_dpool, *m_dsl) },
-      }
-    {
+    explicit pipeline(mapper::tilemap * map) : m_input { map } {
       vee::update_descriptor_set(m_ds, 0, m_input.iv(), *v::g->nearest_sampler);
     }
 

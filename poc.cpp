@@ -125,9 +125,9 @@ struct : public vapp {
       v::globals vg { dq.physical_device() };
       v::g = &vg;
 
-      faces::ceiling ceilings { dq.physical_device() };
-      faces::floor   floors   { dq.physical_device() };
-      faces::wall    walls    { dq.physical_device() };
+      faces::ceiling ceilings {};
+      faces::floor   floors   {};
+      faces::wall    walls    {};
 
       {
         auto c = ceilings.map();
@@ -148,7 +148,7 @@ struct : public vapp {
         });
       }
 
-      lightmap::pipeline lgm { &dq, &map };
+      lightmap::pipeline lgm { &map };
 
       bullet::model blt { dq };
       door::model dr { dq };

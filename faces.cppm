@@ -1,7 +1,7 @@
 export module faces;
 import dotz;
 import traits;
-import voo;
+import v;
 
 export namespace faces {
   struct vtx {
@@ -42,10 +42,10 @@ export namespace faces {
     }
 
   public:
-    explicit instanced(vee::physical_device pd, unsigned v)
-      : m_vtx { pd, static_cast<unsigned>(sizeof(vtx) * v) }
-      , m_inst { pd, sizeof(inst) * max_inst }
-      , m_v_count { v }
+    explicit instanced(unsigned vcount)
+      : m_vtx { v::g->pd, static_cast<unsigned>(sizeof(vtx) * vcount) }
+      , m_inst { v::g->pd, sizeof(inst) * max_inst }
+      , m_v_count { vcount }
     {}
 
     [[nodiscard]] auto map() {
@@ -69,7 +69,7 @@ export namespace faces {
 
   class ceiling : public instanced {
   public:
-    explicit ceiling(vee::physical_device pd) : instanced { pd, 6 } {
+    explicit ceiling() : instanced { 6 } {
       auto m = map_vertex();
 
       m += vtx { .pos = { 0, 1, 0 }, .uv = { 0, 0 } };
@@ -84,7 +84,7 @@ export namespace faces {
 
   class floor : public instanced {
   public:
-    explicit floor(vee::physical_device pd) : instanced { pd, 6 } {
+    explicit floor() : instanced { 6 } {
       auto m = map_vertex();
 
       m += vtx { .pos = { 0, 0, 0 }, .uv = { 0, 0 } };
@@ -118,7 +118,7 @@ export namespace faces {
     }
 
   public:
-    explicit wall(vee::physical_device pd) : instanced { pd, 24 } {
+    explicit wall() : instanced { 24 } {
       auto m = map_vertex();
       x_wall(m, 0, 1, 1);
       x_wall(m, 1, 0, 0);

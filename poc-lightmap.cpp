@@ -16,8 +16,11 @@ struct app : public vapp {
   }
   void run() override {
     main_loop("poc-lightmap", [&](auto & dq, auto & sw) {
+      v::globals vg { dq.physical_device() };
+      v::g = &vg;
+
       auto [map, textures] = mapper::load(sires::real_path_name("example.map"));
-      lightmap::pipeline ppl { &dq, &map };
+      lightmap::pipeline ppl { &map };
 
       voo::single_frag_dset ds { 1 };
       vee::update_descriptor_set(ds.descriptor_set(), 0, ppl.output_iv(), *v::g->nearest_sampler);

@@ -49,7 +49,7 @@ namespace model {
           vee::vertex_attribute_vec3(1, traits::offset_of(&vtx::nrm)),
         },
       }}
-      , m_mdl { dq.physical_device(), max_models * sizeof(mdl) }
+      , m_mdl { v::g->pd, max_models * sizeof(mdl) }
     {
       auto [buf, count] = wavefront::load_model(dq.physical_device(), model);
       m_buf = traits::move(buf);
