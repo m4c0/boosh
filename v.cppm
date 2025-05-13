@@ -15,8 +15,7 @@ namespace v {
   export globals * g;
 
   export template<typename PC> class ppl_with_txt {
-    voo::single_cb m_cb;
-    voo::queue * m_q;
+    voo::single_cb m_cb {};
 
     voo::single_frag_dset m_ds { 1 };
     vee::pipeline_layout m_pl = vee::create_pipeline_layout(
@@ -35,9 +34,7 @@ namespace v {
 
   public:
     ppl_with_txt(voo::device_and_queue * dq, const char * txt, jute::view shader, const vee::gr_pipeline_params & p) 
-      : m_cb { dq->queue_family() }
-      , m_q { dq->queue() }
-      , m_txt { voo::load_image_file(txt, v::g->pd) }
+      : m_txt { voo::load_image_file(txt, v::g->pd) }
       , m_pipeline {
         vee::create_graphics_pipeline(merge(p, {
           .pipeline_layout = *m_pl,
@@ -57,13 +54,13 @@ namespace v {
       voo::cmd_buf_one_time_submit::build(m_cb.cb(), [&](auto cb) {
         m_txt.setup_copy(cb);
       });
-      m_q->queue_submit({ .command_buffer = m_cb.cb() });
+      voo::queue::instance()->queue_submit({ .command_buffer = m_cb.cb() });
     }
     void copy_image(const voo::host_buffer_for_image & img) {
       voo::cmd_buf_one_time_submit::build(m_cb.cb(), [&](auto cb) {
         img.setup_copy(cb, m_txt.image());
       });
-      m_q->queue_submit({ .command_buffer = m_cb.cb() });
+      voo::queue::instance()->queue_submit({ .command_buffer = m_cb.cb() });
     }
 
     void cmd_bind(vee::command_buffer cb, const PC & pc) {
