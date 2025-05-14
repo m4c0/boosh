@@ -26,6 +26,7 @@ define P
 define B
   copy .
   entity bullet
+  light
 .
 
 // TODO: door

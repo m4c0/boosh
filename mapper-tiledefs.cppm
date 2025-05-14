@@ -14,6 +14,7 @@ namespace mapper {
     unsigned ceiling;
     unsigned rotate;
     jute::heap entity {};
+    bool light;
     bool walk;
   };
   class tiledefs {
@@ -31,6 +32,7 @@ namespace mapper {
       if (o.ceiling) c.ceiling = o.ceiling;
       if (o.rotate)  c.rotate  = o.rotate;
       if (o.walk)    c.walk    = o.walk;
+      if (o.light)   c.light   = o.light;
 
       if (o.entity.size()) c.entity = o.entity;
     }
@@ -60,6 +62,7 @@ namespace mapper {
       else if (cmd == "ceiling") current().ceiling = (*m_txts)[args] + 1;
       else if (cmd == "rotate")  current().rotate  = jute::to_f(args);
       else if (cmd == "walk")    current().walk    = true;
+      else if (cmd == "light")   current().light   = true;
       else if (cmd == "copy")    copy((*this)[args.trim()]);
       else if (cmd == "entity")  current().entity  = args;
       else throw error { "unknown command: "_hs + cmd };
