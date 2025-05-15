@@ -14,7 +14,7 @@ namespace mapper {
     unsigned ceiling;
     unsigned rotate;
     jute::heap entity {};
-    bool light;
+    unsigned light;
     bool walk;
   };
   class tiledefs {
@@ -62,7 +62,7 @@ namespace mapper {
       else if (cmd == "ceiling") current().ceiling = (*m_txts)[args] + 1;
       else if (cmd == "rotate")  current().rotate  = jute::to_f(args);
       else if (cmd == "walk")    current().walk    = true;
-      else if (cmd == "light")   current().light   = true;
+      else if (cmd == "light")   current().light   = jute::to_f(args);
       else if (cmd == "copy")    copy((*this)[args.trim()]);
       else if (cmd == "entity")  current().entity  = args;
       else throw error { "unknown command: "_hs + cmd };
@@ -76,6 +76,8 @@ namespace mapper {
 
       if (c.ceiling && !c.floor) err("floor must be defined when ceiling is"_hs);
       if (!c.ceiling && c.floor) err("ceiling must be defined when floor is"_hs);
+
+      if (c.light < 0 || c.light > 255) err("light should be between 0 and 255"_hs);
 
       if (c.entity == "pushwall"_hs) {
         if (c.rotate) err("pushwalls can't be rotated yet"_hs);

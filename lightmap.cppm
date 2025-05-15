@@ -15,7 +15,7 @@ namespace lightmap {
       struct pix { char lvl; char trns; char pad[2]; };
       map->for_each([m = voo::memiter<pix>(host_memory())](auto x, auto y, auto tile) mutable {
         m[y * mapper::width + x] = {
-          .lvl  = !tile.light ? '\x00' : '\xFF',
+          .lvl  = static_cast<char>(tile.light),
           .trns = !tile.ceiling ? '\x00' : '\xFF',
         };
       });
