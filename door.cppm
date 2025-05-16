@@ -46,8 +46,8 @@ namespace door {
     }
 
   public:
-    explicit model(voo::device_and_queue & dq)
-      : batch { dq, "door.obj", "door.uv.png" }
+    explicit model(voo::device_and_queue & dq, vee::image_view::type lgm_iv)
+      : batch { dq, lgm_iv, "door.obj", "door.uv.png" }
     {}
 
     void tick(float ms) {

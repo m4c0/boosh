@@ -29,8 +29,8 @@ namespace bullet {
     }
 
   public:
-    explicit model(voo::device_and_queue & dq)
-      : batch { dq, "bullet.obj", "bullet.uv.png" }
+    explicit model(voo::device_and_queue & dq, vee::image_view::type lgm_iv)
+      : batch { dq, lgm_iv, "bullet.obj", "bullet.uv.png" }
     {}
   };
 }

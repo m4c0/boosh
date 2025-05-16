@@ -70,9 +70,9 @@ namespace hand {
     }
 
   public:
-    explicit model(voo::device_and_queue & dq)
+    explicit model(voo::device_and_queue & dq, vee::image_view::type lgm_iv)
       : m_quad { v::g->pd }
-      , m_ppl { &dq, "hand.png", "hand", {
+      , m_ppl { &dq, lgm_iv, "hand.png", "hand", {
         .depth_test = false,
         .bindings { m_quad.vertex_input_bind() },
         .attributes { m_quad.vertex_attribute(0) },

@@ -12,7 +12,7 @@ namespace overlay {
     vee::gr_pipeline m_pipeline;
 
   public:
-    explicit model(voo::device_and_queue & dq)
+    explicit model(voo::device_and_queue & dq, vee::image_view::type lgm_iv)
       : m_quad { dq.physical_device() }
       , m_pipeline {
         vee::create_graphics_pipeline({
