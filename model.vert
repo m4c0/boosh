@@ -24,7 +24,7 @@ void main() {
   mat4 model = rot * translation(mdl.xyz);
   vec4 p = vec4(pos, 1) * model;
 
-  mvp(cam, mat4(1), p.xyz);
+  mvp(cam, model, pos);
   f_txt = txt;
   f_pos = p.xyz;
 }
