@@ -67,8 +67,8 @@ namespace lightmap {
     void cmd_pipeline_barrier(vee::command_buffer cb) {
       constexpr const auto stage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
       vee::cmd_pipeline_barrier(cb, stage, stage, {
-        .srcAccessMask = VK_ACCESS_SHADER_READ_BIT,
-        .dstAccessMask = VK_ACCESS_SHADER_WRITE_BIT,
+        .srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+        .dstAccessMask = VK_ACCESS_SHADER_READ_BIT,
         .oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
         .newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
         .image = m_output.image(),
