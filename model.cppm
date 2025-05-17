@@ -15,7 +15,12 @@ namespace model {
       float angle;
     };
 
-    using vtx = wavefront::vtx;
+    // Copied from wavefront::vtx because clang explodes on windows otherwise
+    struct vtx {
+      dotz::vec3 pos;
+      dotz::vec2 txt;
+      dotz::vec3 nrm;
+    };
 
     static constexpr const auto max_models = 128;
 
