@@ -194,6 +194,7 @@ struct : public vapp {
       sitime::stopwatch time {};
       bool copied = false;
       ots_loop(dq, sw, [&](auto cb) {
+        // TODO: add a frame time limit or time interpolation
         bool moved = update_camera(map, time.millis());
         process_collisions(cb, blt);
         // TODO: squish
