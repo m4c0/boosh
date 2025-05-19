@@ -9,10 +9,6 @@ import sith;
 import v;
 
 namespace hand {
-  mtx::mutex on_attack_mtx {};
-  mtx::cond on_attack {};
-  volatile bool attacking = false;
-
   enum class states {
     walking,
     to_attack,
@@ -21,9 +17,6 @@ namespace hand {
   } state;
 
   export void attack() {
-    attacking = true;
-    on_attack.wake_all();
-
     // TODO: enable attack when hand is returning
     if (state != states::walking) return;
     state = states::to_attack;
@@ -55,18 +48,20 @@ namespace hand {
     voo::host_buffer_for_image m_atk_img;
     float m_theta = 0;
 
-    sith::memfn_thread<model> m_thread;
-    sith::run_guard m_thguard;
+    void idle_loop(float ms) {
+      m_theta = 0;
+      m_pc.pos = dotz::mix(m_pc.pos, neutral_pos, ms * return_speed / 1000.0f);
+    }
 
-    void attack_loop(sith::thread * t) {
-      while (!t->interrupted()) {
-        mtx::lock l { &on_attack_mtx };
-        on_attack.wait(&l, 1);
-        if (!attacking) continue;
+    void move_loop(float ms) {
+      // TODO: make movement speed proportial to player speed
 
-        silog::trace("<<<<<<<<<<<<<<<<<<<<< ATTACK");
-        attacking = false;
-      }
+      dotz::vec2 target = neutral_pos;
+      target.x += move_radius_x * dotz::cos(m_theta);
+      target.y += move_radius_x * dotz::abs(dotz::sin(m_theta));
+
+      m_theta += ms * theta_speed / 1000.0f;
+      m_pc.pos = dotz::mix(m_pc.pos, target, ms * follow_speed / 1000.0f);
     }
 
   public:
@@ -78,10 +73,7 @@ namespace hand {
         .attributes { m_quad.vertex_attribute(0) },
       }}
       , m_atk_img { voo::load_image_file_as_buffer("hand-attack.png", v::g->pd) }
-      , m_thread { this, &model::attack_loop }
-      , m_thguard { &m_thread }
     {}
-    ~model() { on_attack.wake_all(); }
 
     void tick(float ms, bool moved) {
       // TODO: improve easy in/out of attack
@@ -111,18 +103,8 @@ namespace hand {
         return;
       }
 
-      // TODO: make movement speed proportial to player speed
-      if (moved) {
-        dotz::vec2 target = neutral_pos;
-        target.x += move_radius_x * dotz::cos(m_theta);
-        target.y += move_radius_x * dotz::abs(dotz::sin(m_theta));
-
-        m_theta += ms * theta_speed / 1000.0f;
-        m_pc.pos = dotz::mix(m_pc.pos, target, ms * follow_speed / 1000.0f);
-      } else {
-        m_theta = 0;
-        m_pc.pos = dotz::mix(m_pc.pos, neutral_pos, ms * return_speed / 1000.0f);
-      }
+      if (moved) move_loop(ms);
+      else idle_loop(ms);
     }
 
     void run(vee::command_buffer cb) {
