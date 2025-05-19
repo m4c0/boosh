@@ -84,7 +84,7 @@ static void process_collisions(auto cb, auto & blt) {
   switch (item.owner) {
     case bullet::clid:
       bullet::remove(item.id);
-      g_olay = { 1.0f };
+      g_olay = { 0.5f };
       blt.setup_copy(cb);
       break;
   }
