@@ -8,6 +8,13 @@ import silog;
 import sith;
 import v;
 
+namespace hand {
+  struct upc {
+    dotz::vec2 pos {};
+    dotz::vec2 size {};
+  };
+}
+
 namespace hand::images {
   enum e {
     NIL,
@@ -19,10 +26,45 @@ namespace hand::images {
     e id;
     const char * filename;
   };
-  t all[MAX] = {
+  constexpr const t all[MAX] = {
     { NIL                      },
     { HAND,  "hand.png"        },
     { PUNCH, "hand-attack.png" },
+  };
+}
+namespace hand::anims {
+  static void bob(upc * pc, float ms) {
+  }
+  static void hand_holster(upc * pc, float ms) {
+  }
+  static void punch_go(upc * pc, float ms) {
+  }
+  static void punch_back(upc * pc, float ms) {
+  }
+  static void hand_up(upc * pc, float ms) {
+  }
+}
+namespace hand::stts {
+  enum e {
+    NIL,
+    HAND_IDLE,
+    HAND_HOLSTER,
+    PUNCH_GO,
+    PUNCH_BACK,
+    HAND_UP,
+    MAX,
+  };
+  struct t {
+    e id;
+    e to;
+    void (*tick)(upc *, float);
+  };
+  const t all[MAX] = {
+    { HAND_IDLE,    HAND_IDLE,  anims::bob          },
+    { HAND_HOLSTER, PUNCH_GO,   anims::hand_holster },
+    { PUNCH_GO,     PUNCH_BACK, anims::punch_go     },
+    { PUNCH_BACK,   HAND_UP,    anims::punch_back   },
+    { HAND_UP,      HAND_IDLE,  anims::hand_up      },
   };
 }
 namespace hand {
@@ -55,11 +97,7 @@ namespace hand {
     static constexpr const float theta_speed = 10.0f;
     static constexpr const float move_radius_x = 0.2f;
 
-    struct upc {
-      dotz::vec2 pos { neutral_pos };
-      dotz::vec2 size { neutral_size };
-    } m_pc {};
-
+    upc m_pc {};
     voo::one_quad m_quad;
     v::ppl_with_txt<upc> m_ppl;
     float m_theta = 0;
