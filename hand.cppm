@@ -31,17 +31,32 @@ namespace hand::images {
     { HAND,  "hand.png"        },
     { PUNCH, "hand-attack.png" },
   };
+  static_assert([]{
+    for (auto i = 0; i < MAX; i++) if (all[i].id != i) return false;
+    return true;
+  }());
 }
 namespace hand::anims {
-  static void bob(upc * pc, float ms) {
+  static constexpr const dotz::vec2 hand_neutral_pos { 0.2f };
+  static constexpr const dotz::vec2 hand_neutral_size { 0.8f };
+
+  static bool bob(upc * pc, float t) {
+    pc->pos.x = hand_neutral_pos.x + 0.2f * dotz::cos(t);
+    pc->pos.y = hand_neutral_pos.y + 0.2f * dotz::abs(dotz::sin(t));
+    pc->size = hand_neutral_size;
+    return true;
   }
-  static void hand_holster(upc * pc, float ms) {
+  static bool hand_holster(upc * pc, float ms) {
+    return false;
   }
-  static void punch_go(upc * pc, float ms) {
+  static bool punch_go(upc * pc, float ms) {
+    return false;
   }
-  static void punch_back(upc * pc, float ms) {
+  static bool punch_back(upc * pc, float ms) {
+    return false;
   }
-  static void hand_up(upc * pc, float ms) {
+  static bool hand_up(upc * pc, float ms) {
+    return false;
   }
 }
 namespace hand::stts {
@@ -57,15 +72,20 @@ namespace hand::stts {
   struct t {
     e id;
     e to;
-    void (*tick)(upc *, float);
+    bool (*tick)(upc *, float);
   };
-  const t all[MAX] = {
+  constexpr const t all[MAX] = {
+    { NIL },
     { HAND_IDLE,    HAND_IDLE,  anims::bob          },
     { HAND_HOLSTER, PUNCH_GO,   anims::hand_holster },
     { PUNCH_GO,     PUNCH_BACK, anims::punch_go     },
     { PUNCH_BACK,   HAND_UP,    anims::punch_back   },
     { HAND_UP,      HAND_IDLE,  anims::hand_up      },
   };
+  static_assert([]{
+    for (auto i = 0; i < MAX; i++) if (all[i].id != i) return false;
+    return true;
+  }());
 }
 namespace hand {
   enum class states {
