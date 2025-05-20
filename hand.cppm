@@ -40,6 +40,8 @@ namespace hand::anims {
   static constexpr const dotz::vec2 hand_neutral_pos { 0.2f };
   static constexpr const dotz::vec2 hand_neutral_size { 0.8f };
   static constexpr const dotz::vec2 hand_attack_size { 1.5f };
+  static constexpr const dotz::vec2 hand_attack_start_pos { -1.8f, 1.0f };
+  static constexpr const dotz::vec2 hand_attack_end_pos { -0.8f, -0.5f };
 
   static bool bob(upc * pc, float t, float spd) {
     if (spd == 0) {
@@ -54,15 +56,19 @@ namespace hand::anims {
     return true;
   }
   static bool hand_holster(upc * pc, float t, float spd) {
-    pc->pos.y = hand_neutral_pos.y + t / 2000.0f;
+    pc->pos.x = hand_neutral_pos.x;
+    pc->pos.y = hand_neutral_pos.y + t / 200.0f;
     pc->size = hand_neutral_size;
-    return t < 2000;
+    return t < 200;
   }
   static bool punch_go(upc * pc, float t, float spd) {
+    pc->pos = dotz::mix(hand_attack_start_pos, hand_attack_end_pos, t / 200.0f);
     pc->size = hand_attack_size;
     return t < 200;
   }
   static bool punch_back(upc * pc, float t, float spd) {
+    pc->pos = dotz::mix(hand_attack_end_pos, hand_attack_start_pos, t / 200.0f);
+    pc->size = hand_attack_size;
     return t < 200;
   }
   static bool hand_up(upc * pc, float t, float spd) {
