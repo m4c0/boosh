@@ -39,6 +39,7 @@ namespace hand::images {
 namespace hand::anims {
   static constexpr const dotz::vec2 hand_neutral_pos { 0.2f };
   static constexpr const dotz::vec2 hand_neutral_size { 0.8f };
+  static constexpr const dotz::vec2 hand_attack_size { 1.5f };
 
   static bool bob(upc * pc, float t, float spd) {
     if (spd == 0) {
@@ -53,16 +54,22 @@ namespace hand::anims {
     return true;
   }
   static bool hand_holster(upc * pc, float t, float spd) {
-    return false;
+    pc->pos.y = hand_neutral_pos.y + t / 2000.0f;
+    pc->size = hand_neutral_size;
+    return t < 2000;
   }
   static bool punch_go(upc * pc, float t, float spd) {
-    return false;
+    pc->size = hand_attack_size;
+    return t < 200;
   }
   static bool punch_back(upc * pc, float t, float spd) {
-    return false;
+    return t < 200;
   }
   static bool hand_up(upc * pc, float t, float spd) {
-    return false;
+    pc->pos.x = hand_neutral_pos.x;
+    pc->pos.y = hand_neutral_pos.y + 1.0 - t / 200.0f;
+    pc->size = hand_neutral_size;
+    return t < 200;
   }
 }
 namespace hand::stts {
@@ -111,6 +118,7 @@ namespace hand {
   } state;
 
   export void attack() {
+    // TODO: move to model and reset T
     if (!stts::all[stt].can_attack) return;
     stt = stts::start_attack; // TODO: introduce "weapon" to hold this
   }
@@ -135,25 +143,8 @@ namespace hand {
     voo::one_quad m_quad;
     v::ppl_with_txt<upc> m_ppl;
     float m_t = 0;
-    float m_theta = 0;
 
     hai::array<voo::host_buffer_for_image> m_imgs { images::MAX };
-
-    void idle_loop(float ms) {
-      m_theta = 0;
-      m_pc.pos = dotz::mix(m_pc.pos, neutral_pos, ms * return_speed / 1000.0f);
-    }
-
-    void move_loop(float ms) {
-      // TODO: make movement speed proportial to player speed
-
-      dotz::vec2 target = neutral_pos;
-      target.x += move_radius_x * dotz::cos(m_theta);
-      target.y += move_radius_x * dotz::abs(dotz::sin(m_theta));
-
-      m_theta += ms * theta_speed / 1000.0f;
-      m_pc.pos = dotz::mix(m_pc.pos, target, ms * follow_speed / 1000.0f);
-    }
 
   public:
     explicit model(voo::device_and_queue & dq, vee::image_view::type lgm_iv)
@@ -208,9 +199,6 @@ namespace hand {
         }
         return;
       }
-
-      if (moved) move_loop(ms);
-      else idle_loop(ms);
     }
 
     void run(vee::command_buffer cb) {
