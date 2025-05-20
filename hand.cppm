@@ -68,6 +68,10 @@ namespace hand::anims {
     pc->size = hand_attack_size;
     return t < 200;
   }
+  static bool punch_damage(upc * pc, float t, float spd) {
+    silog::log(silog::info, "PUNCH");
+    return false;
+  }
   static bool punch_back(upc * pc, float t, float spd) {
     pc->pos = dotz::mix(hand_attack_end_pos, hand_attack_start_pos, t / 200.0f);
     pc->size = hand_attack_size;
@@ -88,6 +92,7 @@ namespace hand::stts {
     HAND_IDLE,
     HAND_HOLSTER,
     PUNCH_GO,
+    PUNCH_DMG,
     PUNCH_BACK,
     HAND_UP,
     MAX,
@@ -103,7 +108,8 @@ namespace hand::stts {
     { NIL },
     { HAND_IDLE,    HAND_IDLE,  images::HAND,  T, anims::bob          },
     { HAND_HOLSTER, PUNCH_GO,   images::HAND,  F, anims::hand_holster },
-    { PUNCH_GO,     PUNCH_BACK, images::PUNCH, F, anims::punch_go     },
+    { PUNCH_GO,     PUNCH_DMG,  images::PUNCH, F, anims::punch_go     },
+    { PUNCH_DMG,    PUNCH_BACK, images::PUNCH, F, anims::punch_damage },
     { PUNCH_BACK,   HAND_UP,    images::PUNCH, F, anims::punch_back   },
     { HAND_UP,      HAND_IDLE,  images::HAND,  T, anims::hand_up      },
   };
