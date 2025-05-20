@@ -43,6 +43,8 @@ namespace hand::anims {
   static constexpr const dotz::vec2 hand_attack_start_pos { -1.8f, 1.0f };
   static constexpr const dotz::vec2 hand_attack_end_pos { -0.8f, -0.5f };
 
+  // TODO: improve easy in/out of attack
+
   static bool bob(upc * pc, float t, float spd) {
     if (spd == 0) {
       pc->pos = hand_neutral_pos;
@@ -115,14 +117,6 @@ namespace hand::stts {
 namespace hand {
   stts::e stt = stts::HAND_UP;
 
-  enum class states {
-    dummy,
-    walking,
-    to_attack,
-    attacking,
-    to_walk,
-  } state;
-
   export void attack() {
     // TODO: move to model and reset T
     if (!stts::all[stt].can_attack) return;
@@ -130,21 +124,6 @@ namespace hand {
   }
 
   export class model {
-    static constexpr const dotz::vec2 neutral_pos { 0.2f };
-    static constexpr const dotz::vec2 holster_pos = neutral_pos + dotz::vec2 { 0.0f, 1.0f };
-    static constexpr const dotz::vec2 attack_start_pos { -1.8f, 1.0f };
-    static constexpr const dotz::vec2 attack_end_pos { -0.8f, -0.5f };
-
-    static constexpr const dotz::vec2 neutral_size { 0.8f };
-    static constexpr const dotz::vec2 attack_size { 1.5f };
-
-    static constexpr const float return_speed = 10.0f;
-    static constexpr const float follow_speed = 10.0f;
-    static constexpr const float holster_speed = 20.0f;
-    static constexpr const float attack_speed = 20.0f;
-    static constexpr const float theta_speed = 10.0f;
-    static constexpr const float move_radius_x = 0.2f;
-
     upc m_pc {};
     voo::one_quad m_quad;
     v::ppl_with_txt<upc> m_ppl;
@@ -177,33 +156,6 @@ namespace hand {
 
         auto new_spr = stts::all[stt].spr;
         if (new_spr != old_spr) m_ppl.copy_image(m_imgs[new_spr]);
-      }
-
-      // TODO: improve easy in/out of attack
-      if (state == states::to_attack) {
-        m_pc.pos = dotz::mix(m_pc.pos, holster_pos, ms * holster_speed / 1000.0f);
-        if (dotz::length(m_pc.pos - holster_pos) < 0.01) {
-          state = states::attacking;
-          m_pc.pos = attack_start_pos;
-          m_pc.size = attack_size;
-          m_ppl.copy_image(m_imgs[images::PUNCH]);
-        }
-        return;
-      } else if (state == states::attacking) {
-        m_pc.pos = dotz::mix(m_pc.pos, attack_end_pos, ms * attack_speed / 1000.0f);
-        if (dotz::length(m_pc.pos - attack_end_pos) < 0.01) {
-          state = states::to_walk;
-        }
-        return;
-      } else if (state == states::to_walk) {
-        m_pc.pos = dotz::mix(m_pc.pos, attack_start_pos, ms * attack_speed / 1000.0f);
-        if (dotz::length(m_pc.pos - attack_start_pos) < 0.01) {
-          state = states::walking;
-          m_pc.pos = holster_pos;
-          m_pc.size = neutral_size;
-          m_ppl.copy_image(m_imgs[images::HAND]);
-        }
-        return;
       }
     }
 
