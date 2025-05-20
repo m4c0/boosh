@@ -40,26 +40,34 @@ namespace hand::anims {
   static constexpr const dotz::vec2 hand_neutral_pos { 0.2f };
   static constexpr const dotz::vec2 hand_neutral_size { 0.8f };
 
-  static bool bob(upc * pc, float t) {
-    pc->pos.x = hand_neutral_pos.x + 0.2f * dotz::cos(t);
-    pc->pos.y = hand_neutral_pos.y + 0.2f * dotz::abs(dotz::sin(t));
+  static bool bob(upc * pc, float t, float spd) {
+    if (spd == 0) {
+      pc->pos = hand_neutral_pos;
+      pc->size = hand_neutral_size;
+      return true;
+    }
+    float tt = t * 10.0 / 1000.0;
+    pc->pos.x = hand_neutral_pos.x + 0.2f * dotz::cos(tt);
+    pc->pos.y = hand_neutral_pos.y + 0.2f * dotz::abs(dotz::sin(tt));
     pc->size = hand_neutral_size;
     return true;
   }
-  static bool hand_holster(upc * pc, float ms) {
+  static bool hand_holster(upc * pc, float t, float spd) {
     return false;
   }
-  static bool punch_go(upc * pc, float ms) {
+  static bool punch_go(upc * pc, float t, float spd) {
     return false;
   }
-  static bool punch_back(upc * pc, float ms) {
+  static bool punch_back(upc * pc, float t, float spd) {
     return false;
   }
-  static bool hand_up(upc * pc, float ms) {
+  static bool hand_up(upc * pc, float t, float spd) {
     return false;
   }
 }
 namespace hand::stts {
+  static constexpr const auto T = true;
+  static constexpr const auto F = false;
   enum e {
     NIL,
     HAND_IDLE,
@@ -71,24 +79,30 @@ namespace hand::stts {
   };
   struct t {
     e id;
-    e to;
-    bool (*tick)(upc *, float);
+    e next;
+    bool can_attack;
+    bool (*tick)(upc *, float, float);
   };
   constexpr const t all[MAX] = {
     { NIL },
-    { HAND_IDLE,    HAND_IDLE,  anims::bob          },
-    { HAND_HOLSTER, PUNCH_GO,   anims::hand_holster },
-    { PUNCH_GO,     PUNCH_BACK, anims::punch_go     },
-    { PUNCH_BACK,   HAND_UP,    anims::punch_back   },
-    { HAND_UP,      HAND_IDLE,  anims::hand_up      },
+    { HAND_IDLE,    HAND_IDLE,  T, anims::bob          },
+    { HAND_HOLSTER, PUNCH_GO,   F, anims::hand_holster },
+    { PUNCH_GO,     PUNCH_BACK, F, anims::punch_go     },
+    { PUNCH_BACK,   HAND_UP,    F, anims::punch_back   },
+    { HAND_UP,      HAND_IDLE,  T, anims::hand_up      },
   };
   static_assert([]{
     for (auto i = 0; i < MAX; i++) if (all[i].id != i) return false;
     return true;
   }());
+
+  static constexpr const auto start_attack = HAND_HOLSTER;
 }
 namespace hand {
+  stts::e stt = stts::HAND_UP;
+
   enum class states {
+    dummy,
     walking,
     to_attack,
     attacking,
@@ -96,9 +110,8 @@ namespace hand {
   } state;
 
   export void attack() {
-    // TODO: enable attack when hand is returning
-    if (state != states::walking) return;
-    state = states::to_attack;
+    if (!stts::all[stt].can_attack) return;
+    stt = stts::start_attack; // TODO: introduce "weapon" to hold this
   }
 
   export class model {
@@ -120,6 +133,7 @@ namespace hand {
     upc m_pc {};
     voo::one_quad m_quad;
     v::ppl_with_txt<upc> m_ppl;
+    float m_t = 0;
     float m_theta = 0;
 
     hai::array<voo::host_buffer_for_image> m_imgs { images::MAX };
@@ -155,6 +169,13 @@ namespace hand {
     }
 
     void tick(float ms, bool moved) {
+      if (stts::all[stt].tick(&m_pc, m_t, moved)) {
+        m_t += ms;
+      } else {
+        stt = stts::all[stt].next;
+        m_t = 0;
+      }
+
       // TODO: improve easy in/out of attack
       if (state == states::to_attack) {
         m_pc.pos = dotz::mix(m_pc.pos, holster_pos, ms * holster_speed / 1000.0f);
