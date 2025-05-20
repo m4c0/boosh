@@ -80,16 +80,17 @@ namespace hand::stts {
   struct t {
     e id;
     e next;
+    images::e spr;
     bool can_attack;
     bool (*tick)(upc *, float, float);
   };
   constexpr const t all[MAX] = {
     { NIL },
-    { HAND_IDLE,    HAND_IDLE,  T, anims::bob          },
-    { HAND_HOLSTER, PUNCH_GO,   F, anims::hand_holster },
-    { PUNCH_GO,     PUNCH_BACK, F, anims::punch_go     },
-    { PUNCH_BACK,   HAND_UP,    F, anims::punch_back   },
-    { HAND_UP,      HAND_IDLE,  T, anims::hand_up      },
+    { HAND_IDLE,    HAND_IDLE,  images::HAND,  T, anims::bob          },
+    { HAND_HOLSTER, PUNCH_GO,   images::HAND,  F, anims::hand_holster },
+    { PUNCH_GO,     PUNCH_BACK, images::PUNCH, F, anims::punch_go     },
+    { PUNCH_BACK,   HAND_UP,    images::PUNCH, F, anims::punch_back   },
+    { HAND_UP,      HAND_IDLE,  images::HAND,  T, anims::hand_up      },
   };
   static_assert([]{
     for (auto i = 0; i < MAX; i++) if (all[i].id != i) return false;
@@ -172,8 +173,13 @@ namespace hand {
       if (stts::all[stt].tick(&m_pc, m_t, moved)) {
         m_t += ms;
       } else {
-        stt = stts::all[stt].next;
         m_t = 0;
+
+        auto old_spr = stts::all[stt].spr;
+        stt = stts::all[stt].next;
+
+        auto new_spr = stts::all[stt].spr;
+        if (new_spr != old_spr) m_ppl.copy_image(m_imgs[new_spr]);
       }
 
       // TODO: improve easy in/out of attack
