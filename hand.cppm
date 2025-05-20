@@ -8,6 +8,23 @@ import silog;
 import sith;
 import v;
 
+namespace hand::images {
+  enum e {
+    NIL,
+    HAND,
+    PUNCH,
+    MAX,
+  };
+  struct t {
+    e id;
+    const char * filename;
+  };
+  t all[MAX] = {
+    { NIL                      },
+    { HAND,  "hand.png"        },
+    { PUNCH, "hand-attack.png" },
+  };
+}
 namespace hand {
   enum class states {
     walking,
@@ -45,8 +62,9 @@ namespace hand {
 
     voo::one_quad m_quad;
     v::ppl_with_txt<upc> m_ppl;
-    voo::host_buffer_for_image m_atk_img;
     float m_theta = 0;
+
+    hai::array<voo::host_buffer_for_image> m_imgs { images::MAX };
 
     void idle_loop(float ms) {
       m_theta = 0;
@@ -72,8 +90,11 @@ namespace hand {
         .bindings { m_quad.vertex_input_bind() },
         .attributes { m_quad.vertex_attribute(0) },
       }}
-      , m_atk_img { voo::load_image_file_as_buffer("hand-attack.png", v::g->pd) }
-    {}
+    {
+      for (auto i = 0; i < images::MAX; i++) {
+        m_imgs[i] = voo::load_image_file_as_buffer(images::all[i].filename, v::g->pd);
+      }
+    }
 
     void tick(float ms, bool moved) {
       // TODO: improve easy in/out of attack
@@ -83,7 +104,7 @@ namespace hand {
           state = states::attacking;
           m_pc.pos = attack_start_pos;
           m_pc.size = attack_size;
-          m_ppl.copy_image(m_atk_img);
+          m_ppl.copy_image(m_imgs[images::PUNCH]);
         }
         return;
       } else if (state == states::attacking) {
@@ -98,7 +119,7 @@ namespace hand {
           state = states::walking;
           m_pc.pos = holster_pos;
           m_pc.size = neutral_size;
-          m_ppl.copy_image();
+          m_ppl.copy_image(m_imgs[images::HAND]);
         }
         return;
       }
