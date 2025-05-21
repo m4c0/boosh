@@ -91,10 +91,6 @@ static void process_collisions(auto cb, auto & blt) {
   g_olay = g_olay * 0.9;
 }
 
-static void process_attack() {
-  hand::attack();
-}
-
 static void process_use() {
   auto cam = g_upc.cam.xz();
   auto angle = dotz::radians(g_upc.angle);
@@ -188,7 +184,7 @@ struct : public vapp {
       vee::update_descriptor_set(dset, 0, ivs, *v::g->linear_sampler);
       vee::update_descriptor_set(dset, 1, lgm.output_iv(), *v::g->linear_sampler);
 
-      input::on_button_down(input::buttons::ATTACK, process_attack);
+      input::on_button_down(input::buttons::ATTACK, hand::attack);
       input::on_button_down(input::buttons::USE,    process_use);
 
       sitime::stopwatch time {};
