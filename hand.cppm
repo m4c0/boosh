@@ -3,6 +3,7 @@
 #pragma leco add_shader "hand.vert"
 #pragma leco add_shader "hand.frag"
 export module hand;
+import collision;
 import mtx;
 import silog;
 import sith;
@@ -70,6 +71,7 @@ namespace hand::anims {
   }
   static bool punch_damage(upc * pc, float t, float spd) {
     silog::log(silog::info, "PUNCH");
+    // collision::bodies().closest(player_cam, player_radius + 0.1);;
     return false;
   }
   static bool punch_back(upc * pc, float t, float spd) {
