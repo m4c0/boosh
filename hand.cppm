@@ -153,6 +153,8 @@ namespace hand {
       }
     }
 
+    // TODO: take light map
+    // TODO: take player pos and add to UPC
     void tick(float ms, bool moved) {
       if (stts::all[stt].tick(&m_pc, m_t, moved)) {
         m_t += ms;
