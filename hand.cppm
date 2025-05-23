@@ -148,7 +148,7 @@ namespace hand {
         .attributes { m_quad.vertex_attribute(0) },
       }}
     {
-      for (auto i = 0; i < images::MAX; i++) {
+      for (auto i = images::NIL + 1; i < images::MAX; i++) {
         m_imgs[i] = voo::load_image_file_as_buffer(images::all[i].filename, v::g->pd);
       }
     }
