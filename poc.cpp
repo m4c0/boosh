@@ -196,7 +196,7 @@ struct : public vapp {
         // TODO: squish
         pushwall::tick(walls, time.millis());
         dr.tick(time.millis());
-        hnd.tick(time.millis(), moved);
+        hnd.tick(time.millis(), moved, g_upc.cam);
         time = {};
 
         if (!copied) {

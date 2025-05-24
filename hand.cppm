@@ -13,6 +13,7 @@ namespace hand {
   struct upc {
     dotz::vec2 pos {};
     dotz::vec2 size {};
+    dotz::vec2 cam {};
   };
 }
 
@@ -155,7 +156,9 @@ namespace hand {
 
     // TODO: take light map
     // TODO: take player pos and add to UPC
-    void tick(float ms, bool moved) {
+    void tick(float ms, bool moved, dotz::vec3 cam) {
+      m_pc.cam = cam.xz();
+
       if (stts::all[stt].tick(&m_pc, m_t, moved)) {
         m_t += ms;
       } else {
