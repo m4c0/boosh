@@ -44,6 +44,7 @@ namespace hand::anims {
   static constexpr const dotz::vec2 hand_attack_size { 1.5f };
   static constexpr const dotz::vec2 hand_attack_start_pos { -1.8f, 1.0f };
   static constexpr const dotz::vec2 hand_attack_end_pos { -0.8f, -0.5f };
+  static constexpr const float hand_attack_radius = 1.0f;
 
   // TODO: improve easy in/out of attack
 
@@ -71,8 +72,15 @@ namespace hand::anims {
     return t < 200;
   }
   static bool punch_damage(upc * pc, float t, float spd) {
-    silog::log(silog::info, "PUNCH");
-    // collision::bodies().closest(player_cam, player_radius + 0.1);;
+    auto i = collision::bodies().closest(pc->cam, hand_attack_radius);
+    switch (i.owner) {
+      case 0:
+        silog::log(silog::info, ">>>>>>>>>>> MISS");
+        break;
+      default:
+        silog::log(silog::info, ">>>>>>>>>>> HIT %x %x", i.owner, i.id);
+        break;
+    }
     return false;
   }
   static bool punch_back(upc * pc, float t, float spd) {
