@@ -14,6 +14,7 @@ namespace hand {
     dotz::vec2 pos {};
     dotz::vec2 size {};
     dotz::vec2 cam {};
+    float cam_rot {};
   };
 }
 
@@ -72,7 +73,7 @@ namespace hand::anims {
     return t < 200;
   }
   static bool punch_damage(upc * pc, float t, float spd) {
-    auto i = collision::bodies().closest(pc->cam, hand_attack_radius);
+    auto i = collision::bodies().hitscan(pc->cam, pc->cam_rot, hand_attack_radius);
     switch (i.owner) {
       case 0:
         silog::log(silog::info, ">>>>>>>>>>> MISS");
@@ -162,8 +163,9 @@ namespace hand {
       }
     }
 
-    void tick(float ms, bool moved, dotz::vec3 cam) {
+    void tick(float ms, bool moved, dotz::vec3 cam, float rot) {
       m_pc.cam = cam.xz();
+      m_pc.cam_rot = dotz::radians(rot);
 
       if (stts::all[stt].tick(&m_pc, m_t, moved)) {
         m_t += ms;
