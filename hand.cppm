@@ -162,8 +162,6 @@ namespace hand {
       }
     }
 
-    // TODO: take light map
-    // TODO: take player pos and add to UPC
     void tick(float ms, bool moved, dotz::vec3 cam) {
       m_pc.cam = cam.xz();
 
