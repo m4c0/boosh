@@ -74,12 +74,12 @@ namespace hand::anims {
   }
   static bool punch_damage(upc * pc, float t, float spd) {
     auto i = collision::bodies().hitscan(pc->cam, pc->cam_rot, hand_attack_radius);
-    switch (i.owner) {
+    switch (i.item.owner) {
       case 0:
         silog::log(silog::info, ">>>>>>>>>>> MISS");
         break;
       default:
-        silog::log(silog::info, ">>>>>>>>>>> HIT %x %x", i.owner, i.id);
+        silog::log(silog::info, ">>>>>>>>>>> HIT %x %x", i.item.owner, i.item.id);
         break;
     }
     return false;

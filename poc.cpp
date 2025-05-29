@@ -95,12 +95,12 @@ static void process_use() {
   auto cam = g_upc.cam.xz();
   auto angle = dotz::radians(g_upc.angle);
   auto c = collision::entities().hitscan(cam, angle, max_use_dist);
-  switch (c.owner) {
+  switch (c.item.owner) {
     case door::clid:
-      door::open(c.id);
+      door::open(c.item.id);
       break;
     case pushwall::clid:
-      pushwall::push(cam, c.id);
+      pushwall::push(cam, c.item.id);
       break;
   }
 }

@@ -14,6 +14,10 @@ namespace collision {
     unsigned owner;
     unsigned id;
   };
+  struct hit {
+    item item;
+    float dist;
+  };
 
   class layer {
     hai::varray<item> m_data { 1024 };
@@ -50,22 +54,23 @@ namespace collision {
       set(item { {}, type::none, owner, id });
     }
 
-    [[nodiscard]] item hitscan(dotz::vec2 p, float rad, float max_dist) {
+    [[nodiscard]] hit hitscan(dotz::vec2 p, float rad, float max_dist) {
       dotz::vec2 l { dotz::sinf(rad), dotz::cosf(rad) };
 
-      item res {};
-      float min_dist = max_dist;
+      hit res {
+        .dist = max_dist,
+      };
       for (auto & i : m_data) {
         switch (i.type) {
           case type::none: break;
           case type::circle: {
             auto t = dotz::dot(l, i.fn.xy() - p);
-            if (t < 0 || t > min_dist) continue;
+            if (t < 0 || t > res.dist) continue;
             auto pp = p + l * t;
             if (dotz::length(pp - i.fn.xy()) > i.fn.z) continue;
 
-            min_dist = t;
-            res = i;
+            res.dist = t;
+            res.item = i;
             break;
           }
           case type::aabb: {
@@ -75,10 +80,10 @@ namespace collision {
             auto tfar   = dotz::max(tlow, thigh);
             auto tc = dotz::max(tclose.x, tclose.y);
             auto tf = dotz::min(tfar.x, tfar.y);
-            if (tc < 0 || tc > tf || tc > min_dist) continue;
+            if (tc < 0 || tc > tf || tc > res.dist) continue;
 
-            min_dist = tc;
-            res = i;
+            res.dist = tc;
+            res.item = i;
             break;
           }
         }
