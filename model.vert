@@ -11,8 +11,9 @@ layout(location = 1) in vec3 pos;
 layout(location = 2) in vec2 txt;
 layout(location = 3) in vec3 nrm;
 
-layout(location = 0) out vec2 f_txt;
+layout(location = 0) out vec2 f_uv;
 layout(location = 1) out vec3 f_pos;
+layout(location = 2) out uint f_txt;
 
 void main() {
   mat4 rot = mat4(
@@ -25,6 +26,6 @@ void main() {
   vec4 p = vec4(pos, 1) * model;
 
   mvp(cam, model, pos);
-  f_txt = txt;
+  f_uv = txt;
   f_pos = p.xyz;
 }
