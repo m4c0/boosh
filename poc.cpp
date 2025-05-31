@@ -136,7 +136,7 @@ struct : public vapp {
           if (*d.entity == "door") door::add({ x + 0.5f, 0.0f, y + 0.5f }, dotz::radians(d.rotate));
 
           if (*d.entity == "pushwall") pushwall::add({ x, y }, w.count());
-          else if (d.wall) collision::bodies().add_aabb({ x, y }, { x + 1, y + 1 }, 'wall', 1);
+          if (*d.entity == "wall") collision::bodies().add_aabb({ x, y }, { x + 1, y + 1 }, 'wall', 1);
 
           if (d.wall)    w += { { x, 0, y }, d.wall    - 1 };
           if (d.floor)   f += { { x, 0, y }, d.floor   - 1 };

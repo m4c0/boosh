@@ -13,6 +13,7 @@ define main_hall_fc
 
 define X
   wall t040
+  entity wall
 .
 define .
   copy main_hall_fc
@@ -36,7 +37,6 @@ define B
   entity bullet
 .
 
-// TODO: door
 define -
   copy main_hall_fc
   entity door

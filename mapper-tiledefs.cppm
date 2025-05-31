@@ -82,6 +82,10 @@ namespace mapper {
       if (c.entity == "pushwall"_hs) {
         if (c.rotate) err("pushwalls can't be rotated yet"_hs);
         if (!c.wall || !c.ceiling) err("pushwall must have all of wall, ceiling and floor"_hs);
+      } else if (c.entity == "wall"_hs) {
+        if (c.rotate) err("walls can't be rotated yet"_hs);
+        if (!c.wall) err("wall must have a wall attribute"_hs);
+        if (c.floor) err("wall cannot have floor or ceiling"_hs);
       } else if (c.entity == "bullet"_hs) {
         if (c.rotate) err("bullets can't be rotated yet"_hs);
         if (c.wall) err("bullet cannot be placed on walls"_hs);
@@ -97,7 +101,8 @@ namespace mapper {
         err("invalid entity named "_hs + c.entity);
       } else {
         if (c.rotate) err("tiles can't be rotated yet"_hs);
-        if (!c.wall && !c.ceiling) err("tile should have a wall or both ceiling and floor"_hs);
+        if (c.wall) err("tiles can't have a wall"_hs);
+        if (!c.floor) err("tile should have both ceiling and floor"_hs);
       }
     }
   };
