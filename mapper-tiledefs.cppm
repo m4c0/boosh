@@ -7,16 +7,36 @@ import jute;
 using namespace jute::literals;
 
 namespace mapper {
+  export enum class entities {
+    NONE,
+    BULLET,
+    DOOR,
+    PLAYER,
+    PUSHWALL,
+    WALL,
+  };
   export struct tiledef {
     jute::heap id;
     unsigned wall;
     unsigned floor;
     unsigned ceiling;
     unsigned rotate;
-    jute::heap entity {};
+    entities entity = entities::NONE;
     unsigned light;
     bool walk;
   };
+
+  export constexpr bool operator!(entities e) { return e == entities::NONE; }
+  static constexpr entities parse_entities(jute::view value) {
+    if (value == "bullet")   return entities::BULLET;
+    if (value == "door")     return entities::DOOR;
+    if (value == "player")   return entities::PLAYER;
+    if (value == "pushwall") return entities::PUSHWALL;
+    if (value == "wall")     return entities::WALL;
+
+    throw error { "unknown entity: "_hs + value };
+  }
+
   class tiledefs {
     static constexpr const auto max = 128;
 
@@ -34,7 +54,7 @@ namespace mapper {
       if (o.walk)    c.walk    = o.walk;
       if (o.light)   c.light   = o.light;
 
-      if (o.entity.size()) c.entity = o.entity;
+      if (!!o.entity) c.entity = o.entity;
     }
 
     [[nodiscard]] constexpr auto & operator[](jute::view id) const {
@@ -64,7 +84,7 @@ namespace mapper {
       else if (cmd == "walk")    current().walk    = true;
       else if (cmd == "light")   current().light   = jute::to_f(args);
       else if (cmd == "copy")    copy((*this)[args.trim()]);
-      else if (cmd == "entity")  current().entity  = args;
+      else if (cmd == "entity")  current().entity  = parse_entities(args);
       else throw error { "unknown command: "_hs + cmd };
     }
 
@@ -79,30 +99,34 @@ namespace mapper {
 
       if (c.light < 0 || c.light > 255) err("light should be between 0 and 255"_hs);
 
-      if (c.entity == "pushwall"_hs) {
-        if (c.rotate) err("pushwalls can't be rotated yet"_hs);
-        if (!c.wall || !c.ceiling) err("pushwall must have all of wall, ceiling and floor"_hs);
-      } else if (c.entity == "wall"_hs) {
-        if (c.rotate) err("walls can't be rotated yet"_hs);
-        if (!c.wall) err("wall must have a wall attribute"_hs);
-        if (c.floor) err("wall cannot have floor or ceiling"_hs);
-      } else if (c.entity == "bullet"_hs) {
-        if (c.rotate) err("bullets can't be rotated yet"_hs);
-        if (c.wall) err("bullet cannot be placed on walls"_hs);
-        if (!c.floor) err("bullet requires ceiling and floor"_hs);
-      } else if (c.entity == "player"_hs) {
-        if (c.wall) err("player cannot be placed on walls"_hs);
-        if (!c.floor) err("player requires ceiling and floor"_hs);
-      } else if (c.entity == "door"_hs) {
-        if (c.wall) err("door cannot be placed on walls"_hs);
-        if (!c.floor) err("door requires ceiling and floor"_hs);
-        if (c.rotate != 0 && c.rotate != 90) err("door can only be rotated 0 or 90 degrees"_hs);
-      } else if (c.entity.size()) {
-        err("invalid entity named "_hs + c.entity);
-      } else {
-        if (c.rotate) err("tiles can't be rotated yet"_hs);
-        if (c.wall) err("tiles can't have a wall"_hs);
-        if (!c.floor) err("tile should have both ceiling and floor"_hs);
+      switch (c.entity) {
+        case entities::PUSHWALL:
+          if (c.rotate) err("pushwalls can't be rotated yet"_hs);
+          if (!c.wall || !c.ceiling) err("pushwall must have all of wall, ceiling and floor"_hs);
+          break;
+        case entities::WALL:
+          if (c.rotate) err("walls can't be rotated yet"_hs);
+          if (!c.wall) err("wall must have a wall attribute"_hs);
+          if (c.floor) err("wall cannot have floor or ceiling"_hs);
+          break;
+        case entities::BULLET:
+          if (c.rotate) err("bullets can't be rotated yet"_hs);
+          if (c.wall) err("bullet cannot be placed on walls"_hs);
+          if (!c.floor) err("bullet requires ceiling and floor"_hs);
+        case entities::PLAYER:
+          if (c.wall) err("player cannot be placed on walls"_hs);
+          if (!c.floor) err("player requires ceiling and floor"_hs);
+          break;
+        case entities::DOOR:
+          if (c.wall) err("door cannot be placed on walls"_hs);
+          if (!c.floor) err("door requires ceiling and floor"_hs);
+          if (c.rotate != 0 && c.rotate != 90) err("door can only be rotated 0 or 90 degrees"_hs);
+          break;
+        case entities::NONE:
+          if (c.rotate) err("tiles can't be rotated yet"_hs);
+          if (c.wall) err("tiles can't have a wall"_hs);
+          if (!c.floor) err("tile should have both ceiling and floor"_hs);
+          break;
       }
     }
   };

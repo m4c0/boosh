@@ -131,12 +131,25 @@ struct : public vapp {
         auto w = walls.map();
         map.for_each([&](auto x, auto y, auto & d) {
           // TODO: fix inverted camera Y
-          if (*d.entity == "player") g_upc.cam = { x + 0.5f, -0.5f, y + 0.5f };
-          if (*d.entity == "bullet") bullet::add({ x + 0.5f, 0.0f, y + 0.5f });
-          if (*d.entity == "door") door::add({ x + 0.5f, 0.0f, y + 0.5f }, dotz::radians(d.rotate));
-
-          if (*d.entity == "pushwall") pushwall::add({ x, y }, w.count());
-          if (*d.entity == "wall") collision::bodies().add_aabb({ x, y }, { x + 1, y + 1 }, 'wall', 1);
+          switch (d.entity) {
+            case mapper::entities::PLAYER:
+              g_upc.cam = { x + 0.5f, -0.5f, y + 0.5f };
+              break;
+            case mapper::entities::BULLET:
+              bullet::add({ x + 0.5f, 0.0f, y + 0.5f });
+              break;
+            case mapper::entities::DOOR:
+              door::add({ x + 0.5f, 0.0f, y + 0.5f }, dotz::radians(d.rotate));
+              break;
+            case mapper::entities::PUSHWALL:
+              pushwall::add({ x, y }, w.count());
+              break;
+            case mapper::entities::WALL:
+              collision::bodies().add_aabb({ x, y }, { x + 1, y + 1 }, 'wall', 1);
+              break;
+            case mapper::entities::NONE:
+              break;
+          }
 
           if (d.wall)    w += { { x, 0, y }, d.wall    - 1 };
           if (d.floor)   f += { { x, 0, y }, d.floor   - 1 };
