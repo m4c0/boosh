@@ -10,6 +10,7 @@ namespace faces {
   struct vtx {
     dotz::vec3 pos;
     dotz::vec2 uv;
+    dotz::vec3 nrm;
   };
   struct inst {
     dotz::vec3 pos;
@@ -26,6 +27,7 @@ namespace faces {
     return decltype(vee::gr_pipeline_params::attributes) {
       vee::vertex_attribute_vec3(0, traits::offset_of(&vtx::pos)),
       vee::vertex_attribute_vec2(0, traits::offset_of(&vtx::uv)),
+      vee::vertex_attribute_vec3(0, traits::offset_of(&vtx::nrm)),
       vee::vertex_attribute_vec3(1, traits::offset_of(&inst::pos)),
       vee::vertex_attribute_uint(1, traits::offset_of(&inst::txt)),
     };
