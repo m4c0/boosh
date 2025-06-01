@@ -32,8 +32,8 @@ namespace pushwall {
     i.movement = { x, y };
   }
 
-  export void tick(faces::wall & walls, float ms) {
-    auto w = walls.remap();
+  export void tick(faces::model & fcs, float ms) {
+    auto w = fcs.remap_walls();
     for (auto i = 0; i < list.size(); i++) {
       auto & it = list[i];
       if (0 == dotz::length(it.movement)) continue;

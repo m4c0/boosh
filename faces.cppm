@@ -1,9 +1,10 @@
 export module faces;
 import dotz;
+import mapper;
 import traits;
 import v;
 
-export namespace faces {
+namespace faces {
   struct vtx {
     dotz::vec3 pos;
     dotz::vec2 uv;
@@ -124,6 +125,92 @@ export namespace faces {
       x_wall(m, 1, 0, 0);
       y_wall(m, 0, 0, 1);
       y_wall(m, 1, 1, 0);
+    }
+  };
+
+  struct upc {
+    dotz::vec3 cam {};
+    float angle {};
+  };
+
+  export class model {
+    static constexpr const auto dset_smps = 8;
+
+    faces::ceiling m_ceilings {};
+    faces::floor   m_floors   {};
+    faces::wall    m_walls    {};
+
+    // TODO: refactor to use v::x
+    vee::descriptor_set_layout m_dsl;
+    vee::pipeline_layout m_pl;
+    vee::gr_pipeline m_gp;
+
+    vee::descriptor_pool m_dpool = vee::create_descriptor_pool(2, { vee::combined_image_sampler(dset_smps + 1) });
+    vee::descriptor_set m_dset = vee::allocate_descriptor_set(*m_dpool, *m_dsl);
+
+    hai::array<voo::h2l_image> m_imgs;
+
+  public:
+    explicit model(voo::device_and_queue & dq, vee::image_view::type lightmap, const auto & textures)
+      : m_dsl { vee::create_descriptor_set_layout({
+        vee::dsl_fragment_sampler(dset_smps),
+        vee::dsl_fragment_sampler(),
+      }) }
+      , m_pl { vee::create_pipeline_layout(*m_dsl, vee::vertex_push_constant_range<upc>()) }
+      , m_gp { vee::create_graphics_pipeline({
+        .pipeline_layout = *m_pl,
+        .render_pass = dq.render_pass(),
+        .shaders {
+          voo::shader("poc.vert.spv").pipeline_vert_stage("main", vee::specialisation_info<float>(dq.aspect_of())),
+          voo::shader("poc.frag.spv").pipeline_frag_stage(),
+        },
+        .bindings   = bindings(),
+        .attributes = attributes(),
+      }) }
+    , m_imgs { textures.size() }
+    {
+      hai::array<vee::image_view::type> ivs { dset_smps };
+      for (auto i = 0; i < m_imgs.size(); i++) {
+        m_imgs[i] = voo::load_sires_image(*textures[i], dq.physical_device());
+        ivs[i] = m_imgs[i].iv();
+      }
+      // TODO: avoid hack with specialisation constants
+      for (auto i = m_imgs.size(); i < dset_smps; i++) {
+        ivs[i] = m_imgs[0].iv();
+      }
+      vee::update_descriptor_set(m_dset, 0, ivs, *v::g->linear_sampler);
+      vee::update_descriptor_set(m_dset, 1, lightmap, *v::g->linear_sampler);
+    }
+
+    void load_map(const mapper::tilemap & map) {
+      auto c = m_ceilings.map();
+      auto f = m_floors.map();
+      auto w = m_walls.map();
+      map.for_each([&](auto x, auto y, auto & d) {
+        if (d.wall)    w += { { x, 0, y }, d.wall    - 1 };
+        if (d.floor)   f += { { x, 0, y }, d.floor   - 1 };
+        if (d.ceiling) c += { { x, 0, y }, d.ceiling - 1 };
+      });
+    }
+    [[nodiscard]] auto remap_walls() { return m_walls.remap(); }
+
+    void setup_copy(vee::command_buffer cb) {
+      m_ceilings.setup_copy(cb);
+      m_floors.setup_copy(cb);
+      m_walls.setup_copy(cb);
+      for (auto &i : m_imgs) i.setup_copy(cb);
+    }
+
+    void draw(vee::command_buffer cb, dotz::vec3 cam, float angle) {
+      upc pc { cam, angle };
+
+      vee::cmd_push_vertex_constants(cb, *m_pl, &pc);
+      vee::cmd_bind_gr_pipeline(cb, *m_gp);
+      vee::cmd_bind_descriptor_set(cb, *m_pl, 0, m_dset);
+
+      m_ceilings.draw(cb);
+      m_floors.draw(cb);
+      m_walls.draw(cb);
     }
   };
 }

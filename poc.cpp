@@ -121,81 +121,40 @@ struct : public vapp {
       v::globals vg { dq.physical_device() };
       v::g = &vg;
 
-      faces::ceiling ceilings {};
-      faces::floor   floors   {};
-      faces::wall    walls    {};
-
-      {
-        auto c = ceilings.map();
-        auto f = floors.map();
-        auto w = walls.map();
-        map.for_each([&](auto x, auto y, auto & d) {
-          // TODO: fix inverted camera Y
-          switch (d.entity) {
-            case mapper::entities::PLAYER:
-              g_upc.cam = { x + 0.5f, -0.5f, y + 0.5f };
-              break;
-            case mapper::entities::BULLET:
-              bullet::add({ x + 0.5f, 0.0f, y + 0.5f });
-              break;
-            case mapper::entities::DOOR:
-              door::add({ x + 0.5f, 0.0f, y + 0.5f }, dotz::radians(d.rotate));
-              break;
-            case mapper::entities::PUSHWALL:
-              pushwall::add({ x, y }, w.count());
-              break;
-            case mapper::entities::WALL:
-              collision::bodies().add_aabb({ x, y }, { x + 1, y + 1 }, 'wall', 1);
-              break;
-            case mapper::entities::NONE:
-              break;
-          }
-
-          if (d.wall)    w += { { x, 0, y }, d.wall    - 1 };
-          if (d.floor)   f += { { x, 0, y }, d.floor   - 1 };
-          if (d.ceiling) c += { { x, 0, y }, d.ceiling - 1 };
-        });
-      }
+      auto wcount = 0;
+      map.for_each([&](auto x, auto y, auto & d) {
+        // TODO: fix inverted camera Y
+        switch (d.entity) {
+          case mapper::entities::PLAYER:
+            g_upc.cam = { x + 0.5f, -0.5f, y + 0.5f };
+            break;
+          case mapper::entities::BULLET:
+            bullet::add({ x + 0.5f, 0.0f, y + 0.5f });
+            break;
+          case mapper::entities::DOOR:
+            door::add({ x + 0.5f, 0.0f, y + 0.5f }, dotz::radians(d.rotate));
+            break;
+          case mapper::entities::PUSHWALL:
+            pushwall::add({ x, y }, wcount);
+            break;
+          case mapper::entities::WALL:
+            collision::bodies().add_aabb({ x, y }, { x + 1, y + 1 }, 'wall', 1);
+            break;
+          case mapper::entities::NONE:
+            break;
+        }
+        if (d.wall) wcount++;
+      });
 
       lightmap::pipeline lgm { &map };
 
-      bullet::model  blt  { dq, lgm.output_iv() };
-      door::model    dr   { dq, lgm.output_iv() };
-      hand::model    hnd  { dq, lgm.output_iv() };
-      overlay::model olay { dq, lgm.output_iv() };
+      faces::model   faces { dq, lgm.output_iv(), textures };
+      bullet::model  blt   { dq, lgm.output_iv() };
+      door::model    dr    { dq, lgm.output_iv() };
+      hand::model    hnd   { dq, lgm.output_iv() };
+      overlay::model olay  { dq, lgm.output_iv() };
 
-      // TODO: refactor to use v::x
-      // TODO: move to faces
-      auto dsl = vee::create_descriptor_set_layout({
-        vee::dsl_fragment_sampler(dset_smps),
-        vee::dsl_fragment_sampler(),
-      });
-      auto pl = vee::create_pipeline_layout(*dsl, vee::vertex_push_constant_range<upc>());
-      auto gp = vee::create_graphics_pipeline({
-        .pipeline_layout = *pl,
-        .render_pass = dq.render_pass(),
-        .shaders {
-          voo::shader("poc.vert.spv").pipeline_vert_stage("main", vee::specialisation_info<float>(dq.aspect_of())),
-          voo::shader("poc.frag.spv").pipeline_frag_stage(),
-        },
-        .bindings   = faces::bindings(),
-        .attributes = faces::attributes(),
-      });
-
-      auto dpool = vee::create_descriptor_pool(2, { vee::combined_image_sampler(dset_smps + 1) });
-      auto dset = vee::allocate_descriptor_set(*dpool, *dsl);
-
-      hai::array<voo::h2l_image> imgs { textures.size() };
-      hai::array<vee::image_view::type> ivs { dset_smps };
-      for (auto i = 0; i < imgs.size(); i++) {
-        imgs[i] = voo::load_sires_image(*textures[i], dq.physical_device());
-        ivs[i] = imgs[i].iv();
-      }
-      for (auto i = imgs.size(); i < dset_smps; i++) {
-        ivs[i] = imgs[0].iv();
-      }
-      vee::update_descriptor_set(dset, 0, ivs, *v::g->linear_sampler);
-      vee::update_descriptor_set(dset, 1, lgm.output_iv(), *v::g->linear_sampler);
+      faces.load_map(map); 
 
       input::on_button_down(input::buttons::ATTACK, hand::attack);
       input::on_button_down(input::buttons::USE,    process_use);
@@ -207,21 +166,18 @@ struct : public vapp {
         bool moved = update_camera(map, time.millis());
         process_collisions(cb, blt);
         // TODO: squish
-        pushwall::tick(walls, time.millis());
+        pushwall::tick(faces, time.millis());
         dr.tick(time.millis());
         hnd.tick(time.millis(), moved, g_upc.cam, g_upc.angle);
         time = {};
 
         if (!copied) {
-          ceilings.setup_copy(cb);
-          floors.setup_copy(cb);
           blt.setup_copy(cb);
           dr.setup_copy(cb);
-          for (auto &i : imgs) i.setup_copy(cb);
           copied = true;
         }
+        faces.setup_copy(cb);
         lgm.run(cb);
-        walls.setup_copy(cb);
         dr.copy_models(cb);
 
         voo::cmd_render_pass rp {{
@@ -232,13 +188,7 @@ struct : public vapp {
         }};
         vee::cmd_set_viewport(cb, sw.extent());
         vee::cmd_set_scissor(cb, sw.extent());
-        vee::cmd_push_vertex_constants(cb, *pl, &g_upc);
-        vee::cmd_bind_gr_pipeline(cb, *gp);
-        vee::cmd_bind_descriptor_set(cb, *pl, 0, dset);
-        ceilings.draw(cb);
-        floors.draw(cb);
-        walls.draw(cb);
-
+        faces.draw(cb, g_upc.cam, g_upc.angle);
         dr.draw(cb, g_upc.cam, g_upc.angle);
         blt.draw(cb, g_upc.cam, g_upc.angle);
 
