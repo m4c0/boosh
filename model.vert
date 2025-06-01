@@ -10,6 +10,7 @@ layout(location = 0) in vec4 mdl;
 layout(location = 1) in vec3 pos;
 layout(location = 2) in vec2 txt;
 layout(location = 3) in vec3 nrm;
+layout(location = 4) in vec4 i_txt;
 
 layout(location = 0) out vec2 f_uv;
 layout(location = 1) out vec3 f_pos;
@@ -28,5 +29,5 @@ void main() {
   mvp(cam, model, pos);
   f_uv = txt;
   f_pos = p.xyz;
-  f_txt = 0;
+  f_txt = i_txt;
 }
