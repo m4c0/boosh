@@ -177,7 +177,6 @@ namespace faces {
         m_imgs[i] = voo::load_sires_image(*textures[i], dq.physical_device());
         ivs[i] = m_imgs[i].iv();
       }
-      // TODO: avoid hack with specialisation constants
       for (auto i = m_imgs.size(); i < dset_smps; i++) {
         ivs[i] = m_imgs[0].iv();
       }
