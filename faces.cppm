@@ -156,8 +156,8 @@ namespace faces {
   public:
     explicit model(voo::device_and_queue & dq, vee::image_view::type lightmap, const auto & textures)
       : m_dsl { vee::create_descriptor_set_layout({
-        vee::dsl_fragment_sampler(dset_smps),
         vee::dsl_fragment_sampler(),
+        vee::dsl_fragment_sampler(textures.size()),
       }) }
       , m_pl { vee::create_pipeline_layout(*m_dsl, vee::vertex_push_constant_range<upc>()) }
       , m_gp { vee::create_graphics_pipeline({
@@ -165,23 +165,20 @@ namespace faces {
         .render_pass = dq.render_pass(),
         .shaders {
           voo::shader("faces.vert.spv").pipeline_vert_stage("main", vee::specialisation_info<float>(dq.aspect_of())),
-          voo::shader("faces.frag.spv").pipeline_frag_stage(),
+          voo::shader("faces.frag.spv").pipeline_frag_stage("main", vee::specialisation_info<unsigned>(99, textures.size())),
         },
         .bindings   = bindings(),
         .attributes = attributes(),
       }) }
     , m_imgs { textures.size() }
     {
-      hai::array<vee::image_view::type> ivs { dset_smps };
+      hai::array<vee::image_view::type> ivs { textures.size() };
       for (auto i = 0; i < m_imgs.size(); i++) {
         m_imgs[i] = voo::load_sires_image(*textures[i], dq.physical_device());
         ivs[i] = m_imgs[i].iv();
       }
-      for (auto i = m_imgs.size(); i < dset_smps; i++) {
-        ivs[i] = m_imgs[0].iv();
-      }
-      vee::update_descriptor_set(m_dset, 0, ivs, *v::g->linear_sampler);
-      vee::update_descriptor_set(m_dset, 1, lightmap, *v::g->linear_sampler);
+      vee::update_descriptor_set(m_dset, 0, lightmap, *v::g->linear_sampler);
+      vee::update_descriptor_set(m_dset, 1, ivs, *v::g->linear_sampler);
     }
 
     void load_map(const mapper::tilemap & map) {
