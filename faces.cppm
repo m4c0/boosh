@@ -1,3 +1,6 @@
+#pragma leco add_shader "faces.vert"
+#pragma leco add_shader "faces.frag"
+
 export module faces;
 import dotz;
 import mapper;
@@ -161,8 +164,8 @@ namespace faces {
         .pipeline_layout = *m_pl,
         .render_pass = dq.render_pass(),
         .shaders {
-          voo::shader("poc.vert.spv").pipeline_vert_stage("main", vee::specialisation_info<float>(dq.aspect_of())),
-          voo::shader("poc.frag.spv").pipeline_frag_stage(),
+          voo::shader("faces.vert.spv").pipeline_vert_stage("main", vee::specialisation_info<float>(dq.aspect_of())),
+          voo::shader("faces.frag.spv").pipeline_frag_stage(),
         },
         .bindings   = bindings(),
         .attributes = attributes(),

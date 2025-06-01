@@ -1,6 +1,4 @@
 #pragma leco app
-#pragma leco add_shader "poc.vert"
-#pragma leco add_shader "poc.frag"
 #pragma leco add_resource "Tiles040_1K-JPG_Color.jpg"
 #pragma leco add_resource "Tiles051_1K-JPG_Color.jpg"
 #pragma leco add_resource "Tiles101_1K-JPG_Color.jpg"
