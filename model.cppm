@@ -34,6 +34,7 @@ namespace model {
     struct mdl {
       dotz::vec3 pos;
       float rot;
+      unsigned txt;
     };
 
     virtual void load(voo::memiter<mdl> & m) = 0;
@@ -44,14 +45,15 @@ namespace model {
     batch(voo::device_and_queue & dq, vee::image_view::type lgm_iv, jute::view model, const char * txt)
       : m_ppl { &dq, lgm_iv, txt, "model", {
         .bindings {
-          vee::vertex_input_bind_per_instance(sizeof(mdl)),
           vee::vertex_input_bind(sizeof(vtx)),
+          vee::vertex_input_bind_per_instance(sizeof(mdl)),
         },
         .attributes {
-          vee::vertex_attribute_vec4(0, traits::offset_of(&mdl::pos)),
-          vee::vertex_attribute_vec3(1, traits::offset_of(&vtx::pos)),
-          vee::vertex_attribute_vec2(1, traits::offset_of(&vtx::txt)),
-          vee::vertex_attribute_vec3(1, traits::offset_of(&vtx::nrm)),
+          vee::vertex_attribute_vec3(0, traits::offset_of(&vtx::pos)),
+          vee::vertex_attribute_vec2(0, traits::offset_of(&vtx::txt)),
+          vee::vertex_attribute_vec3(0, traits::offset_of(&vtx::nrm)),
+          vee::vertex_attribute_vec4(1, traits::offset_of(&mdl::pos)),
+          vee::vertex_attribute_uint(1, traits::offset_of(&mdl::txt)),
         },
       }}
       , m_mdl { v::g->pd, max_models * sizeof(mdl) }
@@ -75,8 +77,8 @@ namespace model {
 
     void draw(vee::command_buffer cb, dotz::vec3 cam, float angle) {
       m_ppl.cmd_bind(cb, { cam, angle });
-      vee::cmd_bind_vertex_buffers(cb, 0, m_mdl.local_buffer());
-      vee::cmd_bind_vertex_buffers(cb, 1, m_buf.local_buffer());
+      vee::cmd_bind_vertex_buffers(cb, 0, m_buf.local_buffer());
+      vee::cmd_bind_vertex_buffers(cb, 1, m_mdl.local_buffer());
       vee::cmd_draw(cb, m_vcount, m_icount);
     }
   };
