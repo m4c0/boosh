@@ -14,6 +14,7 @@ namespace faces {
   };
   struct inst {
     dotz::vec3 pos;
+    float rot;
     unsigned txt;
   };
 
@@ -28,7 +29,7 @@ namespace faces {
       vee::vertex_attribute_vec3(0, traits::offset_of(&vtx::pos)),
       vee::vertex_attribute_vec2(0, traits::offset_of(&vtx::uv)),
       vee::vertex_attribute_vec3(0, traits::offset_of(&vtx::nrm)),
-      vee::vertex_attribute_vec3(1, traits::offset_of(&inst::pos)),
+      vee::vertex_attribute_vec4(1, traits::offset_of(&inst::pos)),
       vee::vertex_attribute_uint(1, traits::offset_of(&inst::txt)),
     };
   }
@@ -187,9 +188,9 @@ namespace faces {
       auto f = m_floors.map();
       auto w = m_walls.map();
       map.for_each([&](auto x, auto y, auto & d) {
-        if (d.wall)    w += { { x, 0, y }, d.wall    - 1 };
-        if (d.floor)   f += { { x, 0, y }, d.floor   - 1 };
-        if (d.ceiling) c += { { x, 0, y }, d.ceiling - 1 };
+        if (d.wall)    w += { { x, 0, y }, 0, d.wall    - 1 };
+        if (d.floor)   f += { { x, 0, y }, 0, d.floor   - 1 };
+        if (d.ceiling) c += { { x, 0, y }, 0, d.ceiling - 1 };
       });
     }
     [[nodiscard]] auto remap_walls() { return m_walls.remap(); }
