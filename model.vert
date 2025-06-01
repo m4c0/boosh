@@ -28,4 +28,5 @@ void main() {
   mvp(cam, model, pos);
   f_uv = txt;
   f_pos = p.xyz;
+  f_txt = 0;
 }

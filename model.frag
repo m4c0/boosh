@@ -1,7 +1,9 @@
 #version 450
 
-layout(set = 0, binding = 0) uniform sampler2D textures[1];
-layout(set = 0, binding = 1) uniform sampler2D lightmap;
+layout(constant_id = 99) const uint txt_count = 8;
+
+layout(set = 0, binding = 0) uniform sampler2D lightmap;
+layout(set = 0, binding = 1) uniform sampler2D textures[txt_count];
 
 layout(location = 0) in vec2 f_uv;
 layout(location = 1) in vec3 f_pos;

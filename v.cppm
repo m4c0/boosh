@@ -46,13 +46,13 @@ namespace v {
           .render_pass = dq->render_pass(),
           .shaders {
             voo::shader(*(jute::heap(shader) + ".vert.spv")).pipeline_vert_stage("main", vee::specialisation_info<float>(dq->aspect_of())),
-            voo::shader(*(jute::heap(shader) + ".frag.spv")).pipeline_frag_stage(),
+            voo::shader(*(jute::heap(shader) + ".frag.spv")).pipeline_frag_stage("main", vee::specialisation_info<unsigned>(99, 1)),
           },
         }))
       }
     {
-      vee::update_descriptor_set(m_ds, 0, m_txt.iv(), *v::g->linear_sampler);
-      vee::update_descriptor_set(m_ds, 1, lgm_iv, *v::g->linear_sampler);
+      vee::update_descriptor_set(m_ds, 0, lgm_iv, *v::g->linear_sampler);
+      vee::update_descriptor_set(m_ds, 1, m_txt.iv(), *v::g->linear_sampler);
       copy_image();
     }
 
