@@ -3,6 +3,7 @@ export import dotz;
 export import hai;
 export import jute;
 export import voo;
+import silog;
 import wagen;
 
 namespace v {
@@ -13,6 +14,16 @@ namespace v {
     vee::sampler nearest_sampler = vee::create_sampler(vee::nearest_sampler);
   };
   export globals * g;
+
+  export void check_max_dset(vee::physical_device pd, unsigned dset_smps) {
+    unsigned max_dset_imgs = vee::get_physical_device_properties(pd)
+      .limits
+      .maxDescriptorSetSampledImages;
+
+    silog::log(silog::info, "Max descriptor set sampled images: %u", max_dset_imgs);
+    if (max_dset_imgs < dset_smps)
+      silog::die("Expecting at least %d images sampled per descriptor set. Please notify the developer", dset_smps);
+  }
 
   export template<typename PC> class ppl_with_txt {
     voo::single_cb m_cb {};

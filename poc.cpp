@@ -109,12 +109,7 @@ struct : public vapp {
     auto [map, textures] = mapper::load(sires::real_path_name(map_name));
 
     main_loop("poc-voo", [&](auto & dq, auto & sw) {
-      unsigned max_dset_imgs = vee::get_physical_device_properties(dq.physical_device())
-        .limits
-        .maxDescriptorSetSampledImages;
-      silog::log(silog::info, "Max descriptor set sampled images: %u", max_dset_imgs);
-      if (max_dset_imgs < dset_smps)
-        silog::die("Expecting at least 8 images sampled per descriptor set. Please notify the developer");
+      v::check_max_dset(dq.physical_device(), dset_smps);
 
       v::globals vg { dq.physical_device() };
       v::g = &vg;
