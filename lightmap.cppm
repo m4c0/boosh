@@ -8,21 +8,27 @@ namespace lightmap {
   static constexpr const auto rgba_fmt = VK_FORMAT_R8G8B8A8_UNORM;
 
   class input : voo::h2l_image {
+    mapper::tilemap * m_map;
+
   public:
     explicit input(mapper::tilemap * map)
       : voo::h2l_image { v::g->pd, mapper::width, mapper::height, rgba_fmt }
-    {
+      , m_map { map }
+    {}
+
+    using voo::h2l_image::iv;
+
+    void setup_copy(vee::command_buffer cb) {
       struct pix { char lvl; char trns; char pad[2]; };
-      map->for_each([m = voo::memiter<pix>(host_memory())](auto x, auto y, auto tile) mutable {
+      m_map->for_each([m = voo::memiter<pix>(host_memory())](auto x, auto y, auto tile) mutable {
         m[y * mapper::width + x] = {
           .lvl  = static_cast<char>(tile.light),
           .trns = !tile.ceiling ? '\x00' : '\xFF',
         };
       });
-    }
 
-    using voo::h2l_image::iv;
-    using voo::h2l_image::setup_copy;
+      voo::h2l_image::setup_copy(cb);
+    }
   };
 
   class output : voo::offscreen::colour_buffer {
