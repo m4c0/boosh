@@ -141,11 +141,11 @@ struct : public vapp {
 
       lightmap::pipeline lgm { &map };
 
-      faces::model   faces { dq, lgm.output_iv(), textures };
-      bullet::model  blt   { dq, lgm.output_iv() };
-      door::model    dr    { dq, lgm.output_iv() };
-      hand::model    hnd   { dq, lgm.output_iv() };
-      overlay::model olay  { dq, lgm.output_iv() };
+      faces::model   faces { lgm.output_iv(), textures };
+      bullet::model  blt   { lgm.output_iv() };
+      door::model    dr    { lgm.output_iv() };
+      hand::model    hnd   { lgm.output_iv() };
+      overlay::model olay  { lgm.output_iv() };
 
       faces.load_map(map); 
 

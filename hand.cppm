@@ -150,9 +150,9 @@ namespace hand {
     hai::array<voo::host_buffer_for_image> m_imgs { images::MAX };
 
   public:
-    explicit model(voo::device_and_queue & dq, vee::image_view::type lgm_iv)
+    explicit model(vee::image_view::type lgm_iv)
       : m_quad { v::g->pd }
-      , m_ppl { &dq, lgm_iv, "hand.png", "hand", {
+      , m_ppl { lgm_iv, "hand.png", "hand", {
         .depth_test = false,
         .bindings { m_quad.vertex_input_bind() },
         .attributes { m_quad.vertex_attribute(0) },

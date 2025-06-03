@@ -12,12 +12,12 @@ namespace overlay {
     vee::gr_pipeline m_pipeline;
 
   public:
-    explicit model(voo::device_and_queue & dq, vee::image_view::type lgm_iv)
-      : m_quad { dq.physical_device() }
+    explicit model(vee::image_view::type lgm_iv)
+      : m_quad { v::g->pd }
       , m_pipeline {
         vee::create_graphics_pipeline({
           .pipeline_layout = *m_pl,
-          .render_pass = dq.render_pass(),
+          .render_pass = v::g->dq->render_pass(),
           .depth_test = false,
           .shaders {
             voo::shader("overlay.vert.spv").pipeline_vert_stage(),

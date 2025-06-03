@@ -42,8 +42,8 @@ namespace model {
     auto memiter() { return voo::memiter<mdl> { m_mdl.host_memory() }; }
 
   public:
-    batch(voo::device_and_queue & dq, vee::image_view::type lgm_iv, jute::view model, const char * txt)
-      : m_ppl { &dq, lgm_iv, txt, "model", {
+    batch(vee::image_view::type lgm_iv, jute::view model, const char * txt)
+      : m_ppl { lgm_iv, txt, "model", {
         .bindings {
           vee::vertex_input_bind(sizeof(vtx)),
           vee::vertex_input_bind_per_instance(sizeof(mdl)),
@@ -58,7 +58,7 @@ namespace model {
       }}
       , m_mdl { v::g->pd, max_models * sizeof(mdl) }
     {
-      auto [buf, count] = wavefront::load_model(dq.physical_device(), model);
+      auto [buf, count] = wavefront::load_model(v::g->pd, model);
       m_buf = traits::move(buf);
       m_vcount = count;
     }

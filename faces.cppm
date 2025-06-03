@@ -154,7 +154,7 @@ namespace faces {
     hai::array<voo::h2l_image> m_imgs;
 
   public:
-    explicit model(voo::device_and_queue & dq, vee::image_view::type lightmap, const auto & textures)
+    explicit model(vee::image_view::type lightmap, const auto & textures)
       : m_dsl { vee::create_descriptor_set_layout({
         vee::dsl_fragment_sampler(),
         vee::dsl_fragment_sampler(textures.size()),
@@ -162,9 +162,9 @@ namespace faces {
       , m_pl { vee::create_pipeline_layout(*m_dsl, vee::vertex_push_constant_range<upc>()) }
       , m_gp { vee::create_graphics_pipeline({
         .pipeline_layout = *m_pl,
-        .render_pass = dq.render_pass(),
+        .render_pass = v::g->dq->render_pass(),
         .shaders {
-          voo::shader("model.vert.spv").pipeline_vert_stage("main", vee::specialisation_info<float>(dq.aspect_of())),
+          voo::shader("model.vert.spv").pipeline_vert_stage("main", vee::specialisation_info<float>(v::g->dq->aspect_of())),
           voo::shader("model.frag.spv").pipeline_frag_stage("main", vee::specialisation_info<unsigned>(99, textures.size())),
         },
         .bindings   = bindings(),
@@ -174,7 +174,7 @@ namespace faces {
     {
       hai::array<vee::image_view::type> ivs { textures.size() };
       for (auto i = 0; i < m_imgs.size(); i++) {
-        m_imgs[i] = voo::load_sires_image(*textures[i], dq.physical_device());
+        m_imgs[i] = voo::load_sires_image(*textures[i], v::g->pd);
         ivs[i] = m_imgs[i].iv();
       }
       vee::update_descriptor_set(m_dset, 0, lightmap, *v::g->linear_sampler);

@@ -51,14 +51,14 @@ namespace v {
     }
 
   public:
-    ppl_with_txt(voo::device_and_queue * dq, vee::image_view::type lgm_iv, const char * txt, jute::view shader, const vee::gr_pipeline_params & p) 
+    ppl_with_txt(vee::image_view::type lgm_iv, const char * txt, jute::view shader, const vee::gr_pipeline_params & p) 
       : m_txt { voo::load_image_file(txt, v::g->pd) }
       , m_pipeline {
         vee::create_graphics_pipeline(merge(p, {
           .pipeline_layout = *m_pl,
-          .render_pass = dq->render_pass(),
+          .render_pass = v::g->dq->render_pass(),
           .shaders {
-            voo::shader(*(jute::heap(shader) + ".vert.spv")).pipeline_vert_stage("main", vee::specialisation_info<float>(dq->aspect_of())),
+            voo::shader(*(jute::heap(shader) + ".vert.spv")).pipeline_vert_stage("main", vee::specialisation_info<float>(v::g->dq->aspect_of())),
             voo::shader(*(jute::heap(shader) + ".frag.spv")).pipeline_frag_stage("main", vee::specialisation_info<unsigned>(99, 1)),
           },
         }))
