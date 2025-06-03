@@ -20,7 +20,8 @@ struct app : public vapp {
       v::g = &vg;
 
       auto [map, textures] = mapper::load(sires::real_path_name("example.map"));
-      lightmap::pipeline ppl { &map };
+      lightmap::pipeline ppl {};
+      ppl.load_map(&map);
 
       voo::single_frag_dset ds { 1 };
       vee::update_descriptor_set(ds.descriptor_set(), 0, ppl.output_iv(), *v::g->nearest_sampler);

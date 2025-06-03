@@ -139,7 +139,7 @@ struct : public vapp {
         if (d.wall) wcount++;
       });
 
-      lightmap::pipeline lgm { &map };
+      lightmap::pipeline lgm {};
 
       faces::model   faces { lgm.output_iv(), textures };
       bullet::model  blt   { lgm.output_iv() };
@@ -147,6 +147,7 @@ struct : public vapp {
       hand::model    hnd   { lgm.output_iv() };
       overlay::model olay  { lgm.output_iv() };
 
+      lgm.load_map(&map);
       faces.load_map(map); 
 
       input::on_button_down(input::buttons::ATTACK, hand::attack);

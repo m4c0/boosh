@@ -8,26 +8,22 @@ namespace lightmap {
   static constexpr const auto rgba_fmt = VK_FORMAT_R8G8B8A8_UNORM;
 
   class input : voo::h2l_image {
-    mapper::tilemap * m_map;
-
   public:
-    explicit input(mapper::tilemap * map)
+    explicit input()
       : voo::h2l_image { v::g->pd, mapper::width, mapper::height, rgba_fmt }
-      , m_map { map }
     {}
 
     using voo::h2l_image::iv;
+    using voo::h2l_image::setup_copy;
 
-    void setup_copy(vee::command_buffer cb) {
+    void load_map(const mapper::tilemap * map) {
       struct pix { char lvl; char trns; char pad[2]; };
-      m_map->for_each([m = voo::memiter<pix>(host_memory())](auto x, auto y, auto tile) mutable {
+      map->for_each([m = voo::memiter<pix>(host_memory())](auto x, auto y, auto tile) mutable {
         m[y * mapper::width + x] = {
           .lvl  = static_cast<char>(tile.light),
           .trns = !tile.ceiling ? '\x00' : '\xFF',
         };
       });
-
-      voo::h2l_image::setup_copy(cb);
     }
   };
 
@@ -114,18 +110,22 @@ namespace lightmap {
     });
 
     voo::one_quad m_quad { v::g->pd }; 
-    input m_input;
+    input m_input {};
     fbout m_fbout[2] {
       fbout { *m_rp, vee::allocate_descriptor_set(*m_dpool, *m_dsl) },
       fbout { *m_rp, vee::allocate_descriptor_set(*m_dpool, *m_dsl) },
     };
 
   public:
-    explicit pipeline(mapper::tilemap * map) : m_input { map } {
+    explicit pipeline() {
       vee::update_descriptor_set(m_ds, 0, m_input.iv(), *v::g->nearest_sampler);
     }
 
     [[nodiscard]] constexpr auto output_iv() const { return m_fbout[1].iv(); }
+
+    void load_map(const mapper::tilemap * map) {
+      m_input.load_map(map);
+    }
 
     void run(vee::command_buffer cb) {
       m_input.setup_copy(cb);
