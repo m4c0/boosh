@@ -12,7 +12,7 @@ namespace overlay {
     vee::gr_pipeline m_pipeline;
 
   public:
-    explicit model(vee::image_view::type lgm_iv)
+    explicit model()
       : m_quad { v::g->pd }
       , m_pipeline {
         vee::create_graphics_pipeline({

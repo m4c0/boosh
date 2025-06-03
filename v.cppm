@@ -14,6 +14,8 @@ namespace v {
 
     vee::sampler linear_sampler = vee::create_sampler(vee::linear_sampler);
     vee::sampler nearest_sampler = vee::create_sampler(vee::nearest_sampler);
+
+    vee::image_view::type lightmap;
   };
   export globals * g;
 
@@ -51,7 +53,7 @@ namespace v {
     }
 
   public:
-    ppl_with_txt(vee::image_view::type lgm_iv, const char * txt, jute::view shader, const vee::gr_pipeline_params & p) 
+    ppl_with_txt(const char * txt, jute::view shader, const vee::gr_pipeline_params & p) 
       : m_txt { voo::load_image_file(txt, v::g->pd) }
       , m_pipeline {
         vee::create_graphics_pipeline(merge(p, {
@@ -64,7 +66,7 @@ namespace v {
         }))
       }
     {
-      vee::update_descriptor_set(m_ds, 0, lgm_iv, *v::g->linear_sampler);
+      vee::update_descriptor_set(m_ds, 0, g->lightmap, *v::g->linear_sampler);
       vee::update_descriptor_set(m_ds, 1, m_txt.iv(), *v::g->linear_sampler);
       copy_image();
     }

@@ -140,12 +140,13 @@ struct : public vapp {
       });
 
       lightmap::pipeline lgm {};
+      v::g->lightmap = lgm.output_iv();
 
-      faces::model   faces { lgm.output_iv(), textures };
-      bullet::model  blt   { lgm.output_iv() };
-      door::model    dr    { lgm.output_iv() };
-      hand::model    hnd   { lgm.output_iv() };
-      overlay::model olay  { lgm.output_iv() };
+      faces::model   faces { textures };
+      bullet::model  blt   {};
+      door::model    dr    {};
+      hand::model    hnd   {};
+      overlay::model olay  {};
 
       lgm.load_map(&map);
       faces.load_map(map); 

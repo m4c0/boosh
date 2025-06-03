@@ -46,8 +46,8 @@ namespace door {
     }
 
   public:
-    explicit model(vee::image_view::type lgm_iv)
-      : batch { lgm_iv, "door.obj", "door.uv.png" }
+    explicit model()
+      : batch { "door.obj", "door.uv.png" }
     {}
 
     void tick(float ms) {

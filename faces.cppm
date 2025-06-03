@@ -154,7 +154,7 @@ namespace faces {
     hai::array<voo::h2l_image> m_imgs;
 
   public:
-    explicit model(vee::image_view::type lightmap, const auto & textures)
+    explicit model(const auto & textures)
       : m_dsl { vee::create_descriptor_set_layout({
         vee::dsl_fragment_sampler(),
         vee::dsl_fragment_sampler(textures.size()),
@@ -177,7 +177,7 @@ namespace faces {
         m_imgs[i] = voo::load_sires_image(*textures[i], v::g->pd);
         ivs[i] = m_imgs[i].iv();
       }
-      vee::update_descriptor_set(m_dset, 0, lightmap, *v::g->linear_sampler);
+      vee::update_descriptor_set(m_dset, 0, v::g->lightmap, *v::g->linear_sampler);
       vee::update_descriptor_set(m_dset, 1, ivs, *v::g->linear_sampler);
     }
 

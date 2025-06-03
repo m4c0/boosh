@@ -29,8 +29,8 @@ namespace bullet {
     }
 
   public:
-    explicit model(vee::image_view::type lgm_iv)
-      : batch { lgm_iv, "bullet.obj", "bullet.uv.png" }
+    explicit model()
+      : batch { "bullet.obj", "bullet.uv.png" }
     {}
   };
 }
