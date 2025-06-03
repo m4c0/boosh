@@ -35,16 +35,11 @@ static constexpr const auto max_use_dist = 1.0f;
 
 static constexpr const auto dset_smps = 8;
 
-struct upc {
-  dotz::vec3 cam {};
-  float angle {};
-} g_upc {};
-
 dotz::vec4 g_olay {};
 
 static bool update_camera(const mapper::tilemap & map, float ms) {
   float da = -input::state(input::axis::TURN) * turn_speed * ms / 1000.0;
-  g_upc.angle = dotz::mod(360 + g_upc.angle + da, 360);
+  v::g->camera.angle = dotz::mod(360 + v::g->camera.angle + da, 360);
 
   dotz::vec2 dr {
     input::state(input::axis::STRAFE),
@@ -52,13 +47,13 @@ static bool update_camera(const mapper::tilemap & map, float ms) {
   };
   if (dotz::sq_length(dr) == 0) return false;
 
-  float a = dotz::radians(g_upc.angle);
+  float a = dotz::radians(v::g->camera.angle);
   float c = dotz::cos(a);
   float s = dotz::sin(a);
   auto d = dotz::normalise(dr);
 
   const auto walk = [&](auto dx, auto dy) {
-    auto cam = g_upc.cam;
+    auto cam = v::g->camera.cam;
     cam.x -= dx * walk_speed * ms / 1000.0;
     cam.z += dy * walk_speed * ms / 1000.0;
 
@@ -67,7 +62,7 @@ static bool update_camera(const mapper::tilemap & map, float ms) {
       return false;
     }
 
-    g_upc.cam = cam;
+    v::g->camera.cam = cam;
     return true;
   };
 
@@ -77,7 +72,7 @@ static bool update_camera(const mapper::tilemap & map, float ms) {
 }
 
 static void process_collisions(auto cb, auto & blt) {
-  auto cam = g_upc.cam;
+  auto cam = v::g->camera.cam;
   auto item = collision::entities().closest({ cam.x, cam.z }, player_radius);
   switch (item.owner) {
     case bullet::clid:
@@ -90,8 +85,8 @@ static void process_collisions(auto cb, auto & blt) {
 }
 
 static void process_use() {
-  auto cam = g_upc.cam.xz();
-  auto angle = dotz::radians(g_upc.angle);
+  auto cam = v::g->camera.cam.xz();
+  auto angle = dotz::radians(v::g->camera.angle);
   auto c = collision::entities().hitscan(cam, angle, max_use_dist);
   switch (c.item.owner) {
     case door::clid:
@@ -119,7 +114,7 @@ struct : public vapp {
         // TODO: fix inverted camera Y
         switch (d.entity) {
           case mapper::entities::PLAYER:
-            g_upc.cam = { x + 0.5f, -0.5f, y + 0.5f };
+            v::g->camera.cam = { x + 0.5f, -0.5f, y + 0.5f };
             break;
           case mapper::entities::BULLET:
             bullet::add({ x + 0.5f, 0.0f, y + 0.5f });
@@ -163,7 +158,7 @@ struct : public vapp {
         // TODO: squish
         pushwall::tick(faces, time.millis());
         dr.tick(time.millis());
-        hnd.tick(time.millis(), moved, g_upc.cam, g_upc.angle);
+        hnd.tick(time.millis(), moved);
         time = {};
 
         if (!copied) {
@@ -183,9 +178,9 @@ struct : public vapp {
         }};
         vee::cmd_set_viewport(cb, sw.extent());
         vee::cmd_set_scissor(cb, sw.extent());
-        faces.draw(cb, g_upc.cam, g_upc.angle);
-        dr.draw(cb, g_upc.cam, g_upc.angle);
-        blt.draw(cb, g_upc.cam, g_upc.angle);
+        faces.draw(cb);
+        dr.draw(cb);
+        blt.draw(cb);
 
         hnd.run(cb);
         olay.run(cb, g_olay);

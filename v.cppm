@@ -7,6 +7,11 @@ import silog;
 import wagen;
 
 namespace v {
+  export struct camera {
+    dotz::vec3 cam {};
+    float angle {};
+  };
+
   export struct globals {
     voo::device_and_queue * dq;
 
@@ -16,6 +21,8 @@ namespace v {
     vee::sampler nearest_sampler = vee::create_sampler(vee::nearest_sampler);
 
     vee::image_view::type lightmap;
+
+    camera camera {};
   };
   export globals * g;
 

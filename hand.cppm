@@ -163,9 +163,9 @@ namespace hand {
       }
     }
 
-    void tick(float ms, bool moved, dotz::vec3 cam, float rot) {
-      m_pc.cam = cam.xz();
-      m_pc.cam_rot = dotz::radians(rot);
+    void tick(float ms, bool moved) {
+      m_pc.cam = v::g->camera.cam.xz();
+      m_pc.cam_rot = dotz::radians(v::g->camera.angle);
 
       if (stts::all[stt].tick(&m_pc, m_t, moved)) {
         m_t += ms;

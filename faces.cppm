@@ -131,11 +131,6 @@ namespace faces {
     }
   };
 
-  struct upc {
-    dotz::vec3 cam {};
-    float angle {};
-  };
-
   export class model {
     static constexpr const auto dset_smps = 8;
 
@@ -159,7 +154,7 @@ namespace faces {
         vee::dsl_fragment_sampler(),
         vee::dsl_fragment_sampler(textures.size()),
       }) }
-      , m_pl { vee::create_pipeline_layout(*m_dsl, vee::vertex_push_constant_range<upc>()) }
+      , m_pl { vee::create_pipeline_layout(*m_dsl, vee::vertex_push_constant_range<v::camera>()) }
       , m_gp { vee::create_graphics_pipeline({
         .pipeline_layout = *m_pl,
         .render_pass = v::g->dq->render_pass(),
@@ -200,10 +195,8 @@ namespace faces {
       for (auto &i : m_imgs) i.setup_copy(cb);
     }
 
-    void draw(vee::command_buffer cb, dotz::vec3 cam, float angle) {
-      upc pc { cam, angle };
-
-      vee::cmd_push_vertex_constants(cb, *m_pl, &pc);
+    void draw(vee::command_buffer cb) {
+      vee::cmd_push_vertex_constants(cb, *m_pl, &v::g->camera);
       vee::cmd_bind_gr_pipeline(cb, *m_gp);
       vee::cmd_bind_descriptor_set(cb, *m_pl, 0, m_dset);
 

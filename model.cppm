@@ -10,11 +10,6 @@ import wavefront;
 
 namespace model {
   export class batch {
-    struct upc {
-      dotz::vec3 cam;
-      float angle;
-    };
-
     // Copied from wavefront::vtx because clang explodes on windows otherwise
     struct vtx {
       dotz::vec3 pos;
@@ -24,7 +19,7 @@ namespace model {
 
     static constexpr const auto max_models = 128;
 
-    v::ppl_with_txt<upc> m_ppl;
+    v::ppl_with_txt<v::camera> m_ppl;
     voo::h2l_buffer m_buf;
     voo::h2l_buffer m_mdl;
     unsigned m_vcount;
@@ -75,8 +70,8 @@ namespace model {
       m_mdl.setup_copy(cb);
     }
 
-    void draw(vee::command_buffer cb, dotz::vec3 cam, float angle) {
-      m_ppl.cmd_bind(cb, { cam, angle });
+    void draw(vee::command_buffer cb) {
+      m_ppl.cmd_bind(cb, v::g->camera);
       vee::cmd_bind_vertex_buffers(cb, 0, m_buf.local_buffer());
       vee::cmd_bind_vertex_buffers(cb, 1, m_mdl.local_buffer());
       vee::cmd_draw(cb, m_vcount, m_icount);
