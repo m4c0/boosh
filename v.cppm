@@ -8,15 +8,17 @@ import wagen;
 
 namespace v {
   export struct globals {
-    vee::physical_device pd;
+    voo::device_and_queue * dq;
+
+    vee::physical_device pd = dq->physical_device();
 
     vee::sampler linear_sampler = vee::create_sampler(vee::linear_sampler);
     vee::sampler nearest_sampler = vee::create_sampler(vee::nearest_sampler);
   };
   export globals * g;
 
-  export void check_max_dset(vee::physical_device pd, unsigned dset_smps) {
-    unsigned max_dset_imgs = vee::get_physical_device_properties(pd)
+  export void check_max_dset(unsigned dset_smps) {
+    unsigned max_dset_imgs = vee::get_physical_device_properties(g->pd)
       .limits
       .maxDescriptorSetSampledImages;
 

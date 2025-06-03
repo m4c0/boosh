@@ -16,7 +16,7 @@ struct app : public vapp {
   }
   void run() override {
     main_loop("poc-lightmap", [&](auto & dq, auto & sw) {
-      v::globals vg { dq.physical_device() };
+      v::globals vg { &dq };
       v::g = &vg;
 
       auto [map, textures] = mapper::load(sires::real_path_name("example.map"));

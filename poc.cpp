@@ -109,10 +109,10 @@ struct : public vapp {
     auto [map, textures] = mapper::load(sires::real_path_name(map_name));
 
     main_loop("poc-voo", [&](auto & dq, auto & sw) {
-      v::check_max_dset(dq.physical_device(), dset_smps);
-
-      v::globals vg { dq.physical_device() };
+      v::globals vg { &dq };
       v::g = &vg;
+
+      v::check_max_dset(dset_smps);
 
       auto wcount = 0;
       map.for_each([&](auto x, auto y, auto & d) {
