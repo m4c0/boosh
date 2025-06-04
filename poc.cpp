@@ -109,6 +109,15 @@ struct : public vapp {
 
       v::check_max_dset(dset_smps);
 
+      lightmap::pipeline lgm {};
+      v::g->lightmap = lgm.output_iv();
+
+      faces::model   faces { textures };
+      bullet::model  blt   {};
+      door::model    dr    {};
+      hand::model    hnd   {};
+      overlay::model olay  {};
+
       auto wcount = 0;
       map.for_each([&](auto x, auto y, auto & d) {
         // TODO: fix inverted camera Y
@@ -133,15 +142,6 @@ struct : public vapp {
         }
         if (d.wall) wcount++;
       });
-
-      lightmap::pipeline lgm {};
-      v::g->lightmap = lgm.output_iv();
-
-      faces::model   faces { textures };
-      bullet::model  blt   {};
-      door::model    dr    {};
-      hand::model    hnd   {};
-      overlay::model olay  {};
 
       lgm.load_map(&map);
       faces.load_map(map); 
