@@ -5,6 +5,7 @@ import collision;
 import dotz;
 import hai;
 import model;
+import mapper;
 import voo;
 
 namespace bullet {
@@ -12,25 +13,32 @@ namespace bullet {
 
   static constexpr const auto radius = 0.2;
 
-  hai::varray<dotz::vec3> list { 128 };
-
-  export void add(dotz::vec3 p) { 
-    collision::entities().add_circle({ p.x, p.z }, radius, clid, list.size());
-    list.push_back(p);
-  }
-  export void remove(unsigned id) {
-    collision::entities().remove(clid, id);
-    list[id] = {};
-  }
-
   export class model : public ::model::batch {
+    hai::varray<dotz::vec3> m_list { 128 };
+
     void load(voo::memiter<mdl> & m) override {
-      for (auto p : list) m += { .pos = p };
+      for (auto p : m_list) m += { .pos = p };
     }
 
   public:
-    explicit model()
-      : batch { "bullet.obj", "bullet.uv.png" }
-    {}
+    explicit model() : batch { "bullet.obj", "bullet.uv.png" } {}
+
+    void remove(int id) {
+      collision::entities().remove(clid, id);
+      m_list[id] = 0;
+    }
+
+    void load_map(const mapper::tilemap * map) {
+      for (auto id = 0; id < m_list.size(); id++) remove(id);
+      m_list.truncate(0);
+
+      map->for_each([&](auto x, auto y, auto & d) {
+        if (d.entity != mapper::entities::BULLET) return;
+
+        dotz::vec3 p { x + 0.5f, 0.0f, y + 0.5f };
+        collision::entities().add_circle({ p.x, p.z }, radius, clid, m_list.size());
+        m_list.push_back(p);
+      });
+    }
   };
 }

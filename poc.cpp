@@ -76,9 +76,9 @@ static void process_collisions(auto cb, auto & blt) {
   auto item = collision::entities().closest({ cam.x, cam.z }, player_radius);
   switch (item.owner) {
     case bullet::clid:
-      bullet::remove(item.id);
-      g_olay = { 0.5f };
+      blt.remove(item.id);
       blt.setup_copy(cb);
+      g_olay = { 0.5f };
       break;
   }
   g_olay = g_olay * 0.9;
@@ -125,9 +125,6 @@ struct : public vapp {
           case mapper::entities::PLAYER:
             v::g->camera.cam = { x + 0.5f, -0.5f, y + 0.5f };
             break;
-          case mapper::entities::BULLET:
-            bullet::add({ x + 0.5f, 0.0f, y + 0.5f });
-            break;
           case mapper::entities::DOOR:
             door::add({ x + 0.5f, 0.0f, y + 0.5f }, dotz::radians(d.rotate));
             break;
@@ -137,6 +134,7 @@ struct : public vapp {
           case mapper::entities::WALL:
             collision::bodies().add_aabb({ x, y }, { x + 1, y + 1 }, 'wall', 1);
             break;
+          case mapper::entities::BULLET:
           case mapper::entities::NONE:
             break;
         }
@@ -145,6 +143,7 @@ struct : public vapp {
 
       lgm.load_map(&map);
       faces.load_map(map); 
+      blt.load_map(&map);
 
       input::on_button_down(input::buttons::ATTACK, hand::attack);
       input::on_button_down(input::buttons::USE,    process_use);
