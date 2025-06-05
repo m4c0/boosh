@@ -102,7 +102,8 @@ namespace mapper {
       switch (c.entity) {
         case entities::PUSHWALL:
           if (c.rotate) err("pushwalls can't be rotated yet"_hs);
-          if (!c.wall || !c.ceiling) err("pushwall must have all of wall, ceiling and floor"_hs);
+          if (c.wall) err("pushwall cannot have a wall attribute"_hs);
+          if (!c.ceiling) err("pushwall must have ceiling and floor"_hs);
           break;
         case entities::WALL:
           if (c.rotate) err("walls can't be rotated yet"_hs);

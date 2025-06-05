@@ -49,7 +49,6 @@ define |
 
 define *
   copy main_hall_fc
-  wall t100
   entity pushwall
 .
 

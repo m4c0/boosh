@@ -84,7 +84,7 @@ static void process_collisions(auto cb, auto & blt) {
   g_olay = g_olay * 0.9;
 }
 
-static void process_use(door::model * dr) {
+static void process_use(door::model * dr, pushwall::model * psh) {
   auto cam = v::g->camera.cam.xz();
   auto angle = dotz::radians(v::g->camera.angle);
   auto c = collision::entities().hitscan(cam, angle, max_use_dist);
@@ -93,7 +93,7 @@ static void process_use(door::model * dr) {
       dr->open(c.item.id);
       break;
     case pushwall::clid:
-      pushwall::push(cam, c.item.id);
+      psh->push(cam, c.item.id);
       break;
   }
 }
@@ -112,21 +112,18 @@ struct : public vapp {
       lightmap::pipeline lgm {};
       v::g->lightmap = lgm.output_iv();
 
-      faces::model   faces { textures };
-      bullet::model  blt   {};
-      door::model    dr    {};
-      hand::model    hnd   {};
-      overlay::model olay  {};
+      faces::model    faces { textures };
+      bullet::model   blt   {};
+      door::model     dr    {};
+      pushwall::model psh   {};
+      hand::model     hnd   {};
+      overlay::model  olay  {};
 
-      auto wcount = 0;
       map.for_each([&](auto x, auto y, auto & d) {
         // TODO: fix inverted camera Y
         switch (d.entity) {
           case mapper::entities::PLAYER:
             v::g->camera.cam = { x + 0.5f, -0.5f, y + 0.5f };
-            break;
-          case mapper::entities::PUSHWALL:
-            pushwall::add({ x, y }, wcount);
             break;
           case mapper::entities::WALL:
             collision::bodies().add_aabb({ x, y }, { x + 1, y + 1 }, 'wall', 1);
@@ -134,19 +131,20 @@ struct : public vapp {
           case mapper::entities::BULLET:
           case mapper::entities::DOOR:
           case mapper::entities::NONE:
+          case mapper::entities::PUSHWALL:
             break;
         }
-        if (d.wall) wcount++;
       });
 
       lgm.load_map(&map);
       faces.load_map(map); 
       blt.load_map(&map);
       dr.load_map(&map);
+      psh.load_map(&map);
 
       input::on_button_down(input::buttons::ATTACK, hand::attack);
       input::on_button_down(input::buttons::USE, [&] {
-        process_use(&dr);
+        process_use(&dr, &psh);
       });
 
       sitime::stopwatch time {};
@@ -156,7 +154,7 @@ struct : public vapp {
         bool moved = update_camera(map, time.millis());
         process_collisions(cb, blt);
         // TODO: squish
-        pushwall::tick(faces, time.millis());
+        psh.tick(time.millis());
         dr.tick(time.millis());
         hnd.tick(time.millis(), moved);
         time = {};
@@ -164,11 +162,13 @@ struct : public vapp {
         if (!copied) {
           blt.setup_copy(cb);
           dr.setup_copy(cb);
+          psh.setup_copy(cb);
           copied = true;
         }
         faces.setup_copy(cb);
         lgm.run(cb);
         dr.copy_models(cb);
+        psh.copy_models(cb);
 
         voo::cmd_render_pass rp {{
           .command_buffer = cb,
@@ -180,6 +180,7 @@ struct : public vapp {
         vee::cmd_set_scissor(cb, sw.extent());
         faces.draw(cb);
         dr.draw(cb);
+        psh.draw(cb);
         blt.draw(cb);
 
         hnd.run(cb);
