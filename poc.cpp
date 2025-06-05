@@ -84,13 +84,13 @@ static void process_collisions(auto cb, auto & blt) {
   g_olay = g_olay * 0.9;
 }
 
-static void process_use() {
+static void process_use(door::model * dr) {
   auto cam = v::g->camera.cam.xz();
   auto angle = dotz::radians(v::g->camera.angle);
   auto c = collision::entities().hitscan(cam, angle, max_use_dist);
   switch (c.item.owner) {
     case door::clid:
-      door::open(c.item.id);
+      dr->open(c.item.id);
       break;
     case pushwall::clid:
       pushwall::push(cam, c.item.id);
@@ -125,9 +125,6 @@ struct : public vapp {
           case mapper::entities::PLAYER:
             v::g->camera.cam = { x + 0.5f, -0.5f, y + 0.5f };
             break;
-          case mapper::entities::DOOR:
-            door::add({ x + 0.5f, 0.0f, y + 0.5f }, dotz::radians(d.rotate));
-            break;
           case mapper::entities::PUSHWALL:
             pushwall::add({ x, y }, wcount);
             break;
@@ -135,6 +132,7 @@ struct : public vapp {
             collision::bodies().add_aabb({ x, y }, { x + 1, y + 1 }, 'wall', 1);
             break;
           case mapper::entities::BULLET:
+          case mapper::entities::DOOR:
           case mapper::entities::NONE:
             break;
         }
@@ -144,9 +142,12 @@ struct : public vapp {
       lgm.load_map(&map);
       faces.load_map(map); 
       blt.load_map(&map);
+      dr.load_map(&map);
 
       input::on_button_down(input::buttons::ATTACK, hand::attack);
-      input::on_button_down(input::buttons::USE,    process_use);
+      input::on_button_down(input::buttons::USE, [&] {
+        process_use(&dr);
+      });
 
       sitime::stopwatch time {};
       bool copied = false;
