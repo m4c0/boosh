@@ -7,6 +7,7 @@
 #pragma leco add_resource "example.map"
 
 import bullet;
+import camera;
 import collision;
 import door;
 import faces;
@@ -27,49 +28,12 @@ using namespace jute::literals;
 
 static constexpr const jute::view map_name = "example.map";
 
-static constexpr const auto turn_speed = 180.0f;
-static constexpr const auto walk_speed = 5.0f;
-
 static constexpr const auto player_radius = 0.2f;
 static constexpr const auto max_use_dist = 1.0f;
 
 static constexpr const auto dset_smps = 8;
 
 dotz::vec4 g_olay {};
-
-static bool update_camera(const mapper::tilemap & map, float ms) {
-  float da = -input::state(input::axis::TURN) * turn_speed * ms / 1000.0;
-  v::g->camera.angle = dotz::mod(360 + v::g->camera.angle + da, 360);
-
-  dotz::vec2 dr {
-    input::state(input::axis::STRAFE),
-    input::state(input::axis::WALK)
-  };
-  if (dotz::sq_length(dr) == 0) return false;
-
-  float a = dotz::radians(v::g->camera.angle);
-  float c = dotz::cos(a);
-  float s = dotz::sin(a);
-  auto d = dotz::normalise(dr);
-
-  const auto walk = [&](auto dx, auto dy) {
-    auto cam = v::g->camera.cam;
-    cam.x -= dx * walk_speed * ms / 1000.0;
-    cam.z += dy * walk_speed * ms / 1000.0;
-
-    dotz::vec2 cxz { cam.x, cam.z };
-    if (collision::bodies().closest(cxz, player_radius).owner) {
-      return false;
-    }
-
-    v::g->camera.cam = cam;
-    return true;
-  };
-
-  auto dx = d.x * c - d.y * s;
-  auto dy = d.x * s + d.y * c;
-  return walk(dx, dy) || walk(dx, 0) || walk(0, dy);
-}
 
 static void process_collisions(auto cb, auto & blt) {
   auto cam = v::g->camera.cam;
@@ -119,17 +83,13 @@ struct : public vapp {
       hand::model     hnd   {};
       overlay::model  olay  {};
 
-      map.for_each([&](auto x, auto y, auto & d) {
-        // TODO: fix inverted camera Y
-        if (d.entity != mapper::entities::PLAYER) return;
-        v::g->camera.cam = { x + 0.5f, -0.5f, y + 0.5f };
-      });
-
       lgm.load_map(&map);
       faces.load_map(map); 
       blt.load_map(&map);
       dr.load_map(&map);
       psh.load_map(&map);
+
+      camera::load_map(&map);
 
       input::on_button_down(input::buttons::ATTACK, hand::attack);
       input::on_button_down(input::buttons::USE, [&] {
@@ -140,7 +100,7 @@ struct : public vapp {
       bool copied = false;
       ots_loop(dq, sw, [&](auto cb) {
         // TODO: add a frame time limit or time interpolation
-        bool moved = update_camera(map, time.millis());
+        bool moved = camera::update(map, time.millis());
         process_collisions(cb, blt);
         // TODO: squish
         psh.tick(time.millis());
