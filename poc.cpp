@@ -121,19 +121,8 @@ struct : public vapp {
 
       map.for_each([&](auto x, auto y, auto & d) {
         // TODO: fix inverted camera Y
-        switch (d.entity) {
-          case mapper::entities::PLAYER:
-            v::g->camera.cam = { x + 0.5f, -0.5f, y + 0.5f };
-            break;
-          case mapper::entities::WALL:
-            collision::bodies().add_aabb({ x, y }, { x + 1, y + 1 }, 'wall', 1);
-            break;
-          case mapper::entities::BULLET:
-          case mapper::entities::DOOR:
-          case mapper::entities::NONE:
-          case mapper::entities::PUSHWALL:
-            break;
-        }
+        if (d.entity != mapper::entities::PLAYER) return;
+        v::g->camera.cam = { x + 0.5f, -0.5f, y + 0.5f };
       });
 
       lgm.load_map(&map);

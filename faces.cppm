@@ -1,4 +1,5 @@
 export module faces;
+import collision;
 import dotz;
 import mapper;
 import traits;
@@ -181,6 +182,10 @@ namespace faces {
       auto f = m_floors.map();
       auto w = m_walls.map();
       map.for_each([&](auto x, auto y, auto & d) {
+        if (d.entity == mapper::entities::WALL) {
+          collision::bodies().add_aabb({ x, y }, { x + 1, y + 1 }, 'wall', 1);
+        }
+
         if (d.wall)    w += { { x, 0, y }, 0, d.wall    - 1 };
         if (d.floor)   f += { { x, 0, y }, 0, d.floor   - 1 };
         if (d.ceiling) c += { { x, 0, y }, 0, d.ceiling - 1 };
