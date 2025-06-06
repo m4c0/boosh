@@ -6,7 +6,7 @@ import hai;
 import faces;
 import mapper;
 import model;
-import voo;
+import v;
 
 namespace pushwall {
   export constexpr const auto clid = 'push';
@@ -29,9 +29,9 @@ namespace pushwall {
   public:
     explicit model() : batch { "pushwall.obj", "Tiles101_1K-JPG_Color.jpg" } {}
 
-    void push(dotz::vec2 from, unsigned id) {
+    void push(unsigned id) {
+      auto from = dotz::floor(v::g->camera.cam.xz());
       auto & i = m_list[id];
-      from = dotz::floor(from);
       float x = from.x < i.pos.x ? 1 : from.x > i.pos.x ? -1 : 0;
       float y = from.y < i.pos.y ? 1 : from.y > i.pos.y ? -1 : 0;
       i.movement = { x, y };

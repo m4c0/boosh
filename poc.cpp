@@ -57,7 +57,7 @@ static void process_use(door::model * dr, pushwall::model * psh) {
       dr->open(c.item.id);
       break;
     case pushwall::clid:
-      psh->push(cam, c.item.id);
+      psh->push(c.item.id);
       break;
   }
 }
