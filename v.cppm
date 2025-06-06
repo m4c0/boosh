@@ -7,6 +7,8 @@ import silog;
 import wagen;
 
 namespace v {
+  static constexpr const auto dset_smps = 8;
+
   export struct camera {
     dotz::vec3 cam {};
     float angle {};
@@ -23,18 +25,18 @@ namespace v {
     vee::image_view::type lightmap;
 
     camera camera {};
+
+    explicit globals(voo::device_and_queue * dq) : dq { dq } {
+      unsigned max_dset_imgs = vee::get_physical_device_properties(pd)
+        .limits
+        .maxDescriptorSetSampledImages;
+
+      silog::log(silog::info, "Max descriptor set sampled images: %u", max_dset_imgs);
+      if (max_dset_imgs < dset_smps)
+        silog::die("Expecting at least %d images sampled per descriptor set. Please notify the developer", dset_smps);
+    }
   };
   export globals * g;
-
-  export void check_max_dset(unsigned dset_smps) {
-    unsigned max_dset_imgs = vee::get_physical_device_properties(g->pd)
-      .limits
-      .maxDescriptorSetSampledImages;
-
-    silog::log(silog::info, "Max descriptor set sampled images: %u", max_dset_imgs);
-    if (max_dset_imgs < dset_smps)
-      silog::die("Expecting at least %d images sampled per descriptor set. Please notify the developer", dset_smps);
-  }
 
   export template<typename PC> class ppl_with_txt {
     voo::single_cb m_cb {};

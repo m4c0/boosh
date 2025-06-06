@@ -31,8 +31,6 @@ static constexpr const jute::view map_name = "example.map";
 static constexpr const auto player_radius = 0.2f;
 static constexpr const auto max_use_dist = 1.0f;
 
-static constexpr const auto dset_smps = 8;
-
 dotz::vec4 g_olay {};
 
 static void process_collisions(auto cb, auto & blt) {
@@ -70,8 +68,6 @@ struct : public vapp {
     main_loop("poc-voo", [&](auto & dq, auto & sw) {
       v::globals vg { &dq };
       v::g = &vg;
-
-      v::check_max_dset(dset_smps);
 
       lightmap::pipeline lgm {};
       v::g->lightmap = lgm.output_iv();
