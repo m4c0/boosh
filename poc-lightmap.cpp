@@ -22,11 +22,9 @@ struct app : public vapp {
       auto [map, textures] = mapper::load(sires::real_path_name("example.map"));
       lightmap::pipeline ppl {};
       ppl.load_map(&map);
+      ppl.activate();
 
-      voo::single_frag_dset ds { 1 };
-      vee::update_descriptor_set(ds.descriptor_set(), 0, ppl.output_iv(), *v::g->nearest_sampler);
-
-      auto pl = vee::create_pipeline_layout(ds.descriptor_set_layout());
+      auto pl = vee::create_pipeline_layout(v::g->lightmap.descriptor_set_layout());
       voo::one_quad_render oqr { "poc-lightmap", &dq, *pl };
       extent_loop(dq.queue(), sw, [&] {
         sw.queue_one_time_submit(dq.queue(), [&](auto pcb) {
@@ -35,7 +33,7 @@ struct app : public vapp {
           auto scb = sw.cmd_render_pass({ *pcb });
           vee::cmd_set_viewport(*pcb, sw.extent());
           vee::cmd_set_scissor(*pcb, sw.extent());
-          vee::cmd_bind_descriptor_set(*pcb, *pl, 0, ds.descriptor_set());
+          vee::cmd_bind_descriptor_set(*pcb, *pl, 0, v::g->lightmap.descriptor_set());
           oqr.run(*pcb);
         });
       });

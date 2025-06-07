@@ -70,7 +70,6 @@ struct : public vapp {
       v::g = &vg;
 
       lightmap::pipeline lgm {};
-      v::g->lightmap = lgm.output_iv();
 
       faces::model    faces { textures };
       bullet::model   blt   {};
@@ -84,6 +83,8 @@ struct : public vapp {
       blt.load_map(&map);
       dr.load_map(&map);
       psh.load_map(&map);
+
+      lgm.activate();
 
       camera::load_map(&map);
 

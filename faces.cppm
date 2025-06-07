@@ -144,18 +144,21 @@ namespace faces {
     vee::pipeline_layout m_pl;
     vee::gr_pipeline m_gp;
 
-    vee::descriptor_pool m_dpool = vee::create_descriptor_pool(2, { vee::combined_image_sampler(dset_smps + 1) });
+    vee::descriptor_pool m_dpool = vee::create_descriptor_pool(1, { vee::combined_image_sampler(dset_smps) });
     vee::descriptor_set m_dset = vee::allocate_descriptor_set(*m_dpool, *m_dsl);
 
     hai::array<voo::h2l_image> m_imgs;
 
   public:
     explicit model(const auto & textures)
-      : m_dsl { vee::create_descriptor_set_layout({
-        vee::dsl_fragment_sampler(),
-        vee::dsl_fragment_sampler(textures.size()),
+      : m_dsl { vee::create_descriptor_set_layout({ vee::dsl_fragment_sampler(textures.size()) }) }
+      , m_pl { vee::create_pipeline_layout({
+        .descriptor_set_layouts {{
+          v::g->lightmap.descriptor_set_layout(),
+          *m_dsl,
+        }},
+        .push_constant_ranges {{ vee::vertex_push_constant_range<v::camera>() }},
       }) }
-      , m_pl { vee::create_pipeline_layout(*m_dsl, vee::vertex_push_constant_range<v::camera>()) }
       , m_gp { vee::create_graphics_pipeline({
         .pipeline_layout = *m_pl,
         .render_pass = v::g->dq->render_pass(),
@@ -173,8 +176,7 @@ namespace faces {
         m_imgs[i] = voo::load_sires_image(*textures[i], v::g->pd);
         ivs[i] = m_imgs[i].iv();
       }
-      vee::update_descriptor_set(m_dset, 0, v::g->lightmap, *v::g->linear_sampler);
-      vee::update_descriptor_set(m_dset, 1, ivs, *v::g->linear_sampler);
+      vee::update_descriptor_set(m_dset, 0, ivs, *v::g->linear_sampler);
     }
 
     void load_map(const mapper::tilemap & map) {
@@ -203,7 +205,8 @@ namespace faces {
     void draw(vee::command_buffer cb) {
       vee::cmd_push_vertex_constants(cb, *m_pl, &v::g->camera);
       vee::cmd_bind_gr_pipeline(cb, *m_gp);
-      vee::cmd_bind_descriptor_set(cb, *m_pl, 0, m_dset);
+      vee::cmd_bind_descriptor_set(cb, *m_pl, 0, v::g->lightmap.descriptor_set());
+      vee::cmd_bind_descriptor_set(cb, *m_pl, 1, m_dset);
 
       m_ceilings.draw(cb);
       m_floors.draw(cb);

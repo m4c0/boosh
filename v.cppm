@@ -22,7 +22,7 @@ namespace v {
     vee::sampler linear_sampler = vee::create_sampler(vee::linear_sampler);
     vee::sampler nearest_sampler = vee::create_sampler(vee::nearest_sampler);
 
-    vee::image_view::type lightmap;
+    voo::single_frag_dset lightmap { 1 };
 
     camera camera {};
 
@@ -41,16 +41,14 @@ namespace v {
   export template<typename PC> class ppl_with_txt {
     voo::single_cb m_cb {};
 
-    vee::descriptor_set_layout m_dsl = vee::create_descriptor_set_layout({
-      vee::dsl_fragment_sampler(),
-      vee::dsl_fragment_sampler(),
+    voo::single_frag_dset m_dset { 1 };
+    vee::pipeline_layout m_pl = vee::create_pipeline_layout({
+      .descriptor_set_layouts {{
+        v::g->lightmap.descriptor_set_layout(),
+        m_dset.descriptor_set_layout(),
+      }},
+      .push_constant_ranges {{ vee::vertex_push_constant_range<PC>() }},
     });
-    vee::descriptor_pool m_dpool = vee::create_descriptor_pool(2, { vee::combined_image_sampler(2) });
-    vee::descriptor_set m_ds = vee::allocate_descriptor_set(*m_dpool, *m_dsl);;
-    vee::pipeline_layout m_pl = vee::create_pipeline_layout(
-      *m_dsl,
-      vee::vertex_push_constant_range<PC>()
-    );
     voo::h2l_image m_txt;
     vee::gr_pipeline m_pipeline;
 
@@ -75,8 +73,7 @@ namespace v {
         }))
       }
     {
-      vee::update_descriptor_set(m_ds, 0, g->lightmap, *v::g->linear_sampler);
-      vee::update_descriptor_set(m_ds, 1, m_txt.iv(), *v::g->linear_sampler);
+      vee::update_descriptor_set(m_dset.descriptor_set(), 0, m_txt.iv(), *v::g->linear_sampler);
       copy_image();
     }
 
@@ -94,7 +91,8 @@ namespace v {
     }
 
     void cmd_bind(vee::command_buffer cb, const PC & pc) {
-      vee::cmd_bind_descriptor_set(cb, *m_pl, 0, m_ds);
+      vee::cmd_bind_descriptor_set(cb, *m_pl, 0, v::g->lightmap.descriptor_set());
+      vee::cmd_bind_descriptor_set(cb, *m_pl, 1, m_dset.descriptor_set());
       vee::cmd_push_vertex_constants(cb, *m_pl, &pc);
       vee::cmd_bind_gr_pipeline(cb, *m_pipeline);
     }

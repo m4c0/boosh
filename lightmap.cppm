@@ -121,7 +121,9 @@ namespace lightmap {
       vee::update_descriptor_set(m_ds, 0, m_input.iv(), *v::g->nearest_sampler);
     }
 
-    [[nodiscard]] constexpr auto output_iv() const { return m_fbout[1].iv(); }
+    void activate() {
+      vee::update_descriptor_set(v::g->lightmap.descriptor_set(), 0, m_fbout[1].iv(), *v::g->linear_sampler);
+    }
 
     void load_map(const mapper::tilemap * map) {
       m_input.load_map(map);
