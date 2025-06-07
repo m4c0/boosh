@@ -83,10 +83,9 @@ struct : public vapp {
       blt.load_map(&map);
       dr.load_map(&map);
       psh.load_map(&map);
+      camera::load_map(&map);
 
       lgm.activate();
-
-      camera::load_map(&map);
 
       input::on_button_down(input::buttons::ATTACK, hand::attack);
       input::on_button_down(input::buttons::USE, [&] {

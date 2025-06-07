@@ -139,7 +139,6 @@ namespace faces {
     faces::floor   m_floors   {};
     faces::wall    m_walls    {};
 
-    // TODO: refactor to use v::x
     vee::descriptor_set_layout m_dsl;
     vee::pipeline_layout m_pl;
     vee::gr_pipeline m_gp;
