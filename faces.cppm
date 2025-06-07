@@ -146,11 +146,11 @@ namespace faces {
     vee::descriptor_pool m_dpool = vee::create_descriptor_pool(1, { vee::combined_image_sampler(dset_smps) });
     vee::descriptor_set m_dset = vee::allocate_descriptor_set(*m_dpool, *m_dsl);
 
-    hai::array<voo::h2l_image> m_imgs;
+    hai::array<voo::h2l_image> m_imgs { dset_smps };
 
   public:
     explicit model(const auto & textures)
-      : m_dsl { vee::create_descriptor_set_layout({ vee::dsl_fragment_sampler(textures.size()) }) }
+      : m_dsl { vee::create_descriptor_set_layout({ vee::dsl_fragment_sampler(dset_smps) }) }
       , m_pl { vee::create_pipeline_layout({
         .descriptor_set_layouts {{
           v::g->lightmap.descriptor_set_layout(),
@@ -163,17 +163,16 @@ namespace faces {
         .render_pass = v::g->dq->render_pass(),
         .shaders {
           voo::shader("model.vert.spv").pipeline_vert_stage("main", vee::specialisation_info<float>(v::g->dq->aspect_of())),
-          voo::shader("model.frag.spv").pipeline_frag_stage("main", vee::specialisation_info<unsigned>(99, textures.size())),
+          voo::shader("model.frag.spv").pipeline_frag_stage("main"),
         },
         .bindings   = bindings(),
         .attributes = attributes(),
       }) }
-    , m_imgs { textures.size() }
     {
       hai::array<vee::image_view::type> ivs { textures.size() };
       for (auto i = 0; i < m_imgs.size(); i++) {
-        m_imgs[i] = voo::load_sires_image(*textures[i], v::g->pd);
-        ivs[i] = m_imgs[i].iv();
+        if (i < textures.size()) m_imgs[i] = voo::load_sires_image(*textures[i], v::g->pd);
+        ivs[i] = m_imgs[i < textures.size() ? i : 0].iv();
       }
       vee::update_descriptor_set(m_dset, 0, ivs, *v::g->linear_sampler);
     }
@@ -198,7 +197,7 @@ namespace faces {
       m_ceilings.setup_copy(cb);
       m_floors.setup_copy(cb);
       m_walls.setup_copy(cb);
-      for (auto &i : m_imgs) i.setup_copy(cb);
+      for (auto &i : m_imgs) if (i.image()) i.setup_copy(cb);
     }
 
     void draw(vee::command_buffer cb) {
