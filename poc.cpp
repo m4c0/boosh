@@ -63,8 +63,6 @@ static void process_use(door::model * dr, pushwall::model * psh) {
 struct : public vapp {
   void run() try {
     input::setup();
-    auto [map, textures] = mapper::load(sires::real_path_name(map_name));
-
     main_loop("poc-voo", [&](auto & dq, auto & sw) {
       v::globals vg { &dq };
       v::g = &vg;
@@ -77,6 +75,8 @@ struct : public vapp {
       pushwall::model psh   {};
       hand::model     hnd   {};
       overlay::model  olay  {};
+
+      auto [map, textures] = mapper::load(sires::real_path_name(map_name));
 
       faces.load_textures(textures);
 
@@ -107,12 +107,12 @@ struct : public vapp {
         time = {};
 
         if (!copied) {
+          faces.setup_copy(cb);
           blt.setup_copy(cb);
           dr.setup_copy(cb);
           psh.setup_copy(cb);
           copied = true;
         }
-        faces.setup_copy(cb);
         lgm.run(cb);
         dr.copy_models(cb);
         psh.copy_models(cb);
