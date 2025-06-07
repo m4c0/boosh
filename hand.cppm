@@ -4,9 +4,7 @@
 #pragma leco add_shader "hand.frag"
 export module hand;
 import collision;
-import mtx;
 import silog;
-import sith;
 import v;
 
 namespace hand {

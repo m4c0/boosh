@@ -1,9 +1,6 @@
 #pragma leco add_shader "model.frag"
 #pragma leco add_shader "model.vert"
 export module model;
-import collision;
-import faces;
-import hai;
 import traits;
 import v;
 import wavefront;
