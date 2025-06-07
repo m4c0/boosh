@@ -1,6 +1,7 @@
 #pragma leco add_shader "model.frag"
 #pragma leco add_shader "model.vert"
 export module model;
+import ppl_with_txt;
 import traits;
 import v;
 import wavefront;
@@ -16,7 +17,7 @@ namespace model {
 
     static constexpr const auto max_models = 128;
 
-    v::ppl_with_txt<v::camera> m_ppl;
+    ppl_with_txt<v::camera> m_ppl;
     voo::h2l_buffer m_buf;
     voo::h2l_buffer m_mdl;
     unsigned m_vcount;

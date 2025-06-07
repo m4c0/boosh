@@ -4,6 +4,7 @@
 #pragma leco add_shader "hand.frag"
 export module hand;
 import collision;
+import ppl_with_txt;
 import silog;
 import v;
 
@@ -142,7 +143,7 @@ namespace hand {
   export class model {
     upc m_pc {};
     voo::one_quad m_quad;
-    v::ppl_with_txt<upc> m_ppl;
+    ppl_with_txt<upc> m_ppl;
     float m_t = 0;
 
     hai::array<voo::host_buffer_for_image> m_imgs { images::MAX };
