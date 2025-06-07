@@ -17,6 +17,7 @@ import lightmap;
 import mapper;
 import overlay;
 import pushwall;
+import shaders;
 import silog;
 import sires;
 import sitime;
@@ -131,6 +132,8 @@ struct : public vapp {
         hnd.run(cb);
         olay.run(cb);
       });
+
+      shaders::reset();
     });
   } catch (const mapper::error & e) {
     silog::die("%s", (*e.msg).cstr().begin());
