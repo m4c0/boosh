@@ -101,6 +101,7 @@ void input::setup() {
   handle(MOUSE_MOVE_REL, [] {
     g_mouse_rel_x = mouse_rel.x * 0.5;
   });
+
   cursor_visible = false;
   interrupt(IRQ_CURSOR);
 }
