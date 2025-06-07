@@ -31,19 +31,16 @@ static constexpr const jute::view map_name = "example.map";
 static constexpr const auto player_radius = 0.2f;
 static constexpr const auto max_use_dist = 1.0f;
 
-dotz::vec4 g_olay {};
-
-static void process_collisions(auto cb, auto & blt) {
+static void process_collisions(auto cb, bullet::model & blt, overlay::model & olay) {
   auto cam = v::g->camera.cam;
   auto item = collision::entities().closest({ cam.x, cam.z }, player_radius);
   switch (item.owner) {
     case bullet::clid:
       blt.remove(item.id);
       blt.setup_copy(cb);
-      g_olay = { 0.5f };
+      olay.set(0.5f);
       break;
   }
-  g_olay = g_olay * 0.9;
 }
 
 static void process_use(door::model * dr, pushwall::model * psh) {
@@ -99,11 +96,12 @@ struct : public vapp {
       ots_loop(dq, sw, [&](auto cb) {
         // TODO: add a frame time limit or time interpolation
         bool moved = camera::update(map, time.millis());
-        process_collisions(cb, blt);
+        process_collisions(cb, blt, olay);
         // TODO: squish
         psh.tick(time.millis());
         dr.tick(time.millis());
         hnd.tick(time.millis(), moved);
+        olay.tick(time.millis());
         time = {};
 
         if (!copied) {
@@ -131,7 +129,7 @@ struct : public vapp {
         blt.draw(cb);
 
         hnd.run(cb);
-        olay.run(cb, g_olay);
+        olay.run(cb);
       });
     });
   } catch (const mapper::error & e) {

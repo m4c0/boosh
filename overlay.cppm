@@ -11,6 +11,8 @@ namespace overlay {
     voo::one_quad m_quad;
     vee::gr_pipeline m_pipeline;
 
+    dotz::vec4 m_value {};
+
   public:
     explicit model()
       : m_quad { v::g->pd }
@@ -29,8 +31,15 @@ namespace overlay {
       }
     {}
 
-    void run(vee::command_buffer cb, dotz::vec4 olay) {
-      vee::cmd_push_fragment_constants(cb, *m_pl, &olay);
+    constexpr void set(dotz::vec4 v) { m_value = v; }
+
+    void tick(float millis) {
+      // TODO: make this dependent on time
+      m_value = m_value * 0.9;
+    }
+
+    void run(vee::command_buffer cb) {
+      vee::cmd_push_fragment_constants(cb, *m_pl, &m_value);
       vee::cmd_bind_gr_pipeline(cb, *m_pipeline);
       m_quad.run(cb, 0, 1);
     }
