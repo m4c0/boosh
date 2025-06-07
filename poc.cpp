@@ -71,12 +71,14 @@ struct : public vapp {
 
       lightmap::pipeline lgm {};
 
-      faces::model    faces { textures };
+      faces::model    faces {};
       bullet::model   blt   {};
       door::model     dr    {};
       pushwall::model psh   {};
       hand::model     hnd   {};
       overlay::model  olay  {};
+
+      faces.load_textures(textures);
 
       lgm.load_map(&map);
       faces.load_map(map); 

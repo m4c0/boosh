@@ -149,7 +149,7 @@ namespace faces {
     hai::array<voo::h2l_image> m_imgs { dset_smps };
 
   public:
-    explicit model(const auto & textures)
+    explicit model()
       : m_dsl { vee::create_descriptor_set_layout({ vee::dsl_fragment_sampler(dset_smps) }) }
       , m_pl { vee::create_pipeline_layout({
         .descriptor_set_layouts {{
@@ -168,8 +168,10 @@ namespace faces {
         .bindings   = bindings(),
         .attributes = attributes(),
       }) }
-    {
-      hai::array<vee::image_view::type> ivs { textures.size() };
+    {}
+
+    void load_textures(const auto & textures) {
+      hai::array<vee::image_view::type> ivs { m_imgs.size() };
       for (auto i = 0; i < m_imgs.size(); i++) {
         if (i < textures.size()) m_imgs[i] = voo::load_sires_image(*textures[i], v::g->pd);
         ivs[i] = m_imgs[i < textures.size() ? i : 0].iv();
