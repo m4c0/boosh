@@ -2,6 +2,7 @@
 #pragma leco add_shader "lightmap.frag"
 export module lightmap;
 import mapper;
+import shaders;
 import v;
 
 namespace lightmap {
@@ -102,8 +103,8 @@ namespace lightmap {
       .render_pass = *m_rp,
       .extent = output::extent,
       .shaders {
-        voo::shader("lightmap.vert.spv").pipeline_vert_stage(),
-        voo::shader("lightmap.frag.spv").pipeline_frag_stage(),
+        shaders::get("lightmap.vert.spv").pipeline_vert_stage(),
+        shaders::get("lightmap.frag.spv").pipeline_frag_stage(),
       },
       .bindings { voo::one_quad::vertex_input_bind() },
       .attributes { voo::one_quad::vertex_attribute(0) },

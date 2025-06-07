@@ -1,4 +1,5 @@
 export module ppl_with_txt;
+import shaders;
 import v;
 
 export template<typename PC> class ppl_with_txt {
@@ -30,8 +31,8 @@ public:
         .pipeline_layout = *m_pl,
         .render_pass = v::g->dq->render_pass(),
         .shaders {
-          voo::shader(*(jute::heap(shader) + ".vert.spv")).pipeline_vert_stage("main", vee::specialisation_info<float>(v::g->dq->aspect_of())),
-          voo::shader(*(jute::heap(shader) + ".frag.spv")).pipeline_frag_stage("main", vee::specialisation_info<unsigned>(99, 1)),
+          shaders::get(*(jute::heap(shader) + ".vert.spv")).pipeline_vert_stage("main", vee::specialisation_info<float>(v::g->dq->aspect_of())),
+          shaders::get(*(jute::heap(shader) + ".frag.spv")).pipeline_frag_stage("main", vee::specialisation_info<unsigned>(99, 1)),
         },
       }))
     }

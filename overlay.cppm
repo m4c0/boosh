@@ -1,6 +1,7 @@
 #pragma leco add_shader "overlay.vert"
 #pragma leco add_shader "overlay.frag"
 export module overlay;
+import shaders;
 import v;
 
 namespace overlay {
@@ -22,8 +23,8 @@ namespace overlay {
           .render_pass = v::g->dq->render_pass(),
           .depth_test = false,
           .shaders {
-            voo::shader("overlay.vert.spv").pipeline_vert_stage(),
-            voo::shader("overlay.frag.spv").pipeline_frag_stage(),
+            shaders::get("overlay.vert.spv").pipeline_vert_stage(),
+            shaders::get("overlay.frag.spv").pipeline_frag_stage(),
           },
           .bindings { m_quad.vertex_input_bind() },
           .attributes { m_quad.vertex_attribute(0) },

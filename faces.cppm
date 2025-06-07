@@ -2,6 +2,7 @@ export module faces;
 import collision;
 import dotz;
 import mapper;
+import shaders;
 import traits;
 import v;
 
@@ -162,8 +163,8 @@ namespace faces {
         .pipeline_layout = *m_pl,
         .render_pass = v::g->dq->render_pass(),
         .shaders {
-          voo::shader("model.vert.spv").pipeline_vert_stage("main", vee::specialisation_info<float>(v::g->dq->aspect_of())),
-          voo::shader("model.frag.spv").pipeline_frag_stage("main"),
+          shaders::get("model.vert.spv").pipeline_vert_stage("main", vee::specialisation_info<float>(v::g->dq->aspect_of())),
+          shaders::get("model.frag.spv").pipeline_frag_stage("main"),
         },
         .bindings   = bindings(),
         .attributes = attributes(),
