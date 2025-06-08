@@ -4,7 +4,10 @@ import textures;
 import v;
 
 export template<typename PC> class ppl_with_txt {
-  voo::single_frag_dset m_dset { 1 };
+  voo::single_dset m_dset { 
+    vee::dsl_fragment_samplers({ *v::g->linear_sampler }),
+    vee::combined_image_sampler(),
+  };
   vee::pipeline_layout m_pl = vee::create_pipeline_layout({
     .descriptor_set_layouts {{
       v::g->lightmap.descriptor_set_layout(),
@@ -39,7 +42,7 @@ public:
 
   void copy_image(jute::view txt) {
     textures::get(txt, [this](auto iv) {
-      vee::update_descriptor_set(m_dset.descriptor_set(), 0, iv, *v::g->linear_sampler);
+      vee::update_descriptor_set(m_dset.descriptor_set(), 0, iv);
     });
   }
 
