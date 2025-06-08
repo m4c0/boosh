@@ -20,7 +20,10 @@ namespace v {
     vee::sampler linear_sampler = vee::create_sampler(vee::linear_sampler);
     vee::sampler nearest_sampler = vee::create_sampler(vee::nearest_sampler);
 
-    voo::single_frag_dset lightmap { 1 };
+    voo::single_dset lightmap { 
+      vee::dsl_fragment_samplers({ *linear_sampler }),
+      vee::combined_image_sampler(),
+    };
 
     camera camera {};
 

@@ -123,7 +123,7 @@ namespace lightmap {
     }
 
     void activate() {
-      vee::update_descriptor_set(v::g->lightmap.descriptor_set(), 0, m_fbout[1].iv(), *v::g->linear_sampler);
+      vee::update_descriptor_set(v::g->lightmap.descriptor_set(), 0, m_fbout[1].iv());
     }
 
     void load_map(const mapper::tilemap * map) {
