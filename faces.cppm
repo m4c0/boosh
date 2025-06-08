@@ -178,10 +178,10 @@ namespace faces {
     {}
 
     void load_textures(const auto & textures) {
-      hai::array<vee::image_view::type> ivs { m_imgs.size() };
-      for (auto i = 0; i < m_imgs.size(); i++) {
-        if (i < textures.size()) m_imgs[i] = voo::load_sires_image(*textures[i], v::g->pd);
-        ivs[i] = m_imgs[i < textures.size() ? i : 0].iv();
+      hai::array<vee::image_view::type> ivs { textures.size() };
+      for (auto i = 0; i < textures.size(); i++) {
+        m_imgs[i] = voo::load_sires_image(*textures[i], v::g->pd);
+        ivs[i] = m_imgs[i].iv();
       }
       vee::update_descriptor_set(m_dset, 0, ivs);
     }
