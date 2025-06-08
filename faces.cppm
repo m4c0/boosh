@@ -149,9 +149,15 @@ namespace faces {
 
     hai::array<voo::h2l_image> m_imgs { dset_smps };
 
+    static constexpr const auto samplers() {
+      hai::array<vee::sampler::type> res { dset_smps };
+      for (auto & s : res) s = *v::g->linear_sampler;
+      return res;
+    }
+
   public:
     explicit model()
-      : m_dsl { vee::create_descriptor_set_layout({ vee::dsl_fragment_sampler(dset_smps) }) }
+      : m_dsl { vee::create_descriptor_set_layout({ vee::dsl_fragment_samplers(samplers()) }) }
       , m_pl { vee::create_pipeline_layout({
         .descriptor_set_layouts {{
           v::g->lightmap.descriptor_set_layout(),
@@ -177,7 +183,7 @@ namespace faces {
         if (i < textures.size()) m_imgs[i] = voo::load_sires_image(*textures[i], v::g->pd);
         ivs[i] = m_imgs[i < textures.size() ? i : 0].iv();
       }
-      vee::update_descriptor_set(m_dset, 0, ivs, *v::g->linear_sampler);
+      vee::update_descriptor_set(m_dset, 0, ivs);
     }
 
     void load_map(const mapper::tilemap & map) {
