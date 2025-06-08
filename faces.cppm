@@ -3,6 +3,7 @@ import collision;
 import dotz;
 import mapper;
 import shaders;
+import textures;
 import traits;
 import v;
 
@@ -147,8 +148,6 @@ namespace faces {
     vee::descriptor_pool m_dpool = vee::create_descriptor_pool(1, { vee::combined_image_sampler(dset_smps) });
     vee::descriptor_set m_dset = vee::allocate_descriptor_set(*m_dpool, *m_dsl);
 
-    hai::array<voo::h2l_image> m_imgs { dset_smps };
-
     static constexpr const auto samplers() {
       hai::array<vee::sampler::type> res { dset_smps };
       for (auto & s : res) s = *v::g->linear_sampler;
@@ -178,12 +177,11 @@ namespace faces {
     {}
 
     void load_textures(const auto & textures) {
-      hai::array<vee::image_view::type> ivs { textures.size() };
       for (auto i = 0; i < textures.size(); i++) {
-        m_imgs[i] = voo::load_sires_image(*textures[i], v::g->pd);
-        ivs[i] = m_imgs[i].iv();
+        textures::get(*textures[i], [this, i](auto iv) {
+          vee::update_descriptor_set(m_dset, 0, i, iv);
+        });
       }
-      vee::update_descriptor_set(m_dset, 0, ivs);
     }
 
     void load_map(const mapper::tilemap & map) {
@@ -206,7 +204,6 @@ namespace faces {
       m_ceilings.setup_copy(cb);
       m_floors.setup_copy(cb);
       m_walls.setup_copy(cb);
-      for (auto &i : m_imgs) if (i.image()) i.setup_copy(cb);
     }
 
     void draw(vee::command_buffer cb) {
