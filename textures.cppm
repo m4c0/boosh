@@ -10,7 +10,7 @@ namespace textures {
     return i;
   }
 
-  export void reset() {
+  export void dispose() {
     cache() = hashley::fin<voo::bound_image> { 107 };
   }
   export void get(jute::view name, hai::fn<void, vee::image_view::type> callback) {

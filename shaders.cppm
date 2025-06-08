@@ -10,7 +10,7 @@ namespace shaders {
     return i;
   }
 
-  export void reset() {
+  export void dispose() {
     cache() = hashley::fin<voo::shader> { 107 };
   }
   export auto & get(jute::view name) {

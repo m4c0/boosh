@@ -134,8 +134,8 @@ struct : public vapp {
         olay.run(cb);
       });
 
-      shaders::reset();
-      textures::reset();
+      shaders::dispose();
+      textures::dispose();
     });
   } catch (const mapper::error & e) {
     silog::die("%s", (*e.msg).cstr().begin());
