@@ -1,10 +1,9 @@
 export module ppl_with_txt;
 import shaders;
+import textures;
 import v;
 
 export template<typename PC> class ppl_with_txt {
-  voo::single_cb m_cb {};
-
   voo::single_frag_dset m_dset { 1 };
   vee::pipeline_layout m_pl = vee::create_pipeline_layout({
     .descriptor_set_layouts {{
@@ -13,7 +12,6 @@ export template<typename PC> class ppl_with_txt {
     }},
     .push_constant_ranges {{ vee::vertex_push_constant_range<PC>() }},
   });
-  voo::h2l_image m_txt;
   vee::gr_pipeline m_pipeline;
 
   static auto merge(vee::gr_pipeline_params into, const vee::gr_pipeline_params & from) {
@@ -24,9 +22,8 @@ export template<typename PC> class ppl_with_txt {
   }
 
 public:
-  ppl_with_txt(const char * txt, jute::view shader, const vee::gr_pipeline_params & p) 
-    : m_txt { voo::load_image_file(txt, v::g->pd) }
-    , m_pipeline {
+  ppl_with_txt(jute::view txt, jute::view shader, const vee::gr_pipeline_params & p) 
+    : m_pipeline {
       vee::create_graphics_pipeline(merge(p, {
         .pipeline_layout = *m_pl,
         .render_pass = v::g->dq->render_pass(),
@@ -37,21 +34,13 @@ public:
       }))
     }
   {
-    vee::update_descriptor_set(m_dset.descriptor_set(), 0, m_txt.iv(), *v::g->linear_sampler);
-    copy_image();
+    copy_image(txt);
   }
 
-  void copy_image() {
-    voo::cmd_buf_one_time_submit::build(m_cb.cb(), [&](auto cb) {
-      m_txt.setup_copy(cb);
+  void copy_image(jute::view txt) {
+    textures::get(txt, [this](auto iv) {
+      vee::update_descriptor_set(m_dset.descriptor_set(), 0, iv, *v::g->linear_sampler);
     });
-    voo::queue::instance()->queue_submit({ .command_buffer = m_cb.cb() });
-  }
-  void copy_image(const voo::host_buffer_for_image & img) {
-    voo::cmd_buf_one_time_submit::build(m_cb.cb(), [&](auto cb) {
-      img.setup_copy(cb, m_txt.image());
-    });
-    voo::queue::instance()->queue_submit({ .command_buffer = m_cb.cb() });
   }
 
   void cmd_bind(vee::command_buffer cb, const PC & pc) {

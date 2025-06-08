@@ -26,7 +26,7 @@ namespace hand::images {
   };
   struct t {
     e id;
-    const char * filename;
+    jute::view filename;
   };
   constexpr const t all[MAX] = {
     { NIL                      },
@@ -156,11 +156,7 @@ namespace hand {
         .bindings { m_quad.vertex_input_bind() },
         .attributes { m_quad.vertex_attribute(0) },
       }}
-    {
-      for (auto i = images::NIL + 1; i < images::MAX; i++) {
-        m_imgs[i] = voo::load_image_file_as_buffer(images::all[i].filename, v::g->pd);
-      }
-    }
+    {}
 
     void tick(float ms, bool moved) {
       m_pc.cam = v::g->camera.cam.xz();
@@ -175,7 +171,7 @@ namespace hand {
         stt = stts::all[stt].next;
 
         auto new_spr = stts::all[stt].spr;
-        if (new_spr != old_spr) m_ppl.copy_image(m_imgs[new_spr]);
+        if (new_spr != old_spr) m_ppl.copy_image(images::all[new_spr].filename);
       }
     }
 

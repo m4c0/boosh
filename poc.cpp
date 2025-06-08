@@ -21,6 +21,7 @@ import shaders;
 import silog;
 import sires;
 import sitime;
+import textures;
 import traits;
 import v;
 import vapp;
@@ -134,6 +135,7 @@ struct : public vapp {
       });
 
       shaders::reset();
+      textures::reset();
     });
   } catch (const mapper::error & e) {
     silog::die("%s", (*e.msg).cstr().begin());
