@@ -3,7 +3,6 @@ export module pushwall;
 import collision;
 import dotz;
 import hai;
-import faces;
 import mapper;
 import model;
 import v;
