@@ -38,8 +38,8 @@ namespace textures {
       }
 
       i.idx = m_next++;
-      voo::load_image(name, v::g->pd, v::g->dq->queue(), &i.img, [&i, cb=traits::move(callback)] mutable {
-        //vee::update_descriptor_set(m_dset.descriptor_set(), 0, i.idx, *i.img.iv);
+      voo::load_image(name, v::g->pd, v::g->dq->queue(), &i.img, [this, &i, cb=traits::move(callback)] mutable {
+        vee::update_descriptor_set(m_dset.descriptor_set(), 0, i.idx, *i.img.iv);
         cb(*i.img.iv);
       });
       return i.idx;
