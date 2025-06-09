@@ -5,13 +5,21 @@ import hashley;
 import v;
 
 namespace textures {
+  class cache_t {
+    hashley::fin<voo::bound_image> m_data { 107 };
+
+  public:
+    [[nodiscard]] constexpr auto & operator[](jute::view name) {
+      return m_data[name];
+    }
+  };
   auto & cache() {
-    static hashley::fin<voo::bound_image> i { 107 };
+    static cache_t i {};
     return i;
   }
 
   export void dispose() {
-    cache() = hashley::fin<voo::bound_image> { 107 };
+    cache() = {};
   }
   export void get(jute::view name, hai::fn<void, vee::image_view::type> callback) {
     auto & i = cache()[name];
