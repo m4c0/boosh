@@ -135,8 +135,6 @@ namespace faces {
   };
 
   export class model {
-    static constexpr const auto dset_smps = 8;
-
     faces::ceiling m_ceilings {};
     faces::floor   m_floors   {};
     faces::wall    m_walls    {};
@@ -145,11 +143,8 @@ namespace faces {
     vee::pipeline_layout m_pl;
     vee::gr_pipeline m_gp;
 
-    vee::descriptor_pool m_dpool = vee::create_descriptor_pool(1, { vee::combined_image_sampler(dset_smps) });
-    vee::descriptor_set m_dset = vee::allocate_descriptor_set(*m_dpool, *m_dsl);
-
     static constexpr const auto samplers() {
-      hai::array<vee::sampler::type> res { dset_smps };
+      hai::array<vee::sampler::type> res { textures::max_smps };
       for (auto & s : res) s = *v::g->linear_sampler;
       return res;
     }
@@ -176,14 +171,6 @@ namespace faces {
       }) }
     {}
 
-    void load_textures(const auto & textures) {
-      for (auto i = 0; i < textures.size(); i++) {
-        textures::get(*textures[i], [this, i](auto iv) {
-          vee::update_descriptor_set(m_dset, 0, i, iv);
-        });
-      }
-    }
-
     void load_map(const mapper::tilemap & map) {
       auto c = m_ceilings.map();
       auto f = m_floors.map();
@@ -193,9 +180,9 @@ namespace faces {
           collision::bodies().add_aabb({ x, y }, { x + 1, y + 1 }, 'wall', 1);
         }
 
-        if (d.wall)    w += { { x, 0, y }, 0, d.wall    - 1 };
-        if (d.floor)   f += { { x, 0, y }, 0, d.floor   - 1 };
-        if (d.ceiling) c += { { x, 0, y }, 0, d.ceiling - 1 };
+        if (d.wall.size())    w += { { x, 0, y }, 0, textures::get(*d.wall)    };
+        if (d.floor.size())   f += { { x, 0, y }, 0, textures::get(*d.floor)   };
+        if (d.ceiling.size()) c += { { x, 0, y }, 0, textures::get(*d.ceiling) };
       });
     }
     [[nodiscard]] auto remap_walls() { return m_walls.remap(); }
@@ -210,7 +197,7 @@ namespace faces {
       vee::cmd_push_vertex_constants(cb, *m_pl, &v::g->camera);
       vee::cmd_bind_gr_pipeline(cb, *m_gp);
       vee::cmd_bind_descriptor_set(cb, *m_pl, 0, v::g->lightmap.descriptor_set());
-      vee::cmd_bind_descriptor_set(cb, *m_pl, 1, m_dset);
+      vee::cmd_bind_descriptor_set(cb, *m_pl, 1, v::g->uber_set);
 
       m_ceilings.draw(cb);
       m_floors.draw(cb);

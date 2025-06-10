@@ -77,10 +77,8 @@ struct : public vapp {
 
       auto [map, textures] = mapper::load(sires::real_path_name(map_name));
 
-      faces.load_textures(textures);
-
       lgm.load_map(&map);
-      faces.load_map(map); 
+      faces.load_map(map);
       blt.load_map(&map);
       dr.load_map(&map);
       psh.load_map(&map);

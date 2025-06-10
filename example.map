@@ -1,18 +1,12 @@
 version 0
 
-texture t040  Tiles040_1K-JPG_Color.jpg
-texture t051  Tiles051_1K-JPG_Color.jpg
-texture t100  Tiles101_1K-JPG_Color.jpg
-texture t131  Tiles131_1K-JPG_Color.jpg
-texture t133d Tiles133D_1K-JPG_Color.jpg
-
 define main_hall_fc
-  floor t131
-  ceiling t133d
+  floor Tiles131_1K-JPG_Color.jpg
+  ceiling Tiles133D_1K-JPG_Color.jpg
 .
 
 define X
-  wall t040
+  wall Tiles040_1K-JPG_Color.jpg
   entity wall
 .
 define .

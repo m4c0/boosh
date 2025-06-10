@@ -24,6 +24,7 @@ namespace v {
       vee::dsl_fragment_samplers({ *linear_sampler }),
       vee::combined_image_sampler(),
     };
+    vee::descriptor_set uber_set;
 
     camera camera {};
 

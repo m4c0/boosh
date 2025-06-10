@@ -5,7 +5,8 @@ import hashley;
 import v;
 
 namespace textures {
-  static constexpr const auto max_smps = 16;
+  export constexpr const auto max_smps = 16;
+
   static auto samplers() {
     hai::array<vee::sampler::type> res { max_smps };
     for (auto & s : res) s = *v::g->linear_sampler;
@@ -26,6 +27,10 @@ namespace textures {
     unsigned m_next {};
 
   public:
+    cache_t() {
+      v::g->uber_set = m_dset.descriptor_set();
+    }
+
     [[nodiscard]] constexpr auto & operator[](jute::view name) {
       return m_data[name];
     }

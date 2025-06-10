@@ -17,7 +17,7 @@ namespace mapper {
     unsigned m_map_row = 1;
    
     textures m_txts {};
-    tiledefs m_tdefs { &m_txts };
+    tiledefs m_tdefs {};
     tilemap m_map {};
 
     void cmd_version(jute::view arg) {
