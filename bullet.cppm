@@ -6,6 +6,7 @@ import dotz;
 import hai;
 import model;
 import mapper;
+import textures;
 import voo;
 
 namespace bullet {
@@ -17,11 +18,12 @@ namespace bullet {
     hai::varray<dotz::vec3> m_list { 128 };
 
     void load(voo::memiter<mdl> & m) override {
-      for (auto p : m_list) m += { .pos = p };
+      auto txt = textures::get("bullet.uv.png");
+      for (auto p : m_list) m += { .pos = p, .txt = txt };
     }
 
   public:
-    explicit model() : batch { "bullet.obj", "bullet.uv.png" } {}
+    explicit model() : batch { "bullet.obj" } {}
 
     void remove(int id) {
       collision::entities().remove(clid, id);

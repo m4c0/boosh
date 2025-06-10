@@ -6,6 +6,7 @@ export module hand;
 import collision;
 import ppl_with_txt;
 import silog;
+import textures;
 import v;
 
 namespace hand {
@@ -14,6 +15,7 @@ namespace hand {
     dotz::vec2 size {};
     dotz::vec2 cam {};
     float cam_rot {};
+    unsigned txt {};
   };
 }
 
@@ -151,12 +153,14 @@ namespace hand {
   public:
     explicit model()
       : m_quad { v::g->pd }
-      , m_ppl { "hand.png", "hand", {
+      , m_ppl { "hand", {
         .depth_test = false,
         .bindings { m_quad.vertex_input_bind() },
         .attributes { m_quad.vertex_attribute(0) },
       }}
-    {}
+    {
+      m_pc.txt = textures::get("hand.png");
+    }
 
     void tick(float ms, bool moved) {
       m_pc.cam = v::g->camera.cam.xz();
@@ -171,7 +175,7 @@ namespace hand {
         stt = stts::all[stt].next;
 
         auto new_spr = stts::all[stt].spr;
-        if (new_spr != old_spr) m_ppl.copy_image(images::all[new_spr].filename);
+        if (new_spr != old_spr) m_pc.txt = textures::get(images::all[new_spr].filename);
       }
     }
 

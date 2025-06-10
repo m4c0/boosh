@@ -6,6 +6,7 @@ import dotz;
 import hai;
 import mapper;
 import model;
+import textures;
 import voo;
 
 namespace door {
@@ -25,11 +26,15 @@ namespace door {
     hai::varray<item> m_list { max };
 
     void load(voo::memiter<mdl> & m) override {
-      for (auto p : m_list) m += { .pos = p.pos, .rot = p.rot };
+      for (auto p : m_list) m += {
+        .pos = p.pos,
+        .rot = p.rot,
+        .txt = textures::get("door.uv.png"),
+      };
     }
 
   public:
-    explicit model() : batch { "door.obj", "door.uv.png" } {}
+    explicit model() : batch { "door.obj" } {}
 
     void open(unsigned id) {
       m_list[id].movement = 1;

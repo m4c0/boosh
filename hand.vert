@@ -6,6 +6,8 @@ layout(push_constant) uniform upc {
   vec2 pos;
   vec2 size;
   vec2 cam;
+  float cam_rot;
+  uint txt;
 };
 
 layout(location = 0) in vec2 position;
@@ -19,5 +21,5 @@ void main() {
   gl_Position = vec4(p, 0, 1);
   frag_coord = position;
   frag_cam = cam;
-  f_txt = 0;
+  f_txt = txt;
 }

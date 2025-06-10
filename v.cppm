@@ -12,6 +12,8 @@ namespace v {
     float angle {};
   };
 
+  export constexpr const auto uber_dset_smps = 16;
+
   export struct globals {
     voo::device_and_queue * dq;
 
@@ -24,7 +26,14 @@ namespace v {
       vee::dsl_fragment_samplers({ *linear_sampler }),
       vee::combined_image_sampler(),
     };
-    vee::descriptor_set uber_set;
+    voo::single_dset uber_set {
+      vee::dsl_fragment_samplers([this] {
+        hai::array<vee::sampler::type> res { uber_dset_smps };
+        for (auto & s : res) s = *linear_sampler;
+        return res;
+      }()),
+      vee::combined_image_sampler(uber_dset_smps),
+    };
 
     camera camera {};
 

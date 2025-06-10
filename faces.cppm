@@ -143,19 +143,12 @@ namespace faces {
     vee::pipeline_layout m_pl;
     vee::gr_pipeline m_gp;
 
-    static constexpr const auto samplers() {
-      hai::array<vee::sampler::type> res { textures::max_smps };
-      for (auto & s : res) s = *v::g->linear_sampler;
-      return res;
-    }
-
   public:
     explicit model()
-      : m_dsl { vee::create_descriptor_set_layout({ vee::dsl_fragment_samplers(samplers()) }) }
-      , m_pl { vee::create_pipeline_layout({
+      : m_pl { vee::create_pipeline_layout({
         .descriptor_set_layouts {{
           v::g->lightmap.descriptor_set_layout(),
-          *m_dsl,
+          v::g->uber_set.descriptor_set_layout(),
         }},
         .push_constant_ranges {{ vee::vertex_push_constant_range<v::camera>() }},
       }) }
@@ -197,7 +190,7 @@ namespace faces {
       vee::cmd_push_vertex_constants(cb, *m_pl, &v::g->camera);
       vee::cmd_bind_gr_pipeline(cb, *m_gp);
       vee::cmd_bind_descriptor_set(cb, *m_pl, 0, v::g->lightmap.descriptor_set());
-      vee::cmd_bind_descriptor_set(cb, *m_pl, 1, v::g->uber_set);
+      vee::cmd_bind_descriptor_set(cb, *m_pl, 1, v::g->uber_set.descriptor_set());
 
       m_ceilings.draw(cb);
       m_floors.draw(cb);

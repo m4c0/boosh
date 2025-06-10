@@ -5,6 +5,7 @@ import dotz;
 import hai;
 import mapper;
 import model;
+import textures;
 import v;
 
 namespace pushwall {
@@ -22,11 +23,15 @@ namespace pushwall {
     hai::varray<item> m_list { max };
 
     void load(voo::memiter<mdl> & m) override {
-      for (auto &p : m_list) m += { .pos = dotz::vec3 { p.pos.x + 0.5f, 0.0f, p.pos.y + 0.5f } };
+      auto txt = textures::get("Tiles101_1K-JPG_Color.jpg");
+      for (auto &p : m_list) m += {
+        .pos = dotz::vec3 { p.pos.x + 0.5f, 0.0f, p.pos.y + 0.5f },
+        .txt = txt,
+      };
     }
 
   public:
-    explicit model() : batch { "pushwall.obj", "Tiles101_1K-JPG_Color.jpg" } {}
+    explicit model() : batch { "pushwall.obj" } {}
 
     void push(unsigned id) {
       auto from = dotz::floor(v::g->camera.cam.xz());

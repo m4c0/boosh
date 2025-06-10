@@ -35,8 +35,8 @@ namespace model {
     auto memiter() { return voo::memiter<mdl> { m_mdl.host_memory() }; }
 
   public:
-    batch(jute::view model, jute::view txt)
-      : m_ppl { txt, "model", {
+    explicit batch(jute::view model)
+      : m_ppl { "model", {
         .bindings {
           vee::vertex_input_bind(sizeof(vtx)),
           vee::vertex_input_bind_per_instance(sizeof(mdl)),

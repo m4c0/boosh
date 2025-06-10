@@ -4,14 +4,10 @@ import textures;
 import v;
 
 export template<typename PC> class ppl_with_txt {
-  voo::single_dset m_dset { 
-    vee::dsl_fragment_samplers({ *v::g->linear_sampler }),
-    vee::combined_image_sampler(),
-  };
   vee::pipeline_layout m_pl = vee::create_pipeline_layout({
     .descriptor_set_layouts {{
       v::g->lightmap.descriptor_set_layout(),
-      m_dset.descriptor_set_layout(),
+      v::g->uber_set.descriptor_set_layout(),
     }},
     .push_constant_ranges {{ vee::vertex_push_constant_range<PC>() }},
   });
@@ -25,7 +21,7 @@ export template<typename PC> class ppl_with_txt {
   }
 
 public:
-  ppl_with_txt(jute::view txt, jute::view shader, const vee::gr_pipeline_params & p) 
+  ppl_with_txt(jute::view shader, const vee::gr_pipeline_params & p) 
     : m_pipeline {
       vee::create_graphics_pipeline(merge(p, {
         .pipeline_layout = *m_pl,
@@ -36,19 +32,11 @@ public:
         },
       }))
     }
-  {
-    copy_image(txt);
-  }
-
-  void copy_image(jute::view txt) {
-    textures::get(txt, [this](auto iv) {
-      vee::update_descriptor_set(m_dset.descriptor_set(), 0, iv);
-    });
-  }
+  {}
 
   void cmd_bind(vee::command_buffer cb, const PC & pc) {
     vee::cmd_bind_descriptor_set(cb, *m_pl, 0, v::g->lightmap.descriptor_set());
-    vee::cmd_bind_descriptor_set(cb, *m_pl, 1, m_dset.descriptor_set());
+    vee::cmd_bind_descriptor_set(cb, *m_pl, 1, v::g->uber_set.descriptor_set());
     vee::cmd_push_vertex_constants(cb, *m_pl, &pc);
     vee::cmd_bind_gr_pipeline(cb, *m_pipeline);
   }
