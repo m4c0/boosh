@@ -16,7 +16,6 @@ namespace mapper {
     unsigned m_line_number = 1;
     unsigned m_map_row = 1;
    
-    textures m_txts {};
     tiledefs m_tdefs {};
     tilemap m_map {};
 
@@ -24,8 +23,6 @@ namespace mapper {
       arg = arg.trim();
       if (arg != "0") throw error { "invalid version: "_hs + arg };
     }
-
-    void cmd_texture(jute::view arg) { m_txts.add(arg); }
 
     void cmd_define(jute::view arg) {
       m_tdefs.add(arg);
@@ -64,7 +61,6 @@ namespace mapper {
       auto [cmd, args] = line.split(' ');
     
       if (cmd == "version") return cmd_version(args);
-      if (cmd == "texture") return cmd_texture(args);
       if (cmd == "define")  return cmd_define(args);
 
       if (cmd == "map") {
@@ -90,14 +86,7 @@ namespace mapper {
     }
 
     [[nodiscard]] constexpr auto take() {
-      struct {
-        tilemap map;
-        hai::array<jute::heap> textures;
-      } res {
-        .map = traits::move(m_map),
-        .textures = m_txts.take_list(),
-      };
-      return res;
+      return traits::move(m_map);
     }
   };
 }

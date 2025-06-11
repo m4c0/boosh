@@ -75,7 +75,7 @@ struct : public vapp {
       hand::model     hnd   {};
       overlay::model  olay  {};
 
-      auto [map, textures] = mapper::load(sires::real_path_name(map_name));
+      auto map = mapper::load(sires::real_path_name(map_name));
 
       lgm.load_map(&map);
       faces.load_map(map);

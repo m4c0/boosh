@@ -19,7 +19,7 @@ struct app : public vapp {
       v::globals vg { &dq };
       v::g = &vg;
 
-      auto [map, textures] = mapper::load(sires::real_path_name("example.map"));
+      auto map = mapper::load(sires::real_path_name("example.map"));
       lightmap::pipeline ppl {};
       ppl.load_map(&map);
       ppl.activate();
