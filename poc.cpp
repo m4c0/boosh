@@ -33,31 +33,81 @@ static constexpr const jute::view map_name = "example.map";
 static constexpr const auto player_radius = 0.2f;
 static constexpr const auto max_use_dist = 1.0f;
 
-static void process_collisions(auto cb, bullet::model & blt, overlay::model & olay) {
-  auto cam = v::g->camera.cam;
-  auto item = collision::entities().closest({ cam.x, cam.z }, player_radius);
-  switch (item.owner) {
-    case bullet::clid:
-      blt.remove(item.id);
-      blt.setup_copy(cb);
-      olay.set(0.5f);
-      break;
-  }
-}
+class stuff {
+  lightmap::pipeline m_lgm {};
 
-static void process_use(door::model * dr, pushwall::model * psh) {
-  auto cam = v::g->camera.cam.xz();
-  auto angle = dotz::radians(v::g->camera.angle);
-  auto c = collision::entities().hitscan(cam, angle, max_use_dist);
-  switch (c.item.owner) {
-    case door::clid:
-      dr->open(c.item.id);
-      break;
-    case pushwall::clid:
-      psh->push(c.item.id);
-      break;
+  faces::model    m_faces {};
+  bullet::model   m_blt   {};
+  door::model     m_dr    {};
+  pushwall::model m_psh   {};
+  hand::model     m_hnd   {};
+  overlay::model  m_olay  {};
+
+  bool m_copied = false;
+
+public:
+  void load_map(const mapper::tilemap * map) {
+    m_lgm.load_map(map);
+    m_faces.load_map(map);
+    m_blt.load_map(map);
+    m_dr.load_map(map);
+    m_psh.load_map(map);
+
+    m_lgm.activate();
   }
-}
+
+  void use() {
+    auto cam = v::g->camera.cam.xz();
+    auto angle = dotz::radians(v::g->camera.angle);
+    auto c = collision::entities().hitscan(cam, angle, max_use_dist);
+    switch (c.item.owner) {
+      case door::clid:
+        m_dr.open(c.item.id);
+        break;
+      case pushwall::clid:
+        m_psh.push(c.item.id);
+        break;
+    }
+  }
+
+  void tick(vee::command_buffer cb, float ms, bool moved) {
+    auto cam = v::g->camera.cam;
+    auto item = collision::entities().closest({ cam.x, cam.z }, player_radius);
+    switch (item.owner) {
+      case bullet::clid:
+        m_blt.remove(item.id);
+        m_blt.setup_copy(cb);
+        m_olay.set(0.5f);
+        break;
+    }
+
+    // TODO: squish
+    m_psh.tick(ms);
+    m_dr.tick(ms);
+    m_hnd.tick(ms, moved);
+    m_olay.tick(ms);
+
+    if (!m_copied) {
+      m_faces.setup_copy(cb);
+      m_blt.setup_copy(cb);
+      m_dr.setup_copy(cb);
+      m_psh.setup_copy(cb);
+      m_copied = true;
+    }
+    m_lgm.run(cb);
+    m_dr.copy_models(cb);
+    m_psh.copy_models(cb);
+  }
+
+  void draw(vee::command_buffer cb) {
+    m_faces.draw(cb);
+    m_dr.draw(cb);
+    m_psh.draw(cb);
+    m_blt.draw(cb);
+    m_hnd.run(cb);
+    m_olay.run(cb);
+  }
+};
 
 struct : public vapp {
   void run() try {
@@ -66,54 +116,22 @@ struct : public vapp {
       v::globals vg { &dq };
       v::g = &vg;
 
-      lightmap::pipeline lgm {};
-
-      faces::model    faces {};
-      bullet::model   blt   {};
-      door::model     dr    {};
-      pushwall::model psh   {};
-      hand::model     hnd   {};
-      overlay::model  olay  {};
+      stuff s {};
 
       auto map = mapper::load(sires::real_path_name(map_name));
 
-      lgm.load_map(&map);
-      faces.load_map(map);
-      blt.load_map(&map);
-      dr.load_map(&map);
-      psh.load_map(&map);
+      s.load_map(&map);
       camera::load_map(&map);
 
-      lgm.activate();
-
       input::on_button_down(input::buttons::ATTACK, hand::attack);
-      input::on_button_down(input::buttons::USE, [&] {
-        process_use(&dr, &psh);
-      });
+      input::on_button_down(input::buttons::USE, [&] { s.use(); });
 
       sitime::stopwatch time {};
-      bool copied = false;
       ots_loop(dq, sw, [&](auto cb) {
         // TODO: add a frame time limit or time interpolation
         bool moved = camera::update(time.millis());
-        process_collisions(cb, blt, olay);
-        // TODO: squish
-        psh.tick(time.millis());
-        dr.tick(time.millis());
-        hnd.tick(time.millis(), moved);
-        olay.tick(time.millis());
+        s.tick(cb, time.millis(), moved);
         time = {};
-
-        if (!copied) {
-          faces.setup_copy(cb);
-          blt.setup_copy(cb);
-          dr.setup_copy(cb);
-          psh.setup_copy(cb);
-          copied = true;
-        }
-        lgm.run(cb);
-        dr.copy_models(cb);
-        psh.copy_models(cb);
 
         voo::cmd_render_pass rp {{
           .command_buffer = cb,
@@ -123,13 +141,7 @@ struct : public vapp {
         }};
         vee::cmd_set_viewport(cb, sw.extent());
         vee::cmd_set_scissor(cb, sw.extent());
-        faces.draw(cb);
-        dr.draw(cb);
-        psh.draw(cb);
-        blt.draw(cb);
-
-        hnd.run(cb);
-        olay.run(cb);
+        s.draw(cb);
       });
 
       shaders::dispose();

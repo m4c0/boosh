@@ -164,11 +164,11 @@ namespace faces {
       }) }
     {}
 
-    void load_map(const mapper::tilemap & map) {
+    void load_map(const mapper::tilemap * map) {
       auto c = m_ceilings.map();
       auto f = m_floors.map();
       auto w = m_walls.map();
-      map.for_each([&](auto x, auto y, auto & d) {
+      map->for_each([&](auto x, auto y, auto & d) {
         if (d.entity == mapper::entities::WALL) {
           collision::bodies().add_aabb({ x, y }, { x + 1, y + 1 }, 'wall', 1);
         }
