@@ -95,7 +95,7 @@ struct : public vapp {
       bool copied = false;
       ots_loop(dq, sw, [&](auto cb) {
         // TODO: add a frame time limit or time interpolation
-        bool moved = camera::update(map, time.millis());
+        bool moved = camera::update(time.millis());
         process_collisions(cb, blt, olay);
         // TODO: squish
         psh.tick(time.millis());

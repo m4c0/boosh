@@ -18,7 +18,7 @@ namespace camera {
     });
   }
 
-  export bool update(const mapper::tilemap & map, float ms) {
+  export bool update(float ms) {
     float da = -input::state(input::axis::TURN) * turn_speed * ms / 1000.0;
     v::g->camera.angle = dotz::mod(360 + v::g->camera.angle + da, 360);
   
