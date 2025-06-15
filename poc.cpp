@@ -15,6 +15,7 @@ import hand;
 import input;
 import lightmap;
 import mapper;
+import mob;
 import overlay;
 import pushwall;
 import shaders;
@@ -39,6 +40,7 @@ class stuff {
   faces::model    m_faces {};
   bullet::model   m_blt   {};
   door::model     m_dr    {};
+  mob::model      m_mob   {};
   pushwall::model m_psh   {};
   hand::model     m_hnd   {};
   overlay::model  m_olay  {};
