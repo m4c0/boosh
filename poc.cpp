@@ -52,6 +52,7 @@ public:
     m_lgm.load_map(map);
     m_faces.load_map(map);
     m_blt.load_map(map);
+    m_mob.load_map(map);
     m_dr.load_map(map);
     m_psh.load_map(map);
 
@@ -92,6 +93,7 @@ public:
     if (!m_copied) {
       m_faces.setup_copy(cb);
       m_blt.setup_copy(cb);
+      m_mob.setup_copy(cb);
       m_dr.setup_copy(cb);
       m_psh.setup_copy(cb);
       m_copied = true;
@@ -106,6 +108,7 @@ public:
     m_dr.draw(cb);
     m_psh.draw(cb);
     m_blt.draw(cb);
+    m_mob.draw(cb);
     m_hnd.run(cb);
     m_olay.run(cb);
   }
