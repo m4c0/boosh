@@ -16,6 +16,7 @@ import input;
 import lightmap;
 import mapper;
 import mob;
+import model;
 import overlay;
 import pushwall;
 import shaders;
@@ -48,6 +49,10 @@ class stuff {
   bool m_copied = false;
 
 public:
+  stuff() {
+    model::create_pipeline();
+  }
+
   void load_map(const mapper::tilemap * map) {
     m_lgm.load_map(map);
     m_faces.load_map(map);
@@ -105,10 +110,13 @@ public:
 
   void draw(vee::command_buffer cb) {
     m_faces.draw(cb);
+
+    model::bind(cb);
     m_dr.draw(cb);
     m_psh.draw(cb);
     m_blt.draw(cb);
     m_mob.draw(cb);
+
     m_hnd.run(cb);
     m_olay.run(cb);
   }

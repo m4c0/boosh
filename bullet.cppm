@@ -17,7 +17,7 @@ namespace bullet {
   export class model : public ::model::batch {
     hai::varray<dotz::vec3> m_list { 128 };
 
-    void load(voo::memiter<mdl> & m) override {
+    void load(voo::memiter<::model::mdl> & m) override {
       auto txt = textures::get("bullet.uv.png");
       for (auto p : m_list) m += { .pos = p, .txt = txt };
     }

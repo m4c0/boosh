@@ -22,7 +22,7 @@ namespace pushwall {
   export class model : public ::model::batch {
     hai::varray<item> m_list { max };
 
-    void load(voo::memiter<mdl> & m) override {
+    void load(voo::memiter<::model::mdl> & m) override {
       auto txt = textures::get("Tiles101_1K-JPG_Color.jpg");
       for (auto &p : m_list) m += {
         .pos = dotz::vec3 { p.pos.x + 0.5f, 0.0f, p.pos.y + 0.5f },

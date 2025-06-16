@@ -25,7 +25,7 @@ namespace door {
   export class model : public ::model::batch {
     hai::varray<item> m_list { max };
 
-    void load(voo::memiter<mdl> & m) override {
+    void load(voo::memiter<::model::mdl> & m) override {
       for (auto p : m_list) m += {
         .pos = p.pos,
         .rot = p.rot,
