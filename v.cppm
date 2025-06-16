@@ -40,6 +40,8 @@ namespace v {
       vee::combined_image_sampler(uber_dset_smps),
     };
 
+    grpl model_pipeline {};
+
     camera camera {};
 
     explicit globals(voo::device_and_queue * dq) : dq { dq } {}
