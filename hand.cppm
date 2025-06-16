@@ -145,7 +145,7 @@ namespace hand {
   export class model {
     upc m_pc {};
     voo::one_quad m_quad;
-    ppl_with_txt<upc> m_ppl;
+    v::grpl m_ppl;
     float m_t = 0;
 
     hai::array<voo::host_buffer_for_image> m_imgs { images::MAX };
@@ -153,11 +153,11 @@ namespace hand {
   public:
     explicit model()
       : m_quad { v::g->pd }
-      , m_ppl { "hand", {
+      , m_ppl { ppl_with_txt::create<upc>("hand", {
         .depth_test = false,
         .bindings { m_quad.vertex_input_bind() },
         .attributes { m_quad.vertex_attribute(0) },
-      }}
+      }) }
     {
       m_pc.txt = textures::get("hand.png");
     }
@@ -180,7 +180,8 @@ namespace hand {
     }
 
     void run(vee::command_buffer cb) {
-      m_ppl.cmd_bind(cb, m_pc);
+      ppl_with_txt::cmd_bind(cb, &m_ppl);
+      vee::cmd_push_vertex_constants(cb, *m_ppl.layout, &m_pc);
       m_quad.run(cb, 0, 1);
     }
   };

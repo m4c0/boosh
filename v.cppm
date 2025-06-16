@@ -12,6 +12,11 @@ namespace v {
     float angle {};
   };
 
+  export struct grpl {
+    vee::pipeline_layout layout;
+    vee::gr_pipeline pipeline;
+  };
+
   export constexpr const auto uber_dset_smps = 16;
 
   export struct globals {

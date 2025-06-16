@@ -17,7 +17,7 @@ namespace model {
 
     static constexpr const auto max_models = 128;
 
-    ppl_with_txt<v::camera> m_ppl;
+    v::grpl m_ppl;
     voo::h2l_buffer m_buf;
     voo::h2l_buffer m_mdl;
     unsigned m_vcount;
@@ -36,7 +36,7 @@ namespace model {
 
   public:
     explicit batch(jute::view model)
-      : m_ppl { "model", {
+      : m_ppl { ppl_with_txt::create<v::camera>("model", {
         .bindings {
           vee::vertex_input_bind(sizeof(vtx)),
           vee::vertex_input_bind_per_instance(sizeof(mdl)),
@@ -48,7 +48,7 @@ namespace model {
           vee::vertex_attribute_vec4(1, traits::offset_of(&mdl::pos)),
           vee::vertex_attribute_uint(1, traits::offset_of(&mdl::txt)),
         },
-      }}
+      }) }
       , m_mdl { v::g->pd, max_models * sizeof(mdl) }
     {
       auto [buf, count] = wavefront::load_model(v::g->pd, model);
@@ -69,7 +69,8 @@ namespace model {
     }
 
     void draw(vee::command_buffer cb) {
-      m_ppl.cmd_bind(cb, v::g->camera);
+      ppl_with_txt::cmd_bind(cb, &m_ppl);
+      vee::cmd_push_vertex_constants(cb, *m_ppl.layout, &v::g->camera);
       vee::cmd_bind_vertex_buffers(cb, 0, m_buf.local_buffer());
       vee::cmd_bind_vertex_buffers(cb, 1, m_mdl.local_buffer());
       vee::cmd_draw(cb, m_vcount, m_icount);
