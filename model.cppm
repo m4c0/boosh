@@ -7,6 +7,7 @@ import v;
 import wavefront;
 
 namespace model {
+  // Copied from wavefront::vtx because clang explodes on windows otherwise
   struct vtx {
     dotz::vec3 pos;
     dotz::vec2 txt;
@@ -39,22 +40,21 @@ namespace model {
   }
 
   export class batch {
-    // Copied from wavefront::vtx because clang explodes on windows otherwise
     static constexpr const auto max_models = 128;
 
-    voo::h2l_buffer m_buf;
-    voo::h2l_buffer m_mdl;
+    voo::bound_buffer m_buf;
+    voo::bound_buffer m_mdl;
     unsigned m_vcount;
     unsigned m_icount;
 
   protected:
     virtual void load(voo::memiter<mdl> & m) = 0;
 
-    auto memiter() { return voo::memiter<mdl> { m_mdl.host_memory() }; }
+    auto memiter() { return voo::memiter<mdl> { *m_mdl.memory }; }
 
   public:
     explicit batch(jute::view model)
-      : m_mdl { v::g->pd, max_models * sizeof(mdl) }
+      : m_mdl { voo::bound_buffer::create_from_host(v::g->pd, max_models * sizeof(mdl), vee::buffer_usage::vertex_buffer) }
     {
       auto [buf, count] = wavefront::load_model(v::g->pd, model);
       m_buf = traits::move(buf);
@@ -63,19 +63,14 @@ namespace model {
 
     void setup_copy(vee::command_buffer cb) {
       {
-        voo::memiter<mdl> m { m_mdl.host_memory(), &m_icount };
+        voo::memiter<mdl> m { *m_mdl.memory, &m_icount };
         load(m);
       }
-      m_buf.setup_copy(cb);
-      m_mdl.setup_copy(cb);
-    }
-    void copy_models(vee::command_buffer cb) {
-      m_mdl.setup_copy(cb);
     }
 
     void draw(vee::command_buffer cb) {
-      vee::cmd_bind_vertex_buffers(cb, 0, m_buf.local_buffer());
-      vee::cmd_bind_vertex_buffers(cb, 1, m_mdl.local_buffer());
+      vee::cmd_bind_vertex_buffers(cb, 0, *m_buf.buffer);
+      vee::cmd_bind_vertex_buffers(cb, 1, *m_mdl.buffer);
       vee::cmd_draw(cb, m_vcount, m_icount);
     }
   };

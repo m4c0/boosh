@@ -104,8 +104,6 @@ public:
       m_copied = true;
     }
     m_lgm.run(cb);
-    m_dr.copy_models(cb);
-    m_psh.copy_models(cb);
   }
 
   void draw(vee::command_buffer cb) {
