@@ -1,6 +1,7 @@
 #pragma leco add_shader "model.frag"
 #pragma leco add_shader "model.vert"
 export module model;
+import mapper;
 import ppl_with_txt;
 import traits;
 import v;
@@ -39,7 +40,9 @@ namespace model {
     vee::cmd_push_vertex_constants(cb, *v::g->model_pipeline.layout, &v::g->camera);
   }
 
+  export template<typename T> T create(int x, int y, int id, mapper::tiledef);
   export template<typename T> mdl convert(T);
+  export template<typename T> void remove(int id, T);
 
   export class batch {
     static constexpr const auto max_models = 128;
@@ -89,5 +92,22 @@ namespace model {
 
   public:
     using batch::batch;
+
+    void remove(int id) {
+      model::remove(id, m_list[id]);
+      m_list[id] = {};
+    }
+
+    void clear() {
+      for (auto id = 0; id < m_list.size(); id++) remove(id);
+      m_list.truncate(0);
+    }
+
+    void load_map(const mapper::tilemap * map) {
+      map->for_each([&](auto x, auto y, auto & d) {
+        if (d.entity != T::entity) return;
+        m_list.push_back(create<T>(x, y, m_list.size(), d));
+      });
+    }
   };
 }

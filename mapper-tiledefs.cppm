@@ -11,6 +11,7 @@ namespace mapper {
     NONE,
     BULLET,
     DOOR,
+    MOB,
     PLAYER,
     PUSHWALL,
     WALL,
@@ -119,6 +120,9 @@ namespace mapper {
           if (c.wall.size()) err("door cannot be placed on walls"_hs);
           if (!c.floor.size()) err("door requires ceiling and floor"_hs);
           if (c.rotate != 0 && c.rotate != 90) err("door can only be rotated 0 or 90 degrees"_hs);
+          break;
+        case entities::MOB:
+          err("TBD"_hs);
           break;
         case entities::NONE:
           if (c.rotate) err("tiles can't be rotated yet"_hs);

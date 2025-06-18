@@ -14,20 +14,12 @@ namespace pushwall {
   constexpr const auto wall_speed = 1.0f;
 
   struct item {
+    static constexpr const auto entity = mapper::entities::PUSHWALL;
+
     dotz::vec2 pos {};
     dotz::vec2 movement {};
   };
-}
-namespace model {
-  template<> mdl convert(pushwall::item p) {
-    auto txt = textures::get("Tiles101_1K-JPG_Color.jpg");
-    return {
-      .pos = dotz::vec3 { p.pos.x + 0.5f, 0.0f, p.pos.y + 0.5f },
-      .txt = txt,
-    };
-  }
-}
-namespace pushwall {
+
   export class model : public ::model::list<item> {
   public:
     explicit model() : list { "pushwall.obj" } {}
@@ -38,18 +30,6 @@ namespace pushwall {
       float x = from.x < i.pos.x ? 1 : from.x > i.pos.x ? -1 : 0;
       float y = from.y < i.pos.y ? 1 : from.y > i.pos.y ? -1 : 0;
       i.movement = { x, y };
-    }
-
-    void load_map(const mapper::tilemap * map) {
-      map->for_each([&](auto x, auto y, auto & d) {
-        if (d.entity != mapper::entities::PUSHWALL) return;
-
-        dotz::vec2 aa { x, y };
-        auto bb = aa + 1;
-        collision::entities().add_aabb(aa, bb, clid, data().size());
-        collision::bodies().add_aabb(aa, bb, clid, data().size());
-        data().push_back(item { aa });
-      });
     }
 
     void tick(float ms) {
@@ -82,4 +62,20 @@ namespace pushwall {
       }
     }
   };
+}
+namespace model {
+  template<> mdl convert(pushwall::item p) {
+    auto txt = textures::get("Tiles101_1K-JPG_Color.jpg");
+    return {
+      .pos = dotz::vec3 { p.pos.x + 0.5f, 0.0f, p.pos.y + 0.5f },
+      .txt = txt,
+    };
+  }
+  template<> pushwall::item create(int x, int y, int id, mapper::tiledef d) {
+    dotz::vec2 aa { x, y };
+    auto bb = aa + 1;
+    collision::entities().add_aabb(aa, bb, pushwall::clid, id);
+    collision::bodies().add_aabb(aa, bb, pushwall::clid, id);
+    return pushwall::item { aa };
+  }
 }

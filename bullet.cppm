@@ -10,8 +10,19 @@ import textures;
 import voo;
 
 namespace bullet {
+  export constexpr const auto clid = 'bllt';
+
+  static constexpr const auto radius = 0.2;
+
   struct item : dotz::vec3 {
+    static constexpr const auto entity = mapper::entities::BULLET;
+
     using vec3::vec3;
+  };
+
+  export class model : public ::model::list<item> {
+  public:
+    explicit model() : list { "bullet.obj" } {}
   };
 }
 namespace model {
@@ -19,32 +30,14 @@ namespace model {
     auto txt = textures::get("bullet.uv.png");
     return { .pos = p, .txt = txt };
   }
-}
-namespace bullet {
-  export constexpr const auto clid = 'bllt';
 
-  static constexpr const auto radius = 0.2;
+  template<> bullet::item create(int x, int y, int id, mapper::tiledef map) {
+    bullet::item p { x + 0.5f, 0.0f, y + 0.5f };
+    collision::entities().add_circle({ p.x, p.z }, bullet::radius, bullet::clid, id);
+    return p;
+  }
 
-  export class model : public ::model::list<item> {
-  public:
-    explicit model() : list { "bullet.obj" } {}
-
-    void remove(int id) {
-      collision::entities().remove(clid, id);
-      data()[id] = {};
-    }
-
-    void load_map(const mapper::tilemap * map) {
-      for (auto id = 0; id < data().size(); id++) remove(id);
-      data().truncate(0);
-
-      map->for_each([&](auto x, auto y, auto & d) {
-        if (d.entity != mapper::entities::BULLET) return;
-
-        item p { x + 0.5f, 0.0f, y + 0.5f };
-        collision::entities().add_circle({ p.x, p.z }, radius, clid, data().size());
-        data().push_back(p);
-      });
-    }
-  };
+  template<> void remove(int id, bullet::item _) {
+    collision::entities().remove(bullet::clid, id);
+  }
 }
