@@ -39,6 +39,8 @@ namespace model {
     vee::cmd_push_vertex_constants(cb, *v::g->model_pipeline.layout, &v::g->camera);
   }
 
+  export template<typename T> mdl convert(T);
+
   export class batch {
     static constexpr const auto max_models = 128;
 
@@ -73,5 +75,19 @@ namespace model {
       vee::cmd_bind_vertex_buffers(cb, 1, *m_mdl.buffer);
       vee::cmd_draw(cb, m_vcount, m_icount);
     }
+  };
+
+  export template<typename T> class list : public batch {
+    hai::varray<T> m_list { 128 };
+
+    void load(voo::memiter<::model::mdl> & m) override {
+      for (auto p : m_list) m += ::model::convert(p);
+    }
+
+  protected:
+    [[nodiscard]] constexpr auto & data() { return m_list; }
+
+  public:
+    using batch::batch;
   };
 }

@@ -14,30 +14,29 @@ namespace door {
 
   constexpr const auto door_speed = 1.0f;
   constexpr const auto stop_y = 0.9f;
-  constexpr const auto max = 128;
 
   struct item {
     dotz::vec3 pos;
     float rot;
     float movement;
   };
-
-  export class model : public ::model::batch {
-    hai::varray<item> m_list { max };
-
-    void load(voo::memiter<::model::mdl> & m) override {
-      for (auto p : m_list) m += {
-        .pos = p.pos,
-        .rot = p.rot,
-        .txt = textures::get("door.uv.png"),
-      };
-    }
-
+}
+namespace model {
+  template<> mdl convert(door::item p) {
+    return {
+      .pos = p.pos,
+      .rot = p.rot,
+      .txt = textures::get("door.uv.png"),
+    };
+  }
+}
+namespace door {
+  export class model : public ::model::list<item> {
   public:
-    explicit model() : batch { "door.obj" } {}
+    explicit model() : list { "door.obj" } {}
 
     void open(unsigned id) {
-      m_list[id].movement = 1;
+      data()[id].movement = 1;
     }
 
     void load_map(const mapper::tilemap * map) {
@@ -54,17 +53,17 @@ namespace door {
           aa.y += 0.4;
           bb.y = aa.y + 0.2;
         }
-        collision::bodies().add_aabb(aa, bb, clid, m_list.size());
-        collision::entities().add_aabb(aa, bb, clid, m_list.size());
+        collision::bodies().add_aabb(aa, bb, clid, data().size());
+        collision::entities().add_aabb(aa, bb, clid, data().size());
         float r = dotz::radians(d.rotate);
-        m_list.push_back(item { p, r, 0 });
+        data().push_back(item { p, r, 0 });
       });
     }
 
     void tick(float ms) {
       auto m = memiter();
-      for (auto i = 0; i < m_list.size(); i++) {
-        auto & it = m_list[i];
+      for (auto i = 0; i < data().size(); i++) {
+        auto & it = data()[i];
         if (it.movement == 0) continue;
 
         float y = it.pos.y - door_speed * ms / 1000.0;

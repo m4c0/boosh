@@ -12,30 +12,29 @@ namespace pushwall {
   export constexpr const auto clid = 'push';
 
   constexpr const auto wall_speed = 1.0f;
-  constexpr const auto max = 128;
 
   struct item {
     dotz::vec2 pos {};
     dotz::vec2 movement {};
   };
-
-  export class model : public ::model::batch {
-    hai::varray<item> m_list { max };
-
-    void load(voo::memiter<::model::mdl> & m) override {
-      auto txt = textures::get("Tiles101_1K-JPG_Color.jpg");
-      for (auto &p : m_list) m += {
-        .pos = dotz::vec3 { p.pos.x + 0.5f, 0.0f, p.pos.y + 0.5f },
-        .txt = txt,
-      };
-    }
-
+}
+namespace model {
+  template<> mdl convert(pushwall::item p) {
+    auto txt = textures::get("Tiles101_1K-JPG_Color.jpg");
+    return {
+      .pos = dotz::vec3 { p.pos.x + 0.5f, 0.0f, p.pos.y + 0.5f },
+      .txt = txt,
+    };
+  }
+}
+namespace pushwall {
+  export class model : public ::model::list<item> {
   public:
-    explicit model() : batch { "pushwall.obj" } {}
+    explicit model() : list { "pushwall.obj" } {}
 
     void push(unsigned id) {
       auto from = dotz::floor(v::g->camera.cam.xz());
-      auto & i = m_list[id];
+      auto & i = data()[id];
       float x = from.x < i.pos.x ? 1 : from.x > i.pos.x ? -1 : 0;
       float y = from.y < i.pos.y ? 1 : from.y > i.pos.y ? -1 : 0;
       i.movement = { x, y };
@@ -47,16 +46,16 @@ namespace pushwall {
 
         dotz::vec2 aa { x, y };
         auto bb = aa + 1;
-        collision::entities().add_aabb(aa, bb, clid, m_list.size());
-        collision::bodies().add_aabb(aa, bb, clid, m_list.size());
-        m_list.push_back(item { aa });
+        collision::entities().add_aabb(aa, bb, clid, data().size());
+        collision::bodies().add_aabb(aa, bb, clid, data().size());
+        data().push_back(item { aa });
       });
     }
 
     void tick(float ms) {
       auto m = memiter();
-      for (auto i = 0; i < m_list.size(); i++) {
-        auto & it = m_list[i];
+      for (auto i = 0; i < data().size(); i++) {
+        auto & it = data()[i];
         if (0 == dotz::length(it.movement)) continue;
 
         auto aa = it.pos + it.movement * wall_speed * ms / 1000.0;

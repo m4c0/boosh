@@ -10,36 +10,40 @@ import textures;
 import voo;
 
 namespace bullet {
+  struct item : dotz::vec3 {
+    using vec3::vec3;
+  };
+}
+namespace model {
+  template<> mdl convert(bullet::item p) {
+    auto txt = textures::get("bullet.uv.png");
+    return { .pos = p, .txt = txt };
+  }
+}
+namespace bullet {
   export constexpr const auto clid = 'bllt';
 
   static constexpr const auto radius = 0.2;
 
-  export class model : public ::model::batch {
-    hai::varray<dotz::vec3> m_list { 128 };
-
-    void load(voo::memiter<::model::mdl> & m) override {
-      auto txt = textures::get("bullet.uv.png");
-      for (auto p : m_list) m += { .pos = p, .txt = txt };
-    }
-
+  export class model : public ::model::list<item> {
   public:
-    explicit model() : batch { "bullet.obj" } {}
+    explicit model() : list { "bullet.obj" } {}
 
     void remove(int id) {
       collision::entities().remove(clid, id);
-      m_list[id] = 0;
+      data()[id] = {};
     }
 
     void load_map(const mapper::tilemap * map) {
-      for (auto id = 0; id < m_list.size(); id++) remove(id);
-      m_list.truncate(0);
+      for (auto id = 0; id < data().size(); id++) remove(id);
+      data().truncate(0);
 
       map->for_each([&](auto x, auto y, auto & d) {
         if (d.entity != mapper::entities::BULLET) return;
 
-        dotz::vec3 p { x + 0.5f, 0.0f, y + 0.5f };
-        collision::entities().add_circle({ p.x, p.z }, radius, clid, m_list.size());
-        m_list.push_back(p);
+        item p { x + 0.5f, 0.0f, y + 0.5f };
+        collision::entities().add_circle({ p.x, p.z }, radius, clid, data().size());
+        data().push_back(p);
       });
     }
   };
