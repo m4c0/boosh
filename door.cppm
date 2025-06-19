@@ -3,11 +3,10 @@
 export module door;
 import collision;
 import dotz;
-import hai;
+import jute;
 import mapper;
 import model;
 import textures;
-import voo;
 
 namespace door {
   export constexpr const auto clid = 'door';
@@ -17,16 +16,14 @@ namespace door {
 
   struct item {
     static constexpr const auto entity = mapper::entities::DOOR;
+    static constexpr const jute::view model = "door.obj";
 
     dotz::vec3 pos;
     float rot;
     float movement;
   };
 
-  export class model : public ::model::list<item> {
-  public:
-    explicit model() : list { "door.obj" } {}
-  };
+  export struct model : public ::model::list<item> {};
 }
 namespace model {
   template<> mdl convert(door::item p) {

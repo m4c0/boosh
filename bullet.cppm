@@ -3,11 +3,10 @@
 export module bullet;
 import collision;
 import dotz;
-import hai;
+import jute;
 import model;
 import mapper;
 import textures;
-import voo;
 
 namespace bullet {
   export constexpr const auto clid = 'bllt';
@@ -16,14 +15,12 @@ namespace bullet {
 
   struct item : dotz::vec3 {
     static constexpr const auto entity = mapper::entities::BULLET;
+    static constexpr const jute::view model = "bullet.obj";
 
     using vec3::vec3;
   };
 
-  export class model : public ::model::list<item> {
-  public:
-    explicit model() : list { "bullet.obj" } {}
-  };
+  export struct model : public ::model::list<item> {};
 }
 namespace model {
   template<> mdl convert(bullet::item p) {

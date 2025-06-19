@@ -2,7 +2,7 @@
 export module pushwall;
 import collision;
 import dotz;
-import hai;
+import jute;
 import mapper;
 import model;
 import textures;
@@ -15,15 +15,13 @@ namespace pushwall {
 
   struct item {
     static constexpr const auto entity = mapper::entities::PUSHWALL;
+    static constexpr const jute::view model = "pushwall.obj";
 
     dotz::vec2 pos {};
     dotz::vec2 movement {};
   };
 
-  export class model : public ::model::list<item> {
-  public:
-    explicit model() : list { "pushwall.obj" } {}
-  };
+  export struct model : public ::model::list<item> {};
 }
 namespace model {
   template<> mdl convert(pushwall::item p) {

@@ -2,11 +2,10 @@
 export module mob;
 import collision;
 import dotz;
-import hai;
+import jute;
 import mapper;
 import model;
 import textures;
-import voo;
 
 namespace mob {
   export constexpr const auto clid = 'mobs';
@@ -15,14 +14,12 @@ namespace mob {
 
   struct item {
     static constexpr const auto entity = mapper::entities::MOB;
+    static constexpr const jute::view model = "mob.obj";
 
     dotz::vec3 pos;
   };
 
-  export class model : public ::model::list<mob::item> {
-  public:
-    explicit model() : list { "mob.obj" } {}
-  };
+  export struct model : public ::model::list<mob::item> {};
 }
 
 namespace model {

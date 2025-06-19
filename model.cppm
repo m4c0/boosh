@@ -93,7 +93,7 @@ namespace model {
     [[nodiscard]] constexpr auto & data() { return m_list; }
 
   public:
-    using batch::batch;
+    list() : batch { T::model } {}
 
     void remove(int id) {
       model::remove(id, m_list[id]);
