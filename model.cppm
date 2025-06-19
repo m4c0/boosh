@@ -44,6 +44,7 @@ namespace model {
   export template<typename T> mdl convert(T);
   export template<typename T> void remove(int id, T);
   export template<typename T> void tick(T & it, mdl & m, int id, float ms);
+  export template<typename T> void use(T & i);
 
   export class batch {
     static constexpr const auto max_models = 128;
@@ -114,9 +115,13 @@ namespace model {
     void tick(float ms) {
       auto m = memiter();
       for (auto i = 0; i < data().size(); i++) {
-        auto & it = data()[i];
+        auto & it = m_list[i];
         model::tick(it, m[i], i, ms);
       }
+    }
+
+    void use(int id) {
+      model::use(m_list[id]);
     }
   };
 }

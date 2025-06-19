@@ -26,10 +26,6 @@ namespace door {
   export class model : public ::model::list<item> {
   public:
     explicit model() : list { "door.obj" } {}
-
-    void open(unsigned id) {
-      data()[id].movement = 1;
-    }
   };
 }
 namespace model {
@@ -69,5 +65,9 @@ namespace model {
       collision::entities().remove(door::clid, id);
     }
     m.pos.y = it.pos.y = y;
+  }
+
+  template<> void use(door::item & i) {
+    i.movement = 1;
   }
 }

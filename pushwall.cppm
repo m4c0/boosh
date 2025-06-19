@@ -23,14 +23,6 @@ namespace pushwall {
   export class model : public ::model::list<item> {
   public:
     explicit model() : list { "pushwall.obj" } {}
-
-    void push(unsigned id) {
-      auto from = dotz::floor(v::g->camera.cam.xz());
-      auto & i = data()[id];
-      float x = from.x < i.pos.x ? 1 : from.x > i.pos.x ? -1 : 0;
-      float y = from.y < i.pos.y ? 1 : from.y > i.pos.y ? -1 : 0;
-      i.movement = { x, y };
-    }
   };
 }
 namespace model {
@@ -72,5 +64,11 @@ namespace model {
 
     it.pos = aa;
     m.pos = { aa.x + 0.5f, 0.0f, aa.y + 0.5f };
+  }
+  template<> void use(pushwall::item & i) {
+    auto from = dotz::floor(v::g->camera.cam.xz());
+    float x = from.x < i.pos.x ? 1 : from.x > i.pos.x ? -1 : 0;
+    float y = from.y < i.pos.y ? 1 : from.y > i.pos.y ? -1 : 0;
+    i.movement = { x, y };
   }
 }

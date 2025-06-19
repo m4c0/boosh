@@ -70,10 +70,10 @@ public:
     auto c = collision::entities().hitscan(cam, angle, max_use_dist);
     switch (c.item.owner) {
       case door::clid:
-        m_dr.open(c.item.id);
+        m_dr.use(c.item.id);
         break;
       case pushwall::clid:
-        m_psh.push(c.item.id);
+        m_psh.use(c.item.id);
         break;
     }
   }
