@@ -31,36 +31,6 @@ namespace pushwall {
       float y = from.y < i.pos.y ? 1 : from.y > i.pos.y ? -1 : 0;
       i.movement = { x, y };
     }
-
-    void tick(float ms) {
-      auto m = memiter();
-      for (auto i = 0; i < data().size(); i++) {
-        auto & it = data()[i];
-        if (0 == dotz::length(it.movement)) continue;
-
-        auto aa = it.pos + it.movement * wall_speed * ms / 1000.0;
-        auto bb = it.pos + 1;
-        bool hit = false;
-        collision::bodies().collides_aabb(aa, bb, [&](auto type, auto id) {
-          if (type == clid && id == i) return true;
-          hit = true;
-          return false;
-        });
-        if (hit) {
-          it.movement = {};
-          aa = dotz::floor(it.pos);
-          bb = aa + 1;
-          collision::entities().remove(clid, i);
-        } else {
-          collision::entities().set_aabb(aa, bb, clid, i);
-        }
-
-        collision::bodies().set_aabb(it.pos, bb, clid, i);
-
-        it.pos = aa;
-        m[i].pos = { aa.x + 0.5f, 0.0f, aa.y + 0.5f };
-      }
-    }
   };
 }
 namespace model {
@@ -77,5 +47,30 @@ namespace model {
     collision::entities().add_aabb(aa, bb, pushwall::clid, id);
     collision::bodies().add_aabb(aa, bb, pushwall::clid, id);
     return pushwall::item { aa };
+  }
+  template<> void tick(pushwall::item & it, mdl & m, int id, float ms) {
+    if (0 == dotz::length(it.movement)) return;
+
+    auto aa = it.pos + it.movement * pushwall::wall_speed * ms / 1000.0;
+    auto bb = it.pos + 1;
+    bool hit = false;
+    collision::bodies().collides_aabb(aa, bb, [&](auto type, auto id) {
+      if (type == pushwall::clid && id == id) return true;
+      hit = true;
+      return false;
+    });
+    if (hit) {
+      it.movement = {};
+      aa = dotz::floor(it.pos);
+      bb = aa + 1;
+      collision::entities().remove(pushwall::clid, id);
+    } else {
+      collision::entities().set_aabb(aa, bb, pushwall::clid, id);
+    }
+
+    collision::bodies().set_aabb(it.pos, bb, pushwall::clid, id);
+
+    it.pos = aa;
+    m.pos = { aa.x + 0.5f, 0.0f, aa.y + 0.5f };
   }
 }

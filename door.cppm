@@ -30,23 +30,6 @@ namespace door {
     void open(unsigned id) {
       data()[id].movement = 1;
     }
-
-    void tick(float ms) {
-      auto m = memiter();
-      for (auto i = 0; i < data().size(); i++) {
-        auto & it = data()[i];
-        if (it.movement == 0) continue;
-
-        float y = it.pos.y - door_speed * ms / 1000.0;
-        if (y < -stop_y) {
-          y = -stop_y;
-          it.movement = 0;
-          collision::bodies().remove(clid, i);
-          collision::entities().remove(clid, i);
-        }
-        m[i].pos.y = it.pos.y = y;
-      }
-    }
   };
 }
 namespace model {
@@ -73,5 +56,18 @@ namespace model {
     collision::entities().add_aabb(aa, bb, door::clid, id);
     float r = dotz::radians(d.rotate);
     return door::item { p, r, 0 };
+  }
+
+  template<> void tick(door::item & it, mdl & m, int id, float ms) {
+    if (it.movement == 0) return;
+
+    float y = it.pos.y - door::door_speed * ms / 1000.0;
+    if (y < -door::stop_y) {
+      y = -door::stop_y;
+      it.movement = 0;
+      collision::bodies().remove(door::clid, id);
+      collision::entities().remove(door::clid, id);
+    }
+    m.pos.y = it.pos.y = y;
   }
 }
