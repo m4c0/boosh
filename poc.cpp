@@ -97,10 +97,6 @@ public:
 
     if (!m_copied) {
       m_faces.setup_copy(cb);
-      m_blt.setup_copy();
-      m_mob.setup_copy();
-      m_dr.setup_copy();
-      m_psh.setup_copy();
       m_copied = true;
     }
     m_lgm.run(cb);

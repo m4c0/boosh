@@ -59,6 +59,11 @@ namespace model {
 
     auto memiter() { return voo::memiter<mdl> { *m_mdl.memory }; }
 
+    void setup_copy() {
+      voo::memiter<mdl> m { *m_mdl.memory, &m_icount };
+      load(m);
+    }
+
   public:
     explicit batch(jute::view model)
       : m_mdl { voo::bound_buffer::create_from_host(v::g->pd, max_models * sizeof(mdl), vee::buffer_usage::vertex_buffer) }
@@ -66,11 +71,6 @@ namespace model {
       auto [buf, count] = wavefront::load_model(v::g->pd, model);
       m_buf = traits::move(buf);
       m_vcount = count;
-    }
-
-    void setup_copy() {
-      voo::memiter<mdl> m { *m_mdl.memory, &m_icount };
-      load(m);
     }
 
     void draw(vee::command_buffer cb) {
@@ -99,16 +99,12 @@ namespace model {
       setup_copy();
     }
 
-    void clear() {
-      for (auto id = 0; id < m_list.size(); id++) remove(id);
-      m_list.truncate(0);
-    }
-
     void load_map(const mapper::tilemap * map) {
       map->for_each([&](auto x, auto y, auto & d) {
         if (d.entity != T::entity) return;
         m_list.push_back(create<T>(x, y, m_list.size(), d));
       });
+      setup_copy();
     }
 
     void tick(float ms) {
