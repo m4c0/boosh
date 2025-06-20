@@ -31,6 +31,7 @@ namespace mapper {
   static constexpr entities parse_entities(jute::view value) {
     if (value == "bullet")   return entities::BULLET;
     if (value == "door")     return entities::DOOR;
+    if (value == "mob")      return entities::MOB;
     if (value == "player")   return entities::PLAYER;
     if (value == "pushwall") return entities::PUSHWALL;
     if (value == "wall")     return entities::WALL;
@@ -112,6 +113,7 @@ namespace mapper {
           if (c.rotate) err("bullets can't be rotated yet"_hs);
           if (c.wall.size()) err("bullet cannot be placed on walls"_hs);
           if (!c.floor.size()) err("bullet requires ceiling and floor"_hs);
+          break;
         case entities::PLAYER:
           if (c.wall.size()) err("player cannot be placed on walls"_hs);
           if (!c.floor.size()) err("player requires ceiling and floor"_hs);
@@ -122,7 +124,9 @@ namespace mapper {
           if (c.rotate != 0 && c.rotate != 90) err("door can only be rotated 0 or 90 degrees"_hs);
           break;
         case entities::MOB:
-          err("TBD"_hs);
+          if (c.rotate) err("mobs can't be rotated yet"_hs);
+          if (c.wall.size()) err("mob cannot be placed on walls"_hs);
+          if (!c.floor.size()) err("mob requires ceiling and floor"_hs);
           break;
         case entities::NONE:
           if (c.rotate) err("tiles can't be rotated yet"_hs);
