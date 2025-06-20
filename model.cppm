@@ -68,11 +68,9 @@ namespace model {
       m_vcount = count;
     }
 
-    void setup_copy(vee::command_buffer cb) {
-      {
-        voo::memiter<mdl> m { *m_mdl.memory, &m_icount };
-        load(m);
-      }
+    void setup_copy() {
+      voo::memiter<mdl> m { *m_mdl.memory, &m_icount };
+      load(m);
     }
 
     void draw(vee::command_buffer cb) {
