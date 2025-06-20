@@ -85,7 +85,6 @@ public:
     switch (item.owner) {
       case bullet::clid:
         m_blt.remove(item.id);
-        m_blt.setup_copy();
         m_olay.set(0.5f);
         break;
     }

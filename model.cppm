@@ -96,6 +96,7 @@ namespace model {
     void remove(int id) {
       model::remove(id, m_list[id]);
       m_list[id] = {};
+      setup_copy();
     }
 
     void clear() {
