@@ -38,11 +38,12 @@ static constexpr const auto max_use_dist = 1.0f;
 class stuff {
   lightmap::pipeline m_lgm {};
 
+  model::list<bullet::item>   m_blt   {};
+  model::list<door::item>     m_dr    {};
+  model::list<mob::item>      m_mob   {};
+  model::list<pushwall::item> m_psh   {};
+
   faces::model    m_faces {};
-  bullet::model   m_blt   {};
-  door::model     m_dr    {};
-  mob::model      m_mob   {};
-  pushwall::model m_psh   {};
   hand::model     m_hnd   {};
   overlay::model  m_olay  {};
 

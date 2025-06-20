@@ -12,14 +12,12 @@ namespace mob {
 
   static constexpr const auto radius = 0.3;
 
-  struct item {
+  export struct item {
     static constexpr const auto entity = mapper::entities::MOB;
     static constexpr const jute::view model = "mob.obj";
 
     dotz::vec3 pos;
   };
-
-  export struct model : public ::model::list<mob::item> {};
 }
 
 namespace model {

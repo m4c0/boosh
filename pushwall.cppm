@@ -13,15 +13,13 @@ namespace pushwall {
 
   constexpr const auto wall_speed = 1.0f;
 
-  struct item {
+  export struct item {
     static constexpr const auto entity = mapper::entities::PUSHWALL;
     static constexpr const jute::view model = "pushwall.obj";
 
     dotz::vec2 pos {};
     dotz::vec2 movement {};
   };
-
-  export struct model : public ::model::list<item> {};
 }
 namespace model {
   template<> mdl convert(pushwall::item p) {

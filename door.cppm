@@ -14,7 +14,7 @@ namespace door {
   constexpr const auto door_speed = 1.0f;
   constexpr const auto stop_y = 0.9f;
 
-  struct item {
+  export struct item {
     static constexpr const auto entity = mapper::entities::DOOR;
     static constexpr const jute::view model = "door.obj";
 
@@ -22,8 +22,6 @@ namespace door {
     float rot;
     float movement;
   };
-
-  export struct model : public ::model::list<item> {};
 }
 namespace model {
   template<> mdl convert(door::item p) {

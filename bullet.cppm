@@ -13,14 +13,12 @@ namespace bullet {
 
   static constexpr const auto radius = 0.2;
 
-  struct item : dotz::vec3 {
+  export struct item : dotz::vec3 {
     static constexpr const auto entity = mapper::entities::BULLET;
     static constexpr const jute::view model = "bullet.obj";
 
     using vec3::vec3;
   };
-
-  export struct model : public ::model::list<item> {};
 }
 namespace model {
   template<> mdl convert(bullet::item p) {
