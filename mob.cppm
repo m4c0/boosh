@@ -13,7 +13,7 @@ namespace mob {
   static constexpr const auto radius = 0.3;
 
   export struct item {
-    static constexpr const auto entity = mapper::entities::MOB;
+    static constexpr const jute::view entity = "mob";
     static constexpr const jute::view model = "mob.obj";
 
     dotz::vec3 pos;

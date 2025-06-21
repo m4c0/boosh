@@ -1,42 +1,27 @@
 export module mapper:tiledefs;
 import :error;
 import :textures;
+import entdefs;
 import hai;
 import jute;
 
 using namespace jute::literals;
 
 namespace mapper {
-  export enum class entities {
-    NONE,
-    BULLET,
-    DOOR,
-    MOB,
-    PLAYER,
-    PUSHWALL,
-    WALL,
-  };
   export struct tiledef {
     jute::heap id;
-    jute::heap wall;
     jute::heap floor;
     jute::heap ceiling;
     unsigned rotate;
-    entities entity = entities::NONE;
+    const entdefs::t * entity {};
     unsigned light;
     bool walk;
   };
 
-  export constexpr bool operator!(entities e) { return e == entities::NONE; }
-  static constexpr entities parse_entities(jute::view value) {
-    if (value == "bullet")   return entities::BULLET;
-    if (value == "door")     return entities::DOOR;
-    if (value == "mob")      return entities::MOB;
-    if (value == "player")   return entities::PLAYER;
-    if (value == "pushwall") return entities::PUSHWALL;
-    if (value == "wall")     return entities::WALL;
-
-    throw error { "unknown entity: "_hs + value };
+  static auto parse_entities(jute::view value) {
+    auto e = entdefs::for_name(value);
+    if (!e) throw error { "unknown entity: "_hs + value };
+    return e;
   }
 
   class tiledefs {
@@ -48,7 +33,6 @@ namespace mapper {
 
     void copy(tiledef o) {
       auto & c = current();
-      if (o.wall.size())    c.wall    = o.wall;
       if (o.floor.size())   c.floor   = o.floor;
       if (o.ceiling.size()) c.ceiling = o.ceiling;
       if (o.rotate)  c.rotate  = o.rotate;
@@ -76,8 +60,7 @@ namespace mapper {
       auto [cmd, args] = line.split(' ');
       args = args.trim();
 
-           if (cmd == "wall")    current().wall    = args;
-      else if (cmd == "floor")   current().floor   = args;
+           if (cmd == "floor")   current().floor   = args;
       else if (cmd == "ceiling") current().ceiling = args;
       else if (cmd == "rotate")  current().rotate  = jute::to_f(args);
       else if (cmd == "walk")    current().walk    = true;
@@ -98,41 +81,24 @@ namespace mapper {
 
       if (c.light < 0 || c.light > 255) err("light should be between 0 and 255"_hs);
 
-      switch (c.entity) {
-        case entities::PUSHWALL:
-          if (c.rotate) err("pushwalls can't be rotated yet"_hs);
-          if (c.wall.size()) err("pushwall cannot have a wall attribute"_hs);
-          if (!c.ceiling.size()) err("pushwall must have ceiling and floor"_hs);
-          break;
-        case entities::WALL:
-          if (c.rotate) err("walls can't be rotated yet"_hs);
-          if (!c.wall.size()) err("wall must have a wall attribute"_hs);
-          if (c.floor.size()) err("wall cannot have floor or ceiling"_hs);
-          break;
-        case entities::BULLET:
-          if (c.rotate) err("bullets can't be rotated yet"_hs);
-          if (c.wall.size()) err("bullet cannot be placed on walls"_hs);
-          if (!c.floor.size()) err("bullet requires ceiling and floor"_hs);
-          break;
-        case entities::PLAYER:
-          if (c.wall.size()) err("player cannot be placed on walls"_hs);
-          if (!c.floor.size()) err("player requires ceiling and floor"_hs);
-          break;
-        case entities::DOOR:
-          if (c.wall.size()) err("door cannot be placed on walls"_hs);
-          if (!c.floor.size()) err("door requires ceiling and floor"_hs);
-          if (c.rotate != 0 && c.rotate != 90) err("door can only be rotated 0 or 90 degrees"_hs);
-          break;
-        case entities::MOB:
-          if (c.rotate) err("mobs can't be rotated yet"_hs);
-          if (c.wall.size()) err("mob cannot be placed on walls"_hs);
-          if (!c.floor.size()) err("mob requires ceiling and floor"_hs);
-          break;
-        case entities::NONE:
-          if (c.rotate) err("tiles can't be rotated yet"_hs);
-          if (c.wall.size()) err("tiles can't have a wall"_hs);
-          if (!c.floor.size()) err("tile should have both ceiling and floor"_hs);
-          break;
+      if (c.entity) {
+        auto e = c.entity;
+
+        switch (e->rotates) {
+          using namespace entdefs;
+          case rotation::NONE:
+            if (c.rotate) err(e->name + " cannot be rotated");
+          case rotation::FIXED:
+            if (c.rotate != 0 && c.rotate != 90) err(e->name + " can only be rotated 0 or 90 degrees");
+          case rotation::FREELY:
+            break;
+        }
+
+        if (c.ceiling.size() && !e->grounded) err(e->name + " cannot have floor or ceiling");
+        if (!c.ceiling.size() && e->grounded) err(e->name + " must have floor or ceiling");
+      } else {
+        if (c.rotate) err("empty tiles cannot be rotated"_hs);
+        if (!c.ceiling.size()) err("empty tiles must have floor or ceiling"_hs);
       }
     }
   };

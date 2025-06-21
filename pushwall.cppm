@@ -14,7 +14,7 @@ namespace pushwall {
   constexpr const auto wall_speed = 1.0f;
 
   export struct item {
-    static constexpr const auto entity = mapper::entities::PUSHWALL;
+    static constexpr const jute::view entity = "pushwall";
     static constexpr const jute::view model = "pushwall.obj";
 
     dotz::vec2 pos {};

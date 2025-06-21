@@ -101,7 +101,7 @@ namespace model {
 
     void load_map(const mapper::tilemap * map) {
       map->for_each([&](auto x, auto y, auto & d) {
-        if (d.entity != T::entity) return;
+        if (d.entity->name != T::entity) return;
         m_list.push_back(create<T>(x, y, m_list.size(), d));
       });
       setup_copy();

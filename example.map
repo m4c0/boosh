@@ -6,7 +6,6 @@ define main_hall_fc
 .
 
 define X
-  wall Tiles040_1K-JPG_Color.jpg
   entity wall
 .
 define .

@@ -15,7 +15,7 @@ namespace door {
   constexpr const auto stop_y = 0.9f;
 
   export struct item {
-    static constexpr const auto entity = mapper::entities::DOOR;
+    static constexpr const jute::view entity = "door";
     static constexpr const jute::view model = "door.obj";
 
     dotz::vec3 pos;

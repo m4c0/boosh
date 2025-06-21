@@ -10,6 +10,7 @@ import bullet;
 import camera;
 import collision;
 import door;
+import entdefs;
 import faces;
 import hand;
 import input;
@@ -118,6 +119,20 @@ public:
 
 struct : public vapp {
   void run() try {
+    entdefs::add({ .name = bullet::item::entity });
+    entdefs::add({ .name = mob::item::entity });
+    entdefs::add({ .name = pushwall::item::entity });
+    entdefs::add({
+      .name = door::item::entity,
+      .rotates = entdefs::rotation::FIXED,
+    });
+
+    entdefs::add({ .name = "player" });
+    entdefs::add({
+      .name = "wall",
+      .grounded = false,
+    });
+
     input::setup();
     main_loop("poc-voo", [&](auto & dq, auto & sw) {
       v::globals vg { &dq };

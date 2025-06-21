@@ -169,11 +169,11 @@ namespace faces {
       auto f = m_floors.map();
       auto w = m_walls.map();
       map->for_each([&](auto x, auto y, auto & d) {
-        if (d.entity == mapper::entities::WALL) {
+        if (d.entity->name == "wall") {
           collision::bodies().add_aabb({ x, y }, { x + 1, y + 1 }, 'wall', 1);
+          w += { { x, 0, y }, 0, textures::get("Tiles040_1K-JPG_Color.jpg") };
         }
 
-        if (d.wall.size())    w += { { x, 0, y }, 0, textures::get(*d.wall)    };
         if (d.floor.size())   f += { { x, 0, y }, 0, textures::get(*d.floor)   };
         if (d.ceiling.size()) c += { { x, 0, y }, 0, textures::get(*d.ceiling) };
       });
