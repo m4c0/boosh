@@ -79,9 +79,9 @@ namespace mapper {
           (this->*m_liner)(line);
           m_line_number++;
         });
-      } catch (error e) {
+      } catch (error & e) {
         e.line_number = m_line_number;
-        throw e;
+        throw traits::move(e);
       }
     }
 

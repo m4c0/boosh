@@ -155,6 +155,6 @@ struct : public vapp {
       textures::dispose();
     });
   } catch (const mapper::error & e) {
-    silog::die("%s", (*e.msg).cstr().begin());
+    silog::die("Error in map: %s", e.msg.begin());
   }
 } t;
