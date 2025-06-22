@@ -1,7 +1,11 @@
 #pragma leco tool
 
+import bullet;
+import door;
+import mob;
+import pushwall;
+
 import entdefs;
-import jojo;
 import jute;
 import mapper;
 import print;
@@ -9,14 +13,15 @@ import print;
 constexpr const jute::view filename = "example.map";
 
 int main() try {
-  entdefs::add({ .name = "bullet" });
-  entdefs::add({ .name = "player" });
-  entdefs::add({ .name = "pushwall" });
-
+  entdefs::add({ .name = bullet::item::entity });
+  entdefs::add({ .name = mob::item::entity });
+  entdefs::add({ .name = pushwall::item::entity });
   entdefs::add({
-    .name = "door",
+    .name = door::item::entity,
     .rotates = entdefs::rotation::FIXED,
   });
+
+  entdefs::add({ .name = "player" });
   entdefs::add({
     .name = "wall",
     .grounded = false,
