@@ -13,7 +13,7 @@ namespace camera {
   export void load_map(const mapper::tilemap * map) {
     map->for_each([&](auto x, auto y, auto & d) {
       // TODO: fix inverted camera Y
-      if (d.entity->name != "player") return;
+      if (!d.entity || d.entity->name != "player") return;
       v::g->camera.cam = { x + 0.5f, -0.5f, y + 0.5f };
     });
   }
