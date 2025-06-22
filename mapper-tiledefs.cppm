@@ -81,25 +81,23 @@ namespace mapper {
 
       if (c.light < 0 || c.light > 255) err("light should be between 0 and 255"_hs);
 
-      if (c.entity) {
-        auto e = c.entity;
-
-        switch (e->rotates) {
-          using namespace entdefs;
-          case rotation::NONE:
-            if (c.rotate) err(e->name + " cannot be rotated");
-          case rotation::FIXED:
-            if (c.rotate != 0 && c.rotate != 90) err(e->name + " can only be rotated 0 or 90 degrees");
-          case rotation::FREELY:
-            break;
-        }
-
-        if (c.ceiling.size() && !e->grounded) err(e->name + " cannot have floor or ceiling");
-        if (!c.ceiling.size() && e->grounded) err(e->name + " must have floor or ceiling");
-      } else {
+      if (!c.entity) {
         if (c.rotate) err("empty tiles cannot be rotated"_hs);
         if (!c.ceiling.size()) err("empty tiles must have floor or ceiling"_hs);
+        return;
       }
+
+      auto e = c.entity;
+
+      switch (e->rotates) {
+        using namespace entdefs;
+        case rotation::NONE:   if (c.rotate) err(e->name + " cannot be rotated");
+        case rotation::FIXED:  if (c.rotate != 0 && c.rotate != 90) err(e->name + " can only be rotated 0 or 90 degrees");
+        case rotation::FREELY: break;
+      }
+
+      if (c.ceiling.size() && !e->grounded) err(e->name + " cannot have floor or ceiling");
+      if (!c.ceiling.size() && e->grounded) err(e->name + " must have floor or ceiling");
     }
   };
 
