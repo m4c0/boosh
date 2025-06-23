@@ -124,11 +124,17 @@ namespace collision {
       for (auto & i : m_data) {
         switch (i.type) {
           case type::none: break;
-          case type::circle:
-          // TODO: sdf between mid(aa, bb) and i.fn.xy
-            silog::log(silog::error, "TODO: AABB-circle collision");
-            throw 0;
-          case type::aabb:
+          case type::circle: {
+            auto p = i.fn.xy() - (aa + bb) / 2.0f;
+            auto b = dotz::abs(bb - aa) / 2.0f;
+            auto d = dotz::abs(p) - b;
+            float sd = dotz::length(dotz::max(d, dotz::vec2(0)))
+              + dotz::min(dotz::max(d.x, d.y), 0.0);;
+            if (sd - i.fn.z > 0) continue;
+            if (!fn(i.owner, i.id)) return;
+            break;
+          }
+          case type::aabb: {
             auto iaa = i.fn.xy();
             auto ibb = i.fn.zw();
             if (iaa.x >= bb.x) continue;
@@ -137,6 +143,7 @@ namespace collision {
             if (ibb.y <= aa.y) continue;
             if (!fn(i.owner, i.id)) return;
             break;
+          }
         }
       }
     }
