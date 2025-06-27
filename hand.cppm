@@ -4,6 +4,7 @@
 #pragma leco add_shader "hand.frag"
 export module hand;
 import collision;
+import mob;
 import ppl_with_txt;
 import silog;
 import textures;
@@ -78,6 +79,9 @@ namespace hand::anims {
     switch (i.item.owner) {
       case 0:
         silog::log(silog::info, ">>>>>>>>>>> MISS");
+        break;
+      case mob::clid:
+        silog::log(silog::info, ">>>>>>>>>>> MOB HIT %x", i.item.id);
         break;
       default:
         silog::log(silog::info, ">>>>>>>>>>> HIT %x %x", i.item.owner, i.item.id);
