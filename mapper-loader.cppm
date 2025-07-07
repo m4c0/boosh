@@ -13,7 +13,6 @@ using namespace jute::literals;
 namespace mapper {
   class loader {
     void (loader::*m_liner)(jute::view) = &loader::take_command;
-    unsigned m_line_number = 1;
     unsigned m_map_row = 1;
    
     tiledefs m_tdefs {};
@@ -73,16 +72,8 @@ namespace mapper {
     }
 
   public:
-    explicit loader(jute::view filename) {
-      try {
-        jojo::readlines(filename, [this](auto line) {
-          (this->*m_liner)(line);
-          m_line_number++;
-        });
-      } catch (error & e) {
-        e.line_number = m_line_number;
-        throw traits::move(e);
-      }
+    void parse(jute::view line) {
+      (this->*m_liner)(line);
     }
 
     [[nodiscard]] constexpr auto take() {
