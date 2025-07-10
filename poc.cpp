@@ -149,13 +149,15 @@ struct : public vapp {
       input::on_button_down(input::buttons::USE, [&] { s.use(); });
 
       sitime::stopwatch time {};
-      ots_loop(dq, sw, [&](auto cb) {
+      ots_loop(dq, sw, [&] {
+        auto cb = sw.command_buffer();
+
         // TODO: add a frame time limit or time interpolation
         bool moved = camera::update(time.millis());
         s.tick(cb, time.millis(), moved);
         time = {};
 
-        voo::cmd_render_pass rp {{
+        voo::cmd_render_pass rp { vee::render_pass_begin {
           .command_buffer = cb,
           .render_pass = dq.render_pass(),
           .framebuffer = sw.framebuffer(),

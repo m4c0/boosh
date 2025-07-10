@@ -134,7 +134,7 @@ namespace lightmap {
       m_input.setup_copy(cb);
 
       {
-        voo::cmd_render_pass rp {{
+        voo::cmd_render_pass rp { vee::render_pass_begin {
           .command_buffer = cb,
           .render_pass = *m_rp,
           .framebuffer = m_fbout[1].fb(),
@@ -150,7 +150,7 @@ namespace lightmap {
 
       for (auto i = 0; i < 16; i++) {
         {
-          voo::cmd_render_pass rp {{
+          voo::cmd_render_pass rp { vee::render_pass_begin {
             .command_buffer = cb,
             .render_pass = *m_rp,
             .framebuffer = m_fbout[0].fb(),
@@ -165,7 +165,7 @@ namespace lightmap {
         m_fbout[0].cmd_pipeline_barrier(cb);
 
         {
-          voo::cmd_render_pass rp {{
+          voo::cmd_render_pass rp { vee::render_pass_begin {
             .command_buffer = cb,
             .render_pass = *m_rp,
             .framebuffer = m_fbout[1].fb(),
