@@ -29,7 +29,7 @@ namespace ppl_with_txt {
     });
     res.pipeline = vee::create_graphics_pipeline(merge(p, {
       .pipeline_layout = *res.layout,
-      .render_pass = v::g->dq->render_pass(),
+      .render_pass = *v::g->rp,
       .shaders {
         shaders::get(*(jute::heap(shader) + ".vert.spv")).pipeline_vert_stage("main", vee::specialisation_info<float>(v::g->dq->aspect_of())),
         shaders::get(*(jute::heap(shader) + ".frag.spv")).pipeline_frag_stage("main", vee::specialisation_info<unsigned>(99, 1)),

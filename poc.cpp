@@ -134,9 +134,12 @@ struct : public vapp {
     });
 
     input::setup();
-    main_loop("poc-voo", [&](auto & dq, auto & sw) {
+    main_loop("poc-voo", [&](auto & dq) {
       v::globals vg { &dq };
       v::g = &vg;
+
+      voo::offscreen::depth_buffer depth { v::g->pd, v::g->dq->extent_of() };
+      voo::swapchain_and_stuff sw { dq, *v::g->rp, depth.image_view() };
 
       stuff s {};
 
@@ -159,7 +162,7 @@ struct : public vapp {
 
         voo::cmd_render_pass rp { vee::render_pass_begin {
           .command_buffer = cb,
-          .render_pass = dq.render_pass(),
+          .render_pass = *v::g->rp,
           .framebuffer = sw.framebuffer(),
           .extent = sw.extent(),
         }};

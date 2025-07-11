@@ -20,7 +20,7 @@ namespace overlay {
       , m_pipeline {
         vee::create_graphics_pipeline({
           .pipeline_layout = *m_pl,
-          .render_pass = v::g->dq->render_pass(),
+          .render_pass = *v::g->rp,
           .depth_test = false,
           .shaders {
             shaders::get("overlay.vert.spv").pipeline_vert_stage(),

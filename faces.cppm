@@ -154,7 +154,7 @@ namespace faces {
       }) }
       , m_gp { vee::create_graphics_pipeline({
         .pipeline_layout = *m_pl,
-        .render_pass = v::g->dq->render_pass(),
+        .render_pass = *v::g->rp,
         .shaders {
           shaders::get("model.vert.spv").pipeline_vert_stage("main", vee::specialisation_info<float>(v::g->dq->aspect_of())),
           shaders::get("model.frag.spv").pipeline_frag_stage("main"),
