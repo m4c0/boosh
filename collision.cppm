@@ -1,7 +1,6 @@
 export module collision;
 import dotz;
 import hai;
-import silog;
 
 namespace collision {
   struct overflow {};
